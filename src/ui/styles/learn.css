@@ -459,3 +459,24 @@
 .lesson-card.is-muted:focus-visible {
   opacity: 1;
 }
+
+/* 路线顺序视图：卡片右上角标 STEP，并显示所属章节 */
+.learn-path-flow .lesson-grid {
+  margin-top: 18px;
+}
+
+.lesson-card__order--step {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+}
+
+.lesson-card__chapter {
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-tertiary);
+}

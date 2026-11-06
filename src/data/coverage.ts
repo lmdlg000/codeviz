@@ -35,7 +35,7 @@ export const COVERAGE_ROWS: CoverageRow[] = [
   { source: 'C 程序设计教程', topic: '编译预处理', status: 'covered', lessonIds: ['c14-bits'], note: '#define 宏的括号陷阱、条件编译。' },
   { source: 'C 程序设计教程', topic: '常见错误分析', status: 'covered', lessonIds: ['c01-hello', 'c14-bits'], note: '每节课都有易错警示，实验室另有自动自查清单。' },
 
-  { source: 'C++ 自学视频教程', topic: '从 C 到 C++：cin / cout', status: 'covered', lessonIds: ['c11-classes'], note: '链式输出、endl、按类型解析输入。' },
+  { source: 'C++ 自学视频教程', topic: '从 C 到 C++：cin / cout', status: 'covered', lessonIds: ['cpp-first'], note: '专设「C++ 第一课」：iostream、cout/cin、getline、std::string，不再从 printf 讲起。' },
   { source: 'C++ 自学视频教程', topic: '类与对象、构造与析构', status: 'covered', lessonIds: ['c11-classes'], note: '访问控制、构造函数、this、const 成员函数。' },
   { source: 'C++ 自学视频教程', topic: '继承与派生', status: 'covered', lessonIds: ['c12-inheritance'], note: 'public 继承、构造析构顺序、protected。' },
   { source: 'C++ 自学视频教程', topic: '多态与虚函数', status: 'covered', lessonIds: ['c12-inheritance'], note: '虚函数、虚析构、纯虚函数与抽象类。' },

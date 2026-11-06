@@ -27,9 +27,13 @@ interface LessonCardProps {
   note?: string;
   /** 标记为「可跳过」时弱化展示 */
   muted?: boolean;
+  /** 按路线顺序展示时的步数（1 开始），不传则用章内序号 */
+  step?: number;
+  /** 按路线顺序展示时，卡片上标出所属章节 */
+  chapterLabel?: string;
 }
 
-function LessonCard({ lesson, chapter, note, muted }: LessonCardProps) {
+function LessonCard({ lesson, chapter, note, muted, step, chapterLabel }: LessonCardProps) {
   const completed = useCompletedLessons();
   const isDone = completed.has(lesson.id);
   const codeBlocks = lesson.blocks.filter((block) => block.type === 'code').length;
@@ -44,14 +48,21 @@ function LessonCard({ lesson, chapter, note, muted }: LessonCardProps) {
         aria-label={`${lesson.title}，${DIFFICULTY_LABEL[lesson.difficulty]}，约 ${lesson.minutes} 分钟${isDone ? '，已完成' : ''}`}
       >
         <div className="lesson-card__top">
-          <span className="lesson-card__order mono tabular">
-            {String(lesson.order).padStart(2, '0')}
-          </span>
+          {step ? (
+            <span className="lesson-card__order lesson-card__order--step mono tabular">
+              STEP {String(step).padStart(2, '0')}
+            </span>
+          ) : (
+            <span className="lesson-card__order mono tabular">
+              {String(lesson.order).padStart(2, '0')}
+            </span>
+          )}
           <span className={isDone ? 'lesson-card__status is-done' : 'lesson-card__status'}>
             {isDone ? <Icon name="check" size={13} /> : <Icon name="arrow-right" size={15} />}
             <span className="sr-only">{isDone ? '已完成' : '未完成'}</span>
           </span>
         </div>
+        {chapterLabel ? <span className="lesson-card__chapter mono">{chapterLabel}</span> : null}
         <h3 className="lesson-card__title">{lesson.title}</h3>
         <p className="lesson-card__desc">{lesson.description}</p>
         {note ? (
@@ -86,7 +97,11 @@ export function LearnPage() {
 
   const path = pathById(pathId);
   const coreSet = new Set(path.core);
-  const coreLessons = lessons.filter((lesson) => coreSet.has(lesson.id));
+  const lessonById = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+  // 路线顺序由 paths.ts 决定，不能按目录顺序排——C++ 路线要从 iostream 那节开始
+  const coreLessons = path.core
+    .map((id) => lessonById.get(id))
+    .filter((lesson): lesson is Lesson => Boolean(lesson));
   const optionalLessons = lessons.filter((lesson) => path.optional.includes(lesson.id));
   const total = lessons.length;
   const pathDone = coreLessons.reduce((sum, lesson) => sum + (completed.has(lesson.id) ? 1 : 0), 0);
@@ -111,7 +126,7 @@ export function LearnPage() {
         title="课程"
         description={
           pathId === 'cpp'
-            ? `C++ 直达路线：${coreLessons.length} 节核心课，从变量与流程一路到类、继承与模板，C 专属内容标为可选。`
+            ? `C++ 直达路线：${coreLessons.length} 节核心课，第一节就写 std::cout 与 std::cin，一路到类、继承与模板；C 专属内容标为可选。`
             : `从第一行 printf 到多态，${total} 节课把 C/C++ 的核心概念画出来。先读懂一张图，再回到代码里验证。`
         }
         actions={
@@ -183,6 +198,24 @@ export function LearnPage() {
             </ButtonLink>
           }
         />
+      ) : pathId === 'cpp' ? (
+        <section className="learn-path-flow" aria-label="C++ 直达路线的学习顺序">
+          <ol className="lesson-grid">
+            {coreLessons.map((lesson, index) => {
+              const chapter = chapters.find((item) => item.id === lesson.chapterId) ?? chapters[0];
+              return (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  chapter={chapter}
+                  note={path.notes[lesson.id]}
+                  step={index + 1}
+                  chapterLabel={chapter.title}
+                />
+              );
+            })}
+          </ol>
+        </section>
       ) : (
         <div className="learn-chapters">
           {chapters.map((chapter) => {

@@ -30,8 +30,17 @@ export const chapters: Chapter[] = [
     icon: 'layers',
   },
   {
-    id: 'cpp-oop',
+    id: 'cpp-start',
     order: 4,
+    title: 'C++ 起步',
+    shortTitle: 'C++ 起步',
+    subtitle: '从 iostream 开始，而不是从 printf',
+    tone: 'violet',
+    icon: 'rocket',
+  },
+  {
+    id: 'cpp-oop',
+    order: 5,
     title: 'C++ 面向对象',
     shortTitle: '进阶',
     subtitle: '类、继承、多态与泛型编程',
