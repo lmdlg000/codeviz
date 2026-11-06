@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+dist-ssr/
+*.local
+
+# tooling caches
+.vite/
+coverage/
+*.tsbuildinfo
+
+# local verification artifacts
+shots/
+docs/refs/
+*.log
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# temp reference-scan scripts
+pdfscan.py
+pdfrender.py
