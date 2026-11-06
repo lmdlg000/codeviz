@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  // 相对基址：本地预览、GitHub Pages 项目页（/codeviz/）、自定义域名都能直接用
+  base: './',
   plugins: [react()],
   server: {
     port: 5178,

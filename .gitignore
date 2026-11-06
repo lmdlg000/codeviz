@@ -30,3 +30,7 @@ pdfrender.py
 
 # DSH agent artifacts
 .dsh/
+
+# WorkBuddy workspace data & published-app markers
+.workbuddy/
+.wbapp_*.genie
