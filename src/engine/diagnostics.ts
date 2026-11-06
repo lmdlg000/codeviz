@@ -7,6 +7,7 @@
  * 重复定义、解析跳过等。最多输出 40 条，按行号排序。
  */
 import type { Diagnostic, DiagnosticSeverity } from './types';
+import { MAX_CODE_LINES } from './types';
 import type { AnalysisModel } from './model';
 import type { FuncDeclNode } from './ast';
 import { collectExprs, walkExpr, walkStmt } from './ast';
@@ -108,7 +109,7 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
 
   // ---------- 行数上限 ----------
   const totalLines = input.model.code.split(/\r\n|\r|\n/).length;
-  const maxLines = input.maxLines ?? 500;
+  const maxLines = input.maxLines ?? MAX_CODE_LINES;
   if (totalLines > maxLines) {
     add(
       'error',

@@ -6,33 +6,18 @@
  */
 import type { ExprNode } from './ast';
 import { exprToText, oneLine, truncateText } from './utils';
+import { STDLIB_TRACE_NAMES } from './stdlib';
 
 /** 标准输出函数 */
 export const OUTPUT_CALLS: ReadonlySet<string> = new Set(['printf', 'puts', 'putchar', 'fprintf', 'fputs']);
 /** 标准输入函数 */
 export const INPUT_CALLS: ReadonlySet<string> = new Set(['scanf', 'gets', 'fgets', 'fscanf']);
 
-/** 解释器支持的外部函数（其余外部函数会导致"该函数暂不支持"） */
-export const SUPPORTED_BUILTINS: ReadonlySet<string> = new Set([
-  'printf',
-  'puts',
-  'putchar',
-  'scanf',
-  'strlen',
-  'abs',
-  'sqrt',
-  'pow',
-  'fabs',
-  'floor',
-  'ceil',
-  'toupper',
-  'tolower',
-  'max',
-  'min',
-]);
+/** 解释器支持的外部函数：由标准库覆盖表统一生成（见 stdlib.ts） */
+export const SUPPORTED_BUILTINS: ReadonlySet<string> = STDLIB_TRACE_NAMES;
 
 /** 明确不支持的外部函数（文件、动态内存、随机数、STL 等） */
-export const UNSUPPORTED_FUNCTIONS: ReadonlySet<string> = new Set([
+const UNSUPPORTED_FUNCTION_NAMES = [
   'fopen',
   'fclose',
   'fprintf',
@@ -67,7 +52,12 @@ export const UNSUPPORTED_FUNCTIONS: ReadonlySet<string> = new Set([
   'strcmp',
   'memset',
   'memcpy',
-]);
+];
+
+/** 去掉已被解释器接管的函数，避免"既支持又不支持"的矛盾 */
+export const UNSUPPORTED_FUNCTIONS: ReadonlySet<string> = new Set(
+  UNSUPPORTED_FUNCTION_NAMES.filter((name) => !SUPPORTED_BUILTINS.has(name)),
+);
 
 export interface IOInfo {
   kind: 'input' | 'output';

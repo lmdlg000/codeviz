@@ -250,7 +250,31 @@ int main(void) {
   return 0;
 }
 `
+    },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "语句末尾漏掉分号",
+      wrong: "printf(\"hi\\n\")",
+      right: "printf(\"hi\\n\");",
+      why: "分号是 C 语句的结束标志。漏掉后编译器会把下一行接到这一行上，报错位置常常偏后好几行。"
+    },
+    {
+      mistake: "把 main 写成 mian / Main",
+      wrong: "int Main() { }",
+      right: "int main(void) { }",
+      why: "C/C++ 区分大小写，链接器只认小写的 main，写错会提示找不到入口。"
+    },
+    {
+      mistake: "在代码里用中文引号、中文分号",
+      wrong: "printf（\"hi\"）；",
+      right: "printf(\"hi\");",
+      why: "中文标点不是 ASCII 字符，编译器会当成非法符号；写代码时把输入法切到英文。"
     }
+      ]
+    },
   ],
   keyPoints: [
     '每个 C 程序都必须有且只有一个 `main` 函数，程序从它的第一条语句开始执行。',

@@ -1,15 +1,26 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f6fb" />
+    <meta name="theme-color" content="#070b09" />
     <meta
       name="description"
-      content="CodeViz · C/C++ 图解工坊：面向初学者的图形化 C/C++ 教程。上传 500 行以内代码，自动生成流程图、调用图、类图、内存布局与单步执行动画。"
+      content="CodeViz · C/C++ 图解工坊：面向初学者的图形化 C/C++ 教程。上传 1000 行以内代码，自动生成流程图、调用图、类图、内存布局与单步执行动画。"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>CodeViz · C/C++ 图解工坊</title>
+    <script>
+      // 首屏前决定主题：默认终端深色，用户显式切换过则尊重存储值
+      (function () {
+        try {
+          var stored = localStorage.getItem('codeviz.theme');
+          document.documentElement.dataset.theme = stored === 'light' ? 'light' : 'dark';
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

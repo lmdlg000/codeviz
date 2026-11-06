@@ -3,6 +3,7 @@ import { Badge } from '../Badge';
 import { Icon } from '../Icon';
 import { ProgressBar } from '../Progress';
 import { StatTile } from '../StatTile';
+import { SelfCheckCard, StdlibCard } from './InsightCards';
 
 const DIFFICULTY_TONE: Record<AnalysisResult['stats']['difficulty'], 'teal' | 'indigo' | 'amber' | 'rose'> = {
   入门: 'teal',
@@ -185,6 +186,10 @@ export function OverviewTab({ analysis, onInspectFunction }: OverviewTabProps) {
           有 {analysis.parseErrors} 处语法未能完整解析，图表可能不包含全部语句。
         </p>
       ) : null}
+
+      <SelfCheckCard analysis={analysis} />
+
+      <StdlibCard analysis={analysis} />
 
       <p className="lab-inline-note">
         <Icon name="target" size={14} />

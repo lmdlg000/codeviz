@@ -1363,6 +1363,105 @@ class Interpreter {
         const text = String.fromCharCode(code);
         return intValue((name === 'toupper' ? text.toUpperCase() : text.toLowerCase()).charCodeAt(0), 'char');
       }
+      case 'getchar': {
+        const char = this.readRawChar('字符');
+        return intValue(char.charCodeAt(0), 'char');
+      }
+      case 'atoi':
+      case 'atof':
+      case 'stoi': {
+        const text = this.textOfArg(expr.args[0]).trim();
+        if (name === 'atof') return floatValue(Number.parseFloat(text) || 0);
+        if (name === 'stoi' && !/^[+-]?\d/.test(text)) {
+          throw new SimError(`stoi 无法把 "${truncateText(text, 12)}" 转成整数。`, expr.line);
+        }
+        return intValue(Number.parseInt(text, 10) || 0);
+      }
+      case 'to_string': {
+        return stringValue(this.textOfArg(expr.args[0]));
+      }
+      case 'labs': {
+        const value = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
+        return intValue(Math.abs(asInt(value)));
+      }
+      case 'sin':
+      case 'cos':
+      case 'tan':
+      case 'fmod': {
+        const first = expr.args[0] ? asNumber(this.evalExpr(expr.args[0])) : 0;
+        const second = expr.args[1] ? asNumber(this.evalExpr(expr.args[1])) : 0;
+        if (name === 'fmod') {
+          if (second === 0) throw new SimError('fmod 的除数不能是 0。', expr.line);
+          return floatValue(first % second);
+        }
+        const fn = name === 'sin' ? Math.sin : name === 'cos' ? Math.cos : Math.tan;
+        return floatValue(fn(first));
+      }
+      case 'isdigit':
+      case 'isalpha':
+      case 'isalnum':
+      case 'isspace':
+      case 'isupper':
+      case 'islower': {
+        const code = expr.args[0] ? asInt(this.evalExpr(expr.args[0])) : 0;
+        const char = String.fromCharCode(code);
+        const test =
+          name === 'isdigit'
+            ? /[0-9]/.test(char)
+            : name === 'isalpha'
+              ? /[A-Za-z]/.test(char)
+              : name === 'isalnum'
+                ? /[0-9A-Za-z]/.test(char)
+                : name === 'isspace'
+                  ? /\s/.test(char)
+                  : name === 'isupper'
+                    ? /[A-Z]/.test(char)
+                    : /[a-z]/.test(char);
+        return intValue(test ? 1 : 0);
+      }
+      case 'strcpy':
+      case 'strncpy': {
+        const source = this.textOfArg(expr.args[1]);
+        const target = this.evalScanTarget(expr.args[0], expr.line);
+        const limit =
+          name === 'strncpy' && expr.args[2] ? Math.max(0, asInt(this.evalExpr(expr.args[2]))) : undefined;
+        const chars = Array.from(source);
+        if (limit === undefined) {
+          this.writeCharsToTarget(target, chars.join(''));
+        } else {
+          this.writeCharsToTarget(target, chars.slice(0, limit).join(''));
+        }
+        return stringValue(source);
+      }
+      case 'strcat': {
+        const target = this.evalScanTarget(expr.args[0], expr.line);
+        const existing = this.arrayTextOf(target.array);
+        const source = this.textOfArg(expr.args[1]);
+        this.writeCharsToTarget(target, `${existing}${source}`);
+        return stringValue(`${existing}${source}`);
+      }
+      case 'strcmp':
+      case 'strncmp': {
+        const left = this.textOfArg(expr.args[0]);
+        const right = this.textOfArg(expr.args[1]);
+        const limit =
+          name === 'strncmp' && expr.args[2] ? Math.max(0, asInt(this.evalExpr(expr.args[2]))) : Number.MAX_SAFE_INTEGER;
+        const a = Array.from(left).slice(0, limit);
+        const b = Array.from(right).slice(0, limit);
+        const length = Math.min(a.length, b.length);
+        let result = 0;
+        for (let i = 0; i < length; i++) {
+          const diff = a[i].charCodeAt(0) - b[i].charCodeAt(0);
+          if (diff !== 0) {
+            result = diff < 0 ? -1 : 1;
+            break;
+          }
+        }
+        if (result === 0 && a.length !== b.length && limit > length) {
+          result = a.length < b.length ? -1 : 1;
+        }
+        return intValue(result);
+      }
       default:
         break;
     }
@@ -1841,6 +1940,42 @@ class Interpreter {
       });
     }
     return intValue(assigned);
+  }
+
+  /** 把实参读成字符串（字符数组 / std::string / 字面量都适用） */
+  private textOfArg(expr: ExprNode | undefined): string {
+    if (!expr) return '';
+    const value = this.evalExpr(expr);
+    return charsOf(value) ?? this.toText(value);
+  }
+
+  /** 读出字符数组到第一个 \0 为止的内容 */
+  private arrayTextOf(array?: ArrayValue): string {
+    if (!array) return '';
+    const chars: string[] = [];
+    for (const elem of array.elems) {
+      const code = elem.t === 'int' ? elem.v : 0;
+      if (code === 0) break;
+      chars.push(String.fromCharCode(code));
+    }
+    return chars.join('');
+  }
+
+  /** 把字符串写入字符数组（不足部分补 \0），或直接覆盖 std::string */
+  private writeCharsToTarget(
+    target: { ref: Ref; typeText: string; label: string; array?: ArrayValue },
+    text: string,
+  ): void {
+    if (target.array) {
+      const capacity = target.array.elems.length;
+      const chars = Array.from(text);
+      for (let i = 0; i < capacity; i++) {
+        target.array.elems[i] = intValue(i < chars.length ? chars[i].charCodeAt(0) : 0, 'char');
+      }
+      if (capacity > 0) target.ref.set(target.array.elems[0]);
+      return;
+    }
+    target.ref.set(stringValue(text));
   }
 
   private evalScanTarget(

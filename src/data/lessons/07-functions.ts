@@ -246,6 +246,30 @@ int main() {
       prompt:
         '在实验室打开这段递归求和：单步执行时数一数调用栈最多有几层；再把终止条件改成 `n == 0`，想想 n 为负数时会发生什么。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "以为函数里改了参数就能影响外面",
+      wrong: "void add(int x) { x++; }",
+      right: "void add(int *x) { (*x)++; }  调用 add(&n);",
+      why: "C 是值传递，形参是实参的副本；要修改实参必须传地址（指针或引用）。"
+    },
+    {
+      mistake: "有返回值的函数漏写 return",
+      wrong: "int max(int a, int b) { if (a > b) return a; }",
+      right: "int max(int a, int b) { return a > b ? a : b; }",
+      why: "除 main 外，有返回值的函数所有路径都要 return，否则返回值不确定。"
+    },
+    {
+      mistake: "递归没有终止条件",
+      wrong: "int f(int n) { return n * f(n - 1); }",
+      right: "int f(int n) { if (n <= 1) return 1; return n * f(n - 1); }",
+      why: "递归必须先写出口并让参数逐步靠近出口，否则调用栈会一直增长直到崩溃。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '函数由返回类型、函数名、参数列表和函数体组成，用 return 交回结果。',

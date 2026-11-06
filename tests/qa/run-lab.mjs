@@ -2,7 +2,7 @@
  * 代码实验室深度流程验收
  * ------------------------------------------------------------------
  * 覆盖：分析代码 → 7 个 tab → 流程图节点联动 → 单步执行播放器 →
- * 示例库（搜索/筛选/载入 C++ 类示例）→ 上传（合法 / 超 500 行 / 非法扩展名 / 空文件）→
+ * 示例库（搜索/筛选/载入 C++ 类示例）→ 上传（合法 / 超 1000 行 / 非法扩展名 / 空文件）→
  * Ctrl+Enter / Ctrl+Shift+Enter → 草稿刷新恢复 → 语法错误诊断 → 空代码 → 移动端堆叠。
  *
  * 运行：node tests/qa/run-lab.mjs
@@ -179,7 +179,7 @@ async function main() {
     recorder.check('initial/empty-panel', info.emptyPanel, `tabs=${info.tabs}`);
     recorder.check('initial/no-tabs', info.tabs === 0, `tabs=${info.tabs}`);
     recorder.check('initial/editor-has-code', info.editorText.length > 40, `${info.editorText.length} 字符`);
-    recorder.check('initial/lines-chip', /^\d+\s*\/\s*500\s*行$/.test(info.lines), info.lines);
+    recorder.check('initial/lines-chip', /^\d+\s*\/\s*1000\s*行$/.test(info.lines), info.lines);
     await shot('lab-initial');
   });
 
@@ -653,10 +653,10 @@ async function main() {
   });
 
   /* ------------------------------------------------------------------ */
-  /* 6. 上传：合法 / 超 500 行 / 非法扩展名 / 空文件                      */
+  /* 6. 上传：合法 / 超 1000 行 / 非法扩展名 / 空文件                      */
   /* ------------------------------------------------------------------ */
   await phase('upload', async () => {
-    // 合法 ≤500 行
+    // 合法 ≤1000 行
     await page.locator('input.lab-file-input').setInputFiles({
       name: 'small.c',
       mimeType: 'text/x-c',
@@ -675,7 +675,7 @@ async function main() {
     recorder.check('upload/valid-filename', uploaded.filename === 'small.c', uploaded.filename);
     recorder.check('upload/valid-code', uploaded.code.includes('upload ok'), '编辑器未载入 small.c');
     recorder.check('upload/valid-auto-analyze', uploaded.status.includes('已分析'), uploaded.status);
-    recorder.check('upload/valid-lines', /^\d+\s*\/\s*500\s*行$/.test(uploaded.lines), uploaded.lines);
+    recorder.check('upload/valid-lines', /^\d+\s*\/\s*1000\s*行$/.test(uploaded.lines), uploaded.lines);
 
     // 超过 500 行
     const bigLines = Array.from({ length: 501 }, (_, index) => `// line ${index + 1}`).join('\n');
@@ -684,7 +684,7 @@ async function main() {
       mimeType: 'text/x-c',
       buffer: Buffer.from(bigLines, 'utf8'),
     });
-    const bigToast = await waitForToast(page, /超过了 500 行的上限/);
+    const bigToast = await waitForToast(page, /超过了 1000 行的上限/);
     const afterBig = await page.evaluate(() => ({
       filename: document.querySelector('.lab-file-chip__name')?.textContent?.trim() || '',
       code: document.querySelector('.cm-content')?.innerText || '',
@@ -873,7 +873,7 @@ async function main() {
         document.querySelector('.lab-toolbar__actions .btn--secondary')?.disabled ?? null,
     }));
     details.emptyCode = empty;
-    recorder.check('empty/lines', /^0\s*\/\s*500/.test(empty.lines), empty.lines);
+    recorder.check('empty/lines', /^0\s*\/\s*1000/.test(empty.lines), empty.lines);
     recorder.check('empty/analyze-disabled', empty.analyzeDisabled === true, JSON.stringify(empty));
     recorder.check('empty/trace-disabled', empty.traceDisabled === true, JSON.stringify(empty));
     await page.locator('.cm-content').click();

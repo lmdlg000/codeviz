@@ -55,6 +55,12 @@ export type LessonBlock =
   | { type: 'list'; ordered?: boolean; items: string[] }
   | { type: 'note'; tone: 'tip' | 'info' | 'warn' | 'danger'; title: string; body: string }
   | {
+      /** 易错警示 + 自查清单：错在哪、正确写法、为什么 */
+      type: 'pitfalls';
+      title?: string;
+      items: { mistake: string; wrong?: string; right?: string; why: string }[];
+    }
+  | {
       type: 'code';
       language?: ContentLanguage;
       code: string;

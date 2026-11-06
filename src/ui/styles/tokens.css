@@ -4,50 +4,54 @@
    ========================================================================== */
 
 :root {
-  --font-sans: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
-  --font-mono: "Cascadia Code", "JetBrains Mono", "SFMono-Regular", Consolas, "Courier New", monospace;
+  --font-sans: "Cascadia Mono", "JetBrains Mono", "Sarasa Mono SC", "SFMono-Regular", Consolas, "Microsoft YaHei UI", "PingFang SC", monospace;
+  --font-mono: "Cascadia Mono", "JetBrains Mono", "Sarasa Mono SC", "SFMono-Regular", Consolas, "Courier New", monospace;
 
-  --bg: #f6f7fb;
-  --bg-elevated: #ffffff;
-  --bg-subtle: #eef1f7;
-  --bg-inset: #f8fafc;
-  --ink: #0f172a;
-  --ink-secondary: #475569;
-  --ink-tertiary: #94a3b8;
-  --line: #e4e8f0;
-  --line-strong: #cbd5e1;
+  /* 终端配色：黑底荧光绿，琥珀色作次级强调 */
+  --bg: #070b09;
+  --bg-elevated: #0c120f;
+  --bg-subtle: #101815;
+  --bg-inset: #090e0c;
+  --ink: #d7f7e5;
+  --ink-secondary: #8fb0a1;
+  --ink-tertiary: #5d766a;
+  --line: #1b2a23;
+  --line-strong: #2d4438;
 
-  --primary: #4f46e5;
-  --primary-strong: #4338ca;
-  --primary-soft: #eef2ff;
-  --teal: #0d9488;
-  --teal-soft: #ccfbf1;
-  --amber: #d97706;
-  --amber-soft: #fef3c7;
-  --rose: #e11d48;
-  --rose-soft: #ffe4e6;
-  --sky: #0284c7;
-  --sky-soft: #e0f2fe;
-  --violet: #7c3aed;
-  --violet-soft: #ede9fe;
-  --success: #059669;
-  --danger: #dc2626;
+  --primary: #3bf08a;
+  --primary-strong: #74ffb0;
+  --primary-soft: #0e2a1c;
+  --teal: #2ee6c6;
+  --teal-soft: #082a26;
+  --amber: #ffb454;
+  --amber-soft: #2b1e08;
+  --rose: #ff5f56;
+  --rose-soft: #2d100e;
+  --sky: #5ab8ff;
+  --sky-soft: #081f2e;
+  --violet: #b48cff;
+  --violet-soft: #1c1430;
+  --success: #3bf08a;
+  --danger: #ff5f56;
 
-  --code-bg: #0e1526;
-  --code-surface: #131c31;
-  --code-line: #1e293b;
-  --code-ink: #e2e8f0;
-  --code-muted: #7c8ba1;
+  --code-bg: #050807;
+  --code-surface: #0a100d;
+  --code-line: #16211c;
+  --code-ink: #cfeedd;
+  --code-muted: #6d857a;
 
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 10px 30px -18px rgba(15, 23, 42, 0.22);
-  --shadow-lg: 0 28px 70px -34px rgba(15, 23, 42, 0.3);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --term-glow: 0 0 18px -6px rgba(59, 240, 138, 0.45);
+  --term-glow-soft: 0 0 24px -14px rgba(59, 240, 138, 0.6);
+
 
   --sidebar-w: 264px;
   --content-max: 1200px;
@@ -62,31 +66,51 @@
   --ds-space-7: 44px;
   --ds-space-8: 64px;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
+/* 深色（默认终端皮肤）：与 :root 一致，保留选择器以便主题切换不闪烁 */
 [data-theme="dark"] {
-  --bg: #0a0f1d;
-  --bg-elevated: #111a2e;
-  --bg-subtle: #16213a;
-  --bg-inset: #0d1526;
-  --ink: #e5eaf3;
-  --ink-secondary: #a4b1c6;
-  --ink-tertiary: #64748b;
-  --line: #1d2a44;
-  --line-strong: #31405e;
-  --primary: #818cf8;
-  --primary-strong: #a5b4fc;
-  --primary-soft: #1e1b4b;
-  --teal-soft: #042f2e;
-  --amber-soft: #3b2605;
-  --rose-soft: #3f0d1d;
-  --sky-soft: #082f49;
-  --violet-soft: #2e1065;
-  --code-bg: #070c17;
-  --code-surface: #0b1220;
-
   color-scheme: dark;
+}
+
+/* 浅色：纸张上的终端 */
+[data-theme="light"] {
+  --bg: #f2f5ee;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #e8eee0;
+  --bg-inset: #edf1e6;
+  --ink: #15221b;
+  --ink-secondary: #3f5347;
+  --ink-tertiary: #71857a;
+  --line: #d3ddc9;
+  --line-strong: #b2c1a6;
+
+  --primary: #0a7a44;
+  --primary-strong: #065c32;
+  --primary-soft: #ddf3e6;
+  --teal: #0a7d6b;
+  --teal-soft: #d5f5ee;
+  --amber: #a86400;
+  --amber-soft: #fbefd4;
+  --rose: #c22b22;
+  --rose-soft: #fbe7e5;
+  --sky: #0d6dad;
+  --sky-soft: #e1f0fc;
+  --violet: #6d3fc0;
+  --violet-soft: #eee7fd;
+  --success: #0a7a44;
+  --danger: #c22b22;
+
+  --code-bg: #0a100d;
+  --code-surface: #101815;
+  --code-line: #1b2a23;
+  --code-ink: #d7f7e5;
+  --code-muted: #7d9a8c;
+  --term-glow: none;
+  --term-glow-soft: none;
+
+  color-scheme: light;
 }
 
 /* ------------------------------- 重置 ---------------------------------- */

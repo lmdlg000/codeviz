@@ -317,10 +317,10 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 2px dashed #818cf8;
+  border: 2px dashed var(--primary);
   border-radius: 14px;
   background: rgba(14, 21, 38, 0.92);
-  color: #c7d2fe;
+  color: var(--primary);
   text-align: center;
   pointer-events: none;
   backdrop-filter: blur(2px);

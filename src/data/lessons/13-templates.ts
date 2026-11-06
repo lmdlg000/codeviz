@@ -363,6 +363,30 @@ int main() {
       prompt:
         '在实验室里把阈值改成变量，再对每个元素加 5 分（记得把范围 for 改成引用），最后用 `scores.front()` 和 `scores.back()` 输出排序后的最低分与最高分。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "把模板函数定义写进 .cpp 且没有实例化",
+      wrong: "// a.h 只放声明，a.cpp 放定义",
+      right: "模板定义直接写在头文件里",
+      why: "模板在编译期按实参类型生成代码，编译器看不到定义就无法实例化，链接时会报未定义。"
+    },
+    {
+      mistake: "模板参数类型推导冲突",
+      wrong: "template <class T> T max(T a, T b);\nmax(1, 2.5);",
+      right: "max<double>(1, 2.5);  或 max(1.0, 2.5);",
+      why: "两个实参类型不同时 T 推导不出唯一类型，需要显式指定或统一类型。"
+    },
+    {
+      mistake: "模板里用了不支持的操作却不报错在定义处",
+      wrong: "template <class T> T add(T a, T b) { return a + b; }\nadd(a, b); // 用了没有 + 的类型",
+      right: "为类型提供 operator+，或改用支持的类型",
+      why: "模板定义本身不检查具体类型，只有实例化时才暴露错误，报错信息通常很长，先看第一行。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '`template <typename T>` 声明类型参数，编译器在编译期按实参类型实例化出具体函数或类。',

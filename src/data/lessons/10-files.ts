@@ -291,6 +291,30 @@ int main() {
       prompt:
         '在实验室查看这段代码的流程图和内存布局，再把它复制到本机编译运行，看看工作目录里多出的文件。把 `"w"` 改成 `"a"` 连续运行两次，比较两次文件内容有什么不同。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "fopen 之后不检查是否成功",
+      wrong: "FILE *fp = fopen(\"a.txt\", \"r\");\nfscanf(fp, ...);",
+      right: "FILE *fp = fopen(\"a.txt\", \"r\");\nif (fp == NULL) { perror(\"a.txt\"); return 1; }",
+      why: "文件不存在或没有权限时 fopen 返回 NULL，继续用会导致程序崩溃。"
+    },
+    {
+      mistake: "用 \"w\" 模式打开已有文件",
+      wrong: "fopen(\"data.txt\", \"w\");  // 原内容被清空",
+      right: "fopen(\"data.txt\", \"a\");  // 追加",
+      why: "\"w\" 会截断文件；只想追加用 \"a\"，读写已有内容用 \"r+\"。"
+    },
+    {
+      mistake: "忘记 fclose，或没判断读到文件末尾",
+      wrong: "while (!feof(fp)) { fscanf(...); }",
+      right: "while (fscanf(fp, \"%d\", &x) == 1) { ... }",
+      why: "feof 要等读过一次失败后才为真，会多处理一遍旧数据；直接用读取函数的返回值判断更可靠。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '文件通过 FILE * 指针操作：fopen 打开，fclose 关闭。',

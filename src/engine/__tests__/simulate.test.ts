@@ -638,3 +638,65 @@ int main() {
     expect(elapsed).toBeLessThan(1000);
   });
 });
+
+describe('simulate：标准库覆盖', () => {
+  it('string.h 的 strcpy / strcat / strcmp / strlen 可用', () => {
+    const out = outputOf(`
+#include <string.h>
+#include <stdio.h>
+int main() {
+  char a[16] = "hello";
+  char b[16] = "C";
+  strcat(a, b);
+  printf("%s %d\\n", a, (int)strlen(a));
+  strcpy(b, "world");
+  printf("%s %d\\n", b, strcmp(b, "world"));
+  return 0;
+}
+`);
+    expect(out).toBe('helloC 6\nworld 0\n');
+  });
+
+  it('ctype.h 与 atoi 可用', () => {
+    const out = outputOf(`
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+int main() {
+  char c = 'A';
+  printf("%d %d %d\\n", isupper(c), isalpha('7'), isdigit('7'));
+  printf("%d %c\\n", atoi("42x"), tolower(c));
+  return 0;
+}
+`);
+    expect(out).toBe('1 0 1\n42 a\n');
+  });
+
+  it('getchar 按字符读取输入', () => {
+    const out = outputOf(
+      `
+#include <stdio.h>
+int main() {
+  char a = getchar();
+  char b = getchar();
+  printf("%c%c", b, a);
+  return 0;
+}
+`,
+      'ok',
+    );
+    expect(out).toBe('ko');
+  });
+
+  it('math.h 扩展函数返回浮点结果', () => {
+    const out = outputOf(`
+#include <math.h>
+#include <stdio.h>
+int main() {
+  printf("%.2f %.2f %.2f\\n", sqrt(16.0), sin(0.0), fmod(7.0, 4.0));
+  return 0;
+}
+`);
+    expect(out).toBe('4.00 0.00 3.00\n');
+  });
+});

@@ -23,7 +23,7 @@
 .reading-progress__fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #6366f1, #0ea5e9);
+  background: linear-gradient(90deg, var(--primary), var(--teal));
   border-radius: 0 999px 999px 0;
   transition: width 0.12s linear;
 }

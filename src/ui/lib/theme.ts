@@ -1,5 +1,5 @@
 /**
- * 主题：默认跟随系统，用户切换后持久化到 localStorage 的 `codeviz.theme`。
+ * 主题：终端皮肤默认深色，用户切换后持久化到 localStorage 的 `codeviz.theme`。
  */
 import { STORAGE_KEYS, readString, writeString } from './storage';
 
@@ -12,8 +12,8 @@ export function isTheme(value: string | null | undefined): value is Theme {
 }
 
 export function getSystemTheme(): Theme {
-  if (typeof window === 'undefined' || !window.matchMedia) return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window === 'undefined' || !window.matchMedia) return 'dark';
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
 export function getStoredTheme(): Theme | null {
@@ -21,8 +21,9 @@ export function getStoredTheme(): Theme | null {
   return isTheme(value) ? value : null;
 }
 
+/** 终端皮肤是产品主视觉，首屏一律深色；用户显式切换过才用存储值 */
 export function resolveInitialTheme(): Theme {
-  return getStoredTheme() ?? getSystemTheme();
+  return getStoredTheme() ?? 'dark';
 }
 
 export function applyTheme(theme: Theme): void {
@@ -31,7 +32,7 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.style.colorScheme = theme;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    meta.setAttribute('content', theme === 'dark' ? '#0a0f1d' : '#f6f7fb');
+    meta.setAttribute('content', theme === 'dark' ? '#070b09' : '#f2f5ee');
   }
 }
 

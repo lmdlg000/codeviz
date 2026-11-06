@@ -260,6 +260,30 @@ int main() {
       prompt:
         '在实验室打开这段冒泡排序：先看单步执行里数组的每一次变化，再把比较条件 `>` 改成 `<`，观察输出变成了升序还是降序。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "以为数组长度可以是变量（C89 标准）",
+      wrong: "int n = 5; int a[n];",
+      right: "int a[5];  或  #define N 5",
+      why: "传统 C 要求数组长度是常量表达式；需要动态长度就用 malloc（C）或 std::vector（C++）。"
+    },
+    {
+      mistake: "char 数组没有给 \\0 留位置",
+      wrong: "char s[3] = \"abc\";",
+      right: "char s[4] = \"abc\";  // 含结尾 \\0",
+      why: "字符串末尾必须有 \\0，长度要按字符数 + 1 计算，否则 printf(\"%s\") 会一直读到内存里的垃圾。"
+    },
+    {
+      mistake: "用 = 或 == 操作字符串",
+      wrong: "if (s1 == s2)",
+      right: "if (strcmp(s1, s2) == 0)",
+      why: "数组名是首地址，比较的是地址而不是内容；内容比较要用 string.h 里的 strcmp。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '数组元素类型相同、内存连续，下标从 0 到长度减一。',

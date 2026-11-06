@@ -358,7 +358,31 @@ int main(void) {
   return 0;
 }
 `
+    },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "if 后面多写了分号",
+      wrong: "if (score >= 60);\n  printf(\"及格\");",
+      right: "if (score >= 60)\n  printf(\"及格\");",
+      why: "分号让 if 的语句体变成空语句，后面的 printf 变成无条件执行。"
+    },
+    {
+      mistake: "用 == 比较浮点数",
+      wrong: "if (0.1 + 0.2 == 0.3)",
+      right: "if (fabs(0.1 + 0.2 - 0.3) < 1e-9)",
+      why: "浮点数有精度误差，0.1 + 0.2 实际是 0.30000000000000004，相等判断要用误差范围。"
+    },
+    {
+      mistake: "悬垂 else：else 跟错了 if",
+      wrong: "if (a) if (b) x(); else y();",
+      right: "if (a) { if (b) x(); } else y();",
+      why: "else 永远匹配最近的未配对 if；想让它配外层，必须加花括号。"
     }
+      ]
+    },
   ],
   keyPoints: [
     '条件在 C 里用整数表示：0 为假，非 0 为真；比较时用 `==`，赋值才用 `=`。',

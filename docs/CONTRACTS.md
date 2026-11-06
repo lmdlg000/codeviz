@@ -8,7 +8,7 @@
 面向 C/C++ 初学者的**图形化教程网页**：
 
 - 13 节原创中文课程，覆盖 C 基础 → 控制流程 → 数据组织 → C++ 面向对象，参考两本指定教程的章节脉络（仅参考知识顺序，所有讲解与代码必须原创）。
-- “代码实验室”：上传 / 粘贴 **≤ 500 行** C/C++ 代码，纯前端分析并生成：
+- “代码实验室”：上传 / 粘贴 **≤ 1000 行** C/C++ 代码，纯前端分析并生成：
   1. 代码画像（行数 / 函数 / 循环 / 分支 / 圈复杂度 / 难度）
   2. 结构大纲（AST 摘要树）
   3. 函数流程图（结构化 SVG）
@@ -57,7 +57,7 @@
   ```
 - 所有类型在 `src/engine/types.ts`（Lead 已写好契约）。不得改语义；可增可选字段。
 - 纯同步、纯函数、确定性（相同输入必须相同输出，禁止 Date/random）。
-- **绝不抛异常**：无论输入多离谱，都返回带 diagnostics 的结果。对 500 行内的合法教学代码，`analyzeCode` 建议 < 100ms。
+- **绝不抛异常**：无论输入多离谱，都返回带 diagnostics 的结果。对 1000 行内的合法教学代码，`analyzeCode` 建议 < 100ms。
 
 ### 3.2 词法 / 语法（容错解析）
 
@@ -210,7 +210,7 @@
 - 每课正文（text/note/list）合计约 **1200–2200 个汉字**，结构清晰：引入 → 概念 → 示例 → 图解 → 易错点 → 小结。
 - 每课至少：
   - 3–5 条 objectives，3–5 条 keyPoints；
-  - 3 个以上代码块（`type:'code'`；每段建议 ≤ 40 行，必须 ≤ 500 行）；
+  - 3 个以上代码块（`type:'code'`；每段建议 ≤ 40 行，必须 ≤ 1000 行）；
   - **2 个图形块**（`type:'diagram'`）：控制流课优先 `flow`，数据课用 `memory`/`trace`，函数课用 `calls`/`trace`，C++ 课用 `classes`。图形块里的代码要能被引擎解析；`trace` 代码务必限定在解释器子集（简单声明/循环/函数调用/数组/printf，不依赖输入时可自行赋值，若需 scanf 在 trace 块中请谨慎，建议用固定输入替代）；
   - 2–4 道 quiz（单选题，每题 4 选项、解析完整）；
   - 至少 1 个 `note`（易错点/提示）；
@@ -228,7 +228,7 @@
 | samples/c-advanced.ts | content-advanced | bubble-sort, factorial, swap-pointer, student-struct, score-file |
 | samples/cpp.ts | content-cpp | class-rectangle, shape-polymorphism, stl-vector |
 
-每个文件 default export 一个 `CodeSample[]`（可多于上表，鼓励 8–10 个）。示例代码 ≤ 500 行，尽量 30–90 行；能通过本机 g++ 编译；`description` 一句话说明演示点；`focus` 选择最能展示的图形能力；`tags` 2–4 个中文标签；`level` 1–3。
+每个文件 default export 一个 `CodeSample[]`（可多于上表，鼓励 8–10 个）。示例代码 ≤ 1000 行，尽量 30–90 行；能通过本机 g++ 编译；`description` 一句话说明演示点；`focus` 选择最能展示的图形能力；`tags` 2–4 个中文标签；`level` 1–3。
 
 ## 5. UI 契约（ui-dev / viz-dev 必读）
 

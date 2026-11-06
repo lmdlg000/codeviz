@@ -402,6 +402,30 @@ int main() {
       prompt:
         '在实验室里给 Rectangle 增加 `perimeter` 成员函数和会校验正数的 `setHeight`，再把 `isSquare` 改成 `const` 成员函数，观察常量对象能否调用它。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "给构造函数写了返回类型",
+      wrong: "void Point() { x = 0; }",
+      right: "Point() { x = 0; }",
+      why: "构造函数没有返回类型，加上 void 就变成了普通成员函数。"
+    },
+    {
+      mistake: "忘了 class 默认是 private",
+      wrong: "class Point { int x; };  // 外部访问不到",
+      right: "class Point { public: int x; };",
+      why: "class 的成员默认私有，struct 默认公有；想让外部访问必须显式写 public:。"
+    },
+    {
+      mistake: "只读成员函数忘记 const",
+      wrong: "int getX() { return x; }",
+      right: "int getX() const { return x; }",
+      why: "const 对象只能调用 const 成员函数，漏写会导致 const 对象编译不过。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '类描述“有哪些数据、能做什么”，对象是类的一个实例，每个对象拥有独立的数据。',

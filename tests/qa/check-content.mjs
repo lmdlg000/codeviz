@@ -309,7 +309,7 @@ async function main() {
           sample.tags.length <= 4 &&
           sample.level >= 1 &&
           sample.level <= 3 &&
-          sample.lines <= 500,
+          sample.lines <= 1000,
         JSON.stringify({ tags: sample.tags, level: sample.level, lines: sample.lines }),
       );
       recorder.check(
@@ -345,7 +345,7 @@ async function main() {
         if (block.type === 'try') tries += 1;
         if (block.type === 'code') {
           codeBlocks += 1;
-          if (block.lines > 500) recorder.fail(`data/${lesson.id}/code-limit`, `${block.lines} 行`);
+          if (block.lines > 1000) recorder.fail(`data/${lesson.id}/code-limit`, `${block.lines} 行`);
         }
         if (block.type === 'diagram') {
           diagramBlocks += 1;

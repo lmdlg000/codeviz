@@ -204,8 +204,8 @@ int main() {
     expect(info.supportedPatterns.length).toBeGreaterThan(5);
   });
 
-  it('超过 500 行给出 line-limit 错误但仍分析', () => {
-    const code = `int main() {\n${'  int x = 1;\n'.repeat(520)}  return 0;\n}`;
+  it('超过上限行数给出 line-limit 错误但仍分析', () => {
+    const code = `int main() {\n${'  int x = 1;\n'.repeat(1020)}  return 0;\n}`;
     const result = analyzeCode(code);
     expect(result.diagnostics.some((d) => d.rule === 'line-limit')).toBe(true);
     expect(result.stats.functions).toBe(1);
@@ -728,9 +728,9 @@ int main() { return 0; }
     expect(rules).toContain('scanf-arg-count');
   });
 
-  it('500 行规模分析在 100ms 量级', () => {
+  it('上限规模（约 1000 行）分析在 100ms 量级', () => {
     const lines: string[] = ['#include <stdio.h>', 'int main() {'];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 240; i++) {
       lines.push(`  int v${i} = ${i};`);
       lines.push(`  if (v${i} % 2 == 0) { v${i} += 1; }`);
     }

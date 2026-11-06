@@ -96,7 +96,11 @@ function DiagramCard({ diagram, title, caption }: { diagram: DiagramSpec; title?
           {title ? <h3 className="diagram-card__title">{title}</h3> : null}
         </div>
       </div>
-      {caption ? <p className="diagram-card__caption">{caption}</p> : null}
+      {caption ? (
+        <p className="diagram-card__caption">
+          <InlineText text={caption} />
+        </p>
+      ) : null}
       <div className="diagram-card__body">
         <AnalyzedDiagram
           kind={diagram.kind}
@@ -157,6 +161,43 @@ function BlockView({ block, index }: { block: LessonBlock; index: number }) {
         </aside>
       );
     }
+
+    case 'pitfalls':
+      return (
+        <section className="pitfalls" aria-label={block.title ?? '易错警示'}>
+          <header className="pitfalls__head">
+            <span className="pitfalls__icon" aria-hidden="true">
+              <Icon name="warning" size={17} />
+            </span>
+            <h3 className="pitfalls__title">{block.title ?? '易错警示 · 自查清单'}</h3>
+            <span className="pitfalls__count mono">{block.items.length} 条</span>
+          </header>
+          <ol className="pitfalls__list">
+            {block.items.map((item, itemIndex) => (
+              <li className="pitfalls__item" key={itemIndex}>
+                <div className="pitfalls__mistake">
+                  <span className="pitfalls__badge pitfalls__badge--bad">常见错误</span>
+                  <span className="pitfalls__text">{item.mistake}</span>
+                </div>
+                {item.wrong || item.right ? (
+                  <div className="pitfalls__compare">
+                    {item.wrong ? (
+                      <code className="pitfalls__code pitfalls__code--bad">{item.wrong}</code>
+                    ) : null}
+                    {item.right ? (
+                      <code className="pitfalls__code pitfalls__code--good">{item.right}</code>
+                    ) : null}
+                  </div>
+                ) : null}
+                <p className="pitfalls__why">
+                  <span className="pitfalls__badge pitfalls__badge--good">为什么</span>
+                  {item.why}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
 
     case 'code': {
       const language = block.language ?? detectLanguage(block.code);
@@ -261,7 +302,11 @@ function BlockView({ block, index }: { block: LessonBlock; index: number }) {
               runnable
             />
           </div>
-          {block.caption ? <p className="compare-block__caption">{block.caption}</p> : null}
+          {block.caption ? (
+            <p className="compare-block__caption">
+              <InlineText text={block.caption} />
+            </p>
+          ) : null}
         </div>
       );
 

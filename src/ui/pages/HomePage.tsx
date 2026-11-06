@@ -8,6 +8,7 @@ import {
 import type { Chapter, CodeSample, Lesson } from '../../data/types';
 import { analyzeCode } from '../../engine';
 import type { AnalysisResult } from '../../engine/types';
+import { MAX_CODE_LINES } from '../../engine/types';
 import { useCompletedLessons } from '../hooks/useProgress';
 import { hrefFor, labHref, lessonHref } from '../lib/router';
 import { Badge } from '../components/Badge';
@@ -244,7 +245,7 @@ export function HomePage() {
             </span>
           </h1>
           <p className="home-hero__lead">
-            上传 500 行以内的代码，立刻得到流程图、调用图、类图、内存布局与单步执行动画。
+            上传 {MAX_CODE_LINES} 行以内的代码，立刻得到流程图、调用图、类图、内存布局与单步执行动画。
             抽象概念第一次变得触手可及。
           </p>
           <div className="home-hero__actions">

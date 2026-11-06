@@ -780,9 +780,14 @@
   gap: 28px;
   margin-top: 64px;
   padding: 38px 38px;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #312e81 0%, #4338ca 52%, #1e3a8a 100%);
-  color: #eef2ff;
+  border-radius: 0;
+  border: 1px solid var(--primary);
+  background: var(--bg-elevated);
+  background-image:
+    linear-gradient(135deg, rgba(59, 240, 138, 0.14), transparent 62%),
+    repeating-linear-gradient(180deg, rgba(59, 240, 138, 0.05) 0 1px, transparent 1px 4px);
+  color: var(--ink);
+  box-shadow: var(--term-glow-soft, none);
   overflow: hidden;
 }
 
@@ -793,7 +798,7 @@
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(125, 211, 252, 0.32), transparent 68%);
+  background: radial-gradient(circle, rgba(59, 240, 138, 0.18), transparent 68%);
   pointer-events: none;
 }
 
@@ -809,14 +814,14 @@
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.16em;
-  color: #c7d2fe;
+  color: var(--primary);
 }
 
 .home-cta__title {
   margin-top: 10px;
   font-size: clamp(24px, 2.8vw, 31px);
   line-height: 1.3;
-  color: #ffffff;
+  color: var(--ink);
 }
 
 .home-cta__text {
@@ -824,7 +829,7 @@
   max-width: 560px;
   font-size: 14px;
   line-height: 1.75;
-  color: #c7d2fe;
+  color: var(--ink-secondary);
 }
 
 .home-cta__actions {
@@ -836,24 +841,24 @@
 }
 
 .home-cta .btn--secondary {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #312e81;
+  background: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .home-cta .btn--secondary:hover {
-  background: #eef2ff;
-  border-color: #eef2ff;
+  background: var(--primary-soft);
+  border-color: var(--primary-strong);
 }
 
 .home-cta .btn--ghost {
-  color: #e0e7ff;
-  border-color: rgba(199, 210, 254, 0.35);
+  color: var(--ink-secondary);
+  border-color: var(--line-strong);
 }
 
 .home-cta .btn--ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--bg-subtle);
+  color: var(--ink);
 }
 
 .home-footnote {

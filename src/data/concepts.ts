@@ -34,6 +34,9 @@ export const conceptGraph: ConceptGraphData = {
     { id: 'polymorphism', label: '多态', group: 'cpp', chapterId: 'cpp-oop', lessonId: 'c12-inheritance', tier: 9, description: '同一接口在运行时表现出不同行为，依赖虚函数机制。' },
     { id: 'template', label: '模板', group: 'cpp', chapterId: 'cpp-oop', lessonId: 'c13-templates', tier: 9, description: '用类型参数编写与具体类型无关的通用代码。' },
     { id: 'stl', label: 'STL', group: 'cpp', chapterId: 'cpp-oop', lessonId: 'c13-templates', tier: 10, description: '标准模板库，提供 vector、string、sort 等常用组件。' },
+    { id: 'preprocess', label: '预处理', group: 'basics', chapterId: 'c-data', lessonId: 'c14-bits', tier: 1, description: '#include、#define 与条件编译在正式编译之前完成文本级处理。' },
+    { id: 'bitop', label: '位运算', group: 'basics', chapterId: 'c-data', lessonId: 'c14-bits', tier: 3, description: '按二进制位做与、或、异或、取反与移位，常用于标志位与掩码。' },
+    { id: 'union', label: '共用体', group: 'data', chapterId: 'c-data', lessonId: 'c14-bits', tier: 8, description: '多个成员共用同一块内存，大小取最大成员。' },
   ],
   edges: [
     { from: 'program', to: 'compile' },
@@ -64,6 +67,10 @@ export const conceptGraph: ConceptGraphData = {
     { from: 'inheritance', to: 'polymorphism' },
     { from: 'polymorphism', to: 'template' },
     { from: 'template', to: 'stl' },
+    { from: 'program', to: 'preprocess' },
+    { from: 'operator', to: 'bitop' },
+    { from: 'bitop', to: 'enum', label: '标志位' },
+    { from: 'struct', to: 'union', label: '共用内存' },
   ],
 };
 

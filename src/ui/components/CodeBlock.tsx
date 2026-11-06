@@ -4,6 +4,7 @@ import { highlightCode, renderTokens } from '../lib/highlight';
 import { copyTextToClipboard } from '../lib/clipboard';
 import { useToast } from '../hooks/useToast';
 import { Icon } from './Icon';
+import { InlineText } from '../lib/markdown';
 
 export interface CodeBlockProps {
   code: string;
@@ -114,7 +115,11 @@ export function CodeBlock({
         </div>
       </div>
 
-      {caption ? <figcaption className="code-block__caption">{caption}</figcaption> : null}
+      {caption ? (
+        <figcaption className="code-block__caption">
+          <InlineText text={caption} />
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

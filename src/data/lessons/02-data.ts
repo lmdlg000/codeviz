@@ -280,7 +280,31 @@ int main(void) {
   return 0;
 }
 `
+    },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "以为 5 / 2 等于 2.5",
+      wrong: "double r = 5 / 2;      // r = 2.0",
+      right: "double r = 5.0 / 2;    // r = 2.5",
+      why: "两个 int 相除做整数除法，小数部分直接丢弃，赋给 double 时已经是 2 了；至少让一个操作数是浮点。"
+    },
+    {
+      mistake: "printf 的占位符和变量类型不匹配",
+      wrong: "printf(\"%f\", 3);",
+      right: "printf(\"%d\", 3);  或  printf(\"%f\", 3.0);",
+      why: "%d 读 int，%f 读 double。类型对不上会输出垃圾值，编译器通常只给警告。"
+    },
+    {
+      mistake: "把字符 '1' 当成数字 1",
+      wrong: "int n = '1';        // n = 49",
+      right: "int n = '1' - '0';  // n = 1",
+      why: "字符在内存里存的是编码值，数字字符要转成数值必须减去 '0'。"
     }
+      ]
+    },
   ],
   keyPoints: [
     '变量是内存中一块有名字、有类型的存储空间，声明时最好同时给出初始值。',

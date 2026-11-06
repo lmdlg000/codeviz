@@ -332,7 +332,7 @@ export interface MemoryModel {
 
 export interface AnalyzeOptions {
   filename?: string;
-  /** 默认 500；超过时返回错误诊断，仍尽量给出可分析结果 */
+  /** 默认 1000（MAX_CODE_LINES）；超过时返回错误诊断，仍尽量给出可分析结果 */
   maxLines?: number;
 }
 
@@ -445,4 +445,4 @@ export interface EngineApi {
 }
 
 /** 行数上限（含空行），与产品需求一致 */
-export const MAX_CODE_LINES = 500;
+export const MAX_CODE_LINES = 1000;

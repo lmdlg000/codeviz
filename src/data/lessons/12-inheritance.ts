@@ -390,6 +390,30 @@ int main() {
       prompt:
         '在实验室里把 Triangle 加进上一段程序的 `const Shape*` 数组，确认 totalArea 一行都不用改；再试试去掉基类的 virtual，观察 shape->area() 还能不能调用到 Triangle 的版本。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "基类析构函数不是虚函数",
+      wrong: "class Base { ~Base(); };",
+      right: "class Base { virtual ~Base(); };",
+      why: "通过基类指针 delete 派生类对象时，非虚析构只调基类版本，派生类资源泄漏。"
+    },
+    {
+      mistake: "以为派生类构造函数会先执行基类",
+      wrong: "先执行派生类构造函数体",
+      right: "Base() → Derived() 构造；~Derived() → ~Base() 析构",
+      why: "构造由内到外，析构由外到内；基类先准备好，派生类才能使用它的成员。"
+    },
+    {
+      mistake: "在派生类里直接访问基类 private 成员",
+      wrong: "class D : public B { void f() { x = 1; } };",
+      right: "把 x 改成 protected，或用基类的 public 接口",
+      why: "private 只对声明它的类可见；需要派生类访问就用 protected。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '派生类自动拥有基类成员；构造顺序是基类再到派生类，析构顺序相反。',

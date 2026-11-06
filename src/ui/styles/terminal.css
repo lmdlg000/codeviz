@@ -1,0 +1,759 @@
+/* ==========================================================================
+   CodeViz 终端皮肤
+   --------------------------------------------------------------------------
+   在基础变量之上做的一层"性格化"覆盖：等宽字体、方角、荧光绿、扫描线、
+   提示符前缀。所有覆盖都基于既有 class，不改组件结构。
+   级联顺序：最后引入（main.tsx），因此同名选择器可以覆盖前序样式。
+   ========================================================================== */
+
+:root {
+  --term-cursor: 1px solid var(--primary);
+  --term-panel: linear-gradient(180deg, rgba(59, 240, 138, 0.04), transparent 42%);
+}
+
+/* ------------------------------- 基础排版 ------------------------------- */
+
+body {
+  font-size: 15px;
+  line-height: 1.72;
+  letter-spacing: 0.005em;
+  background-image:
+    linear-gradient(rgba(59, 240, 138, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 240, 138, 0.028) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px;
+  background-position: -1px -1px;
+}
+
+[data-theme='light'] body {
+  background-image:
+    linear-gradient(rgba(10, 122, 68, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 122, 68, 0.05) 1px, transparent 1px);
+}
+
+/* 扫描线：整屏一层极淡的横向条纹，营造 CRT 质感 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.45;
+}
+
+[data-theme='light'] body::after {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(21, 34, 27, 0.05) 0px,
+    rgba(21, 34, 27, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.3;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+code,
+kbd,
+pre,
+samp,
+.mono,
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'liga' 0;
+}
+
+::selection {
+  background: rgba(59, 240, 138, 0.28);
+  color: #eafff3;
+}
+
+/* 焦点环：终端里用反色块更醒目 */
+:focus-visible {
+  outline: 1px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* ------------------------------- 方角化 -------------------------------- */
+
+[class*='card'],
+[class*='chip'],
+[class*='badge'],
+[class*='tile'],
+[class*='panel'],
+[class*='banner'],
+[class*='btn'],
+[class*='tab'],
+[class*='note-block'],
+[class*='segmented'],
+[class*='pill'],
+[class*='input'],
+[class*='modal'],
+[class*='dialog'],
+[class*='code-block'],
+[class*='progress'],
+[class*='table'],
+[class*='pitfalls'],
+[class*='lab-check'],
+[class*='lab-stdlib'],
+input,
+textarea,
+select,
+button {
+  border-radius: 0;
+}
+
+/* ------------------------------ 提示符语言 ------------------------------ */
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.eyebrow::before {
+  content: '~$ ';
+  opacity: 0.7;
+}
+
+.sidebar__section-title::before {
+  content: '// ';
+  color: var(--ink-tertiary);
+}
+
+.page-header__title::after {
+  content: '';
+  display: inline-block;
+  width: 9px;
+  height: 1.05em;
+  margin-left: 8px;
+  vertical-align: -0.16em;
+  background: var(--primary);
+  animation: term-caret 1.15s steps(2, start) infinite;
+  opacity: 0.85;
+}
+
+@keyframes term-caret {
+  0%,
+  49% {
+    opacity: 0.85;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-header__title::after {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+html {
+  background: var(--bg);
+}
+
+/* 侧边栏：终端目录 */
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--bg-elevated);
+  background-image: var(--term-panel);
+}
+
+.sidebar__brand-name,
+.sidebar__brand-sub {
+  font-family: var(--font-mono);
+}
+
+.sidebar__brand-sub::before {
+  content: '// ';
+  color: var(--ink-tertiary);
+}
+
+.sidebar__link {
+  border-radius: 0;
+  border-left: 2px solid transparent;
+  font-size: 13px;
+}
+
+.sidebar__link:hover {
+  border-left-color: var(--line-strong);
+  background: var(--bg-subtle);
+}
+
+.sidebar__link.is-active {
+  border-left-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+}
+
+.sidebar__link.is-active::before {
+  content: '>';
+  margin-right: 6px;
+  color: var(--primary);
+}
+
+.sidebar__section-hint,
+.sidebar__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------- 按钮 --------------------------------- */
+
+.btn {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-width: 1px;
+}
+
+.btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #04150c;
+  box-shadow: var(--term-glow);
+}
+
+.btn--primary:hover {
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
+  color: #04150c;
+}
+
+.btn--secondary {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.btn--secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.btn--ghost:hover {
+  background: var(--bg-subtle);
+}
+
+/* 徽标 / 标签：更像状态栏 */
+.badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border-width: 1px;
+}
+
+.chip,
+.filter-chip,
+.lab-chip,
+.lab-code-chip,
+.lab-fn-chip {
+  font-family: var(--font-mono);
+}
+
+/* ------------------------------- 卡片 --------------------------------- */
+
+.card,
+.lab-card,
+.stat-tile,
+.note-block,
+.diagram-card {
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  box-shadow: none;
+}
+
+.card:hover,
+.card--interactive:hover {
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
+.card__title,
+.lab-card__title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lab-card__title::before,
+.card__title::before {
+  content: '# ';
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+/* 统计块：数字用荧光绿 */
+.stat-tile__value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* --------------------------- 代码块：终端窗口 --------------------------- */
+
+.code-block {
+  border: 1px solid var(--line-strong);
+  background: var(--code-bg);
+  box-shadow: 0 0 0 1px rgba(59, 240, 138, 0.06), var(--term-glow-soft);
+}
+
+.code-block__head {
+  border-bottom: 1px solid var(--code-line);
+  background: var(--code-surface);
+}
+
+.code-block__filename {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.code-block__filename::before {
+  content: '● ';
+  color: var(--primary);
+  font-size: 9px;
+  vertical-align: 1px;
+}
+
+.code-block__caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+
+.code-block__caption::before {
+  content: '$ ';
+  color: var(--primary);
+}
+
+/* --------------------------- 课程正文细节 ------------------------------ */
+
+.lesson-heading {
+  border-left: 2px solid var(--primary);
+  padding-left: 12px;
+  margin-left: -14px;
+}
+
+.lesson-list__item::marker {
+  color: var(--primary);
+}
+
+.lesson-table th {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lesson-table td,
+.lesson-table th {
+  border-color: var(--line);
+}
+
+.note-block {
+  border-left: 2px solid var(--line-strong);
+}
+
+.note-block--tip,
+.note-block--info {
+  border-left-color: var(--primary);
+}
+
+.note-block--warn {
+  border-left-color: var(--amber);
+}
+
+.note-block--danger {
+  border-left-color: var(--rose);
+}
+
+.note-block__title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* ------------------------ 易错警示 / 自查清单 -------------------------- */
+
+.pitfalls {
+  margin: 28px 0;
+  border: 1px solid var(--line-strong);
+  background: var(--bg-elevated);
+  background-image: linear-gradient(180deg, rgba(255, 95, 86, 0.06), transparent 55%);
+}
+
+.pitfalls__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+
+.pitfalls__icon {
+  display: inline-flex;
+  color: var(--amber);
+}
+
+.pitfalls__title {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.pitfalls__count {
+  font-size: 11px;
+  color: var(--ink-tertiary);
+}
+
+.pitfalls__list {
+  counter-reset: pitfall;
+}
+
+.pitfalls__item {
+  counter-increment: pitfall;
+  padding: 14px 16px 16px 46px;
+  position: relative;
+  border-bottom: 1px solid var(--line);
+}
+
+.pitfalls__item:last-child {
+  border-bottom: none;
+}
+
+.pitfalls__item::before {
+  content: counter(pitfall, decimal-leading-zero);
+  position: absolute;
+  left: 16px;
+  top: 15px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--rose);
+  letter-spacing: 0.06em;
+}
+
+.pitfalls__mistake {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pitfalls__text {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pitfalls__badge {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+}
+
+.pitfalls__badge--bad {
+  color: var(--rose);
+}
+
+.pitfalls__badge--good {
+  color: var(--primary);
+}
+
+.pitfalls__compare {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 8px;
+}
+
+.pitfalls__code {
+  display: block;
+  padding: 6px 10px;
+  border-left: 2px solid var(--line-strong);
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pitfalls__code--bad {
+  border-left-color: var(--rose);
+}
+
+.pitfalls__code--bad::before {
+  content: '- ';
+  color: var(--rose);
+}
+
+.pitfalls__code--good {
+  border-left-color: var(--primary);
+}
+
+.pitfalls__code--good::before {
+  content: '+ ';
+  color: var(--primary);
+}
+
+.pitfalls__why {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-secondary);
+}
+
+/* ------------------------- 实验室：覆盖表 / 清单 ------------------------ */
+
+.lab-stdlib {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.lab-stdlib__group {
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+}
+
+.lab-stdlib__summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+}
+
+.lab-stdlib__summary::-webkit-details-marker {
+  display: none;
+}
+
+.lab-stdlib__summary::before {
+  content: '▸';
+  color: var(--primary);
+  font-size: 10px;
+}
+
+.lab-stdlib__group[open] > .lab-stdlib__summary::before {
+  content: '▾';
+}
+
+.lab-stdlib__header {
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.lab-stdlib__title {
+  flex: 1;
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+}
+
+.lab-stdlib__count {
+  font-size: 11px;
+  color: var(--ink-tertiary);
+}
+
+.lab-stdlib__list {
+  border-top: 1px dashed var(--line);
+}
+
+.lab-stdlib__item {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+}
+
+.lab-stdlib__item:last-child {
+  border-bottom: none;
+}
+
+.lab-stdlib__item.is-used {
+  background: var(--primary-soft);
+  box-shadow: inset 2px 0 0 var(--primary);
+}
+
+.lab-stdlib__name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lab-stdlib__sig {
+  grid-column: 2 / 4;
+  color: var(--ink-tertiary);
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+}
+
+.lab-stdlib__note {
+  grid-column: 2 / 3;
+  color: var(--ink-secondary);
+}
+
+.lab-stdlib__tag {
+  grid-column: 3 / 4;
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-tertiary);
+}
+
+.lab-stdlib__tag--trace {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.lab-check {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lab-check__item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-inset);
+}
+
+.lab-check__item.is-issue {
+  border-color: color-mix(in srgb, var(--rose) 55%, transparent);
+  background: color-mix(in srgb, var(--rose-soft) 55%, var(--bg-inset));
+}
+
+.lab-check__item.is-manual {
+  border-style: dashed;
+}
+
+.lab-check__box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  margin-top: 2px;
+  border: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink-tertiary);
+}
+
+.lab-check__box--pass {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.lab-check__box--issue {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.lab-check__box--manual {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.lab-check__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.lab-check__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lab-check__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lab-check__detail {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+.lab-check__hits {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--rose);
+}
+
+.lab-check__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--primary);
+}
+
+.lab-check__link:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------ 知识图谱 ------------------------------- */
+
+.map-node rect,
+.map-node circle {
+  rx: 0;
+}
+
+/* ------------------------------ 响应式 --------------------------------- */
+
+@media (max-width: 720px) {
+  body {
+    font-size: 14.5px;
+  }
+
+  .lab-stdlib__item {
+    grid-template-columns: 92px minmax(0, 1fr) auto;
+  }
+}

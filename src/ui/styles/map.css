@@ -232,7 +232,7 @@
 }
 
 [data-theme='dark'] .map-node__dot--indigo {
-  fill: #818cf8;
+  fill: var(--primary);
 }
 
 [data-theme='dark'] .map-node__dot--teal {

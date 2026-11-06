@@ -1,5 +1,5 @@
 /**
- * 文件读取与 500 行校验（代码实验室使用）。
+ * 文件读取与行数校验（代码实验室使用）。
  */
 import { MAX_CODE_LINES } from '../../engine/types';
 import type { SourceLanguage } from '../../engine/types';

@@ -55,15 +55,15 @@
 }
 
 .btn--primary {
-  background: #4f46e5;
-  border-color: #4f46e5;
+  background: var(--primary);
+  border-color: var(--primary);
   color: #ffffff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
 }
 
 .btn--primary:hover {
-  background: #4338ca;
-  border-color: #4338ca;
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
 }
 
 .btn--primary:active {
@@ -200,36 +200,37 @@
   color: var(--danger);
 }
 
+/* 深色模式下 badge 直接复用语义色变量，避免出现与主题不符的靛蓝/天蓝 */
 [data-theme='dark'] .badge--indigo {
-  color: #a5b4fc;
+  color: var(--primary);
 }
 
 [data-theme='dark'] .badge--teal {
-  color: #5eead4;
+  color: var(--teal);
 }
 
 [data-theme='dark'] .badge--amber {
-  color: #fbbf24;
+  color: var(--amber);
 }
 
 [data-theme='dark'] .badge--rose {
-  color: #fb7185;
+  color: var(--rose);
 }
 
 [data-theme='dark'] .badge--sky {
-  color: #38bdf8;
+  color: var(--sky);
 }
 
 [data-theme='dark'] .badge--violet {
-  color: #c4b5fd;
+  color: var(--violet);
 }
 
 [data-theme='dark'] .badge--success {
-  color: #34d399;
+  color: var(--success);
 }
 
 [data-theme='dark'] .badge--danger {
-  color: #f87171;
+  color: var(--danger);
 }
 
 /* --------------------------------- 卡片 --------------------------------- */
@@ -734,11 +735,12 @@
   align-items: flex-start;
   gap: 10px;
   padding: 11px 12px 11px 14px;
-  border-radius: 12px;
-  background: #0f172a;
-  color: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  box-shadow: var(--shadow-lg);
+  border-radius: 0;
+  background: var(--bg-elevated);
+  color: var(--ink);
+  border: 1px solid var(--primary);
+  border-left-width: 3px;
+  box-shadow: var(--term-glow-soft, none);
   animation: cvz-toast-in 0.25s var(--ease);
   pointer-events: auto;
 }
@@ -754,18 +756,18 @@
 }
 
 .toast--success .toast__icon {
-  background: rgba(13, 148, 136, 0.22);
-  color: #5eead4;
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .toast--error .toast__icon {
-  background: rgba(225, 29, 72, 0.22);
-  color: #fda4af;
+  background: var(--rose-soft);
+  color: var(--rose);
 }
 
 .toast--info .toast__icon {
-  background: rgba(2, 132, 199, 0.22);
-  color: #7dd3fc;
+  background: var(--sky-soft);
+  color: var(--sky);
 }
 
 .toast__message {
@@ -780,8 +782,8 @@
   place-items: center;
   width: 22px;
   height: 22px;
-  border-radius: 6px;
-  color: #94a3b8;
+  border-radius: 0;
+  color: var(--ink-tertiary);
   flex: none;
 }
 
@@ -833,7 +835,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   background: rgba(129, 140, 248, 0.18);
-  color: #c7d2fe;
+  color: var(--primary);
   flex: none;
 }
 
@@ -915,7 +917,7 @@
 
 .code-block__line.is-highlight {
   background: rgba(79, 70, 229, 0.18);
-  box-shadow: inset 2px 0 0 #818cf8;
+  box-shadow: inset 2px 0 0 var(--primary);
 }
 
 .code-block__ln {

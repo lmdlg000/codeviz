@@ -3,12 +3,23 @@ import { SiteFooter } from '../layout/Footer';
 import { Badge } from '../components/Badge';
 import { ButtonLink } from '../components/Button';
 import { Icon, type IconName } from '../components/Icon';
-import { hrefFor, labHref } from '../lib/router';
+import { hrefFor, labHref, lessonHref } from '../lib/router';
+import { MAX_CODE_LINES } from '../../engine/types';
+import { lessons } from '../../data';
+import { COVERAGE_LABEL, COVERAGE_ROWS, COVERAGE_SUMMARY } from '../../data/coverage';
+
+const LESSON_TITLE = new Map(lessons.map((lesson) => [lesson.id, lesson.title]));
+
+const COVERAGE_TONE = {
+  covered: 'teal',
+  partial: 'amber',
+  gap: 'rose',
+} as const;
 
 const CAN_DO = [
-  '把 500 行以内的 C/C++ 代码解析成流程图、调用图、类图、内存布局与结构大纲。',
+  `把 ${MAX_CODE_LINES} 行以内的 C/C++ 代码解析成流程图、调用图、类图、内存布局与结构大纲。`,
   '用教学子集解释器逐句执行常见语法，展示变量变化、调用栈与程序输出。',
-  '通过 13 节原创课程、随堂测验与知识图谱，把零散概念连成一条路径。',
+  `通过 ${lessons.length} 节原创课程、随堂测验与知识图谱，把零散概念连成一条路径。`,
   '深色模式、键盘操作与本地进度记录，所有数据只留在你的浏览器里。',
 ];
 
@@ -178,6 +189,71 @@ export function AboutPage() {
             构建依赖
           </Badge>
           <p>CodeMirror 6 · React · Vite · TypeScript；无图表库、无外部 CDN、无运行时网络请求。</p>
+        </div>
+      </section>
+
+
+      <section className="about-section" aria-labelledby="about-coverage-title">
+        <div className="about-section__head">
+          <span className="eyebrow">COVERAGE</span>
+          <h2 className="about-section__title" id="about-coverage-title">
+            知识点覆盖矩阵
+          </h2>
+        </div>
+        <p className="about-section__lead">
+          下表把两本参考教材的章节逐条对到课程上。没有完全覆盖的部分会直接写出来——比起"什么都教了"，知道自己缺什么更重要。
+        </p>
+        <div className="coverage-summary" role="list">
+          <span className="coverage-summary__item coverage-summary__item--covered" role="listitem">
+            已覆盖 <strong className="tabular">{COVERAGE_SUMMARY.covered}</strong>
+          </span>
+          <span className="coverage-summary__item coverage-summary__item--partial" role="listitem">
+            部分覆盖 <strong className="tabular">{COVERAGE_SUMMARY.partial}</strong>
+          </span>
+          <span className="coverage-summary__item coverage-summary__item--gap" role="listitem">
+            未覆盖 <strong className="tabular">{COVERAGE_SUMMARY.gap}</strong>
+          </span>
+          <span className="coverage-summary__total tabular">共 {COVERAGE_SUMMARY.total} 个知识点</span>
+        </div>
+        <div className="table-wrap">
+          <table className="coverage-table">
+            <thead>
+              <tr>
+                <th scope="col">来源</th>
+                <th scope="col">教材知识点</th>
+                <th scope="col">状态</th>
+                <th scope="col">对应课程</th>
+                <th scope="col">说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COVERAGE_ROWS.map((row) => (
+                <tr key={`${row.source}-${row.topic}`}>
+                  <td className="coverage-table__source">
+                    {row.source === 'C 程序设计教程' ? 'C' : 'C++'}
+                  </td>
+                  <td>{row.topic}</td>
+                  <td>
+                    <Badge tone={COVERAGE_TONE[row.status]}>{COVERAGE_LABEL[row.status]}</Badge>
+                  </td>
+                  <td>
+                    {row.lessonIds.length === 0 ? (
+                      <span className="muted">—</span>
+                    ) : (
+                      <span className="coverage-table__lessons">
+                        {row.lessonIds.map((id) => (
+                          <a className="coverage-table__link mono" key={id} href={lessonHref(id)}>
+                            {LESSON_TITLE.get(id)?.split('：')[0] ?? id}
+                          </a>
+                        ))}
+                      </span>
+                    )}
+                  </td>
+                  <td className="muted">{row.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 

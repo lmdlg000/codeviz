@@ -275,6 +275,30 @@ int main() {
       prompt:
         '在实验室打开这段代码：先看内存图里结构体数组的排列，再把某个分数改成 59，观察及格人数如何变化；最后试着给结构体加一个 `name` 成员。',
     },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "结构体定义后面漏分号",
+      wrong: "struct Point { int x; int y; }",
+      right: "struct Point { int x; int y; };",
+      why: "结构体定义本身是一条语句，右花括号后必须有分号。"
+    },
+    {
+      mistake: "结构体和结构体指针用同一个访问符",
+      wrong: "p.x   /  s->x",
+      right: "p->x  /  s.x",
+      why: "变量用点，指针用箭头；p->x 等价于 (*p).x。"
+    },
+    {
+      mistake: "结构体里有指针时直接整体赋值",
+      wrong: "b = a;  // 两个结构体指向同一块内存",
+      right: "b.s = strdup(a.s);  // 深拷贝",
+      why: "结构体赋值是浅拷贝，指针成员只复制地址，改一个另一个也跟着变，释放时还会重复 free。"
+    }
+      ]
+    },
   ],
   keyPoints: [
     '结构体把多个不同类型的成员组合成一个整体，定义末尾必须写分号。',

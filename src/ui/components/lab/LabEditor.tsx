@@ -42,7 +42,7 @@ export interface LabEditorProps {
   onAnalyze: () => void;
   onTrace: () => void;
   onDropFile: (file: File) => void;
-  /** 粘贴内容会让总行数超过 500 行时触发（内容被拒绝） */
+  /** 粘贴内容会让总行数超过行数上限时触发（内容被拒绝） */
   onLimitExceeded: () => void;
 }
 
@@ -63,8 +63,8 @@ const tokenClass: Record<Exclude<TokenKind, 'plain'>, string> = {
 const codeTheme = EditorView.theme(
   {
     '&': {
-      color: '#e2e8f0',
-      backgroundColor: '#0e1526',
+      color: '#cfeedd',
+      backgroundColor: '#080d0b',
       height: '100%',
       fontSize: '13.5px',
     },
@@ -75,54 +75,54 @@ const codeTheme = EditorView.theme(
     },
     '.cm-content': {
       padding: '14px 0 28px',
-      caretColor: '#a5b4fc',
+      caretColor: '#3bf08a',
     },
     '.cm-line': {
       padding: '0 18px 0 6px',
     },
     '.cm-gutters': {
-      backgroundColor: '#0e1526',
-      color: '#5b6b82',
-      borderRight: '1px solid #1e293b',
+      backgroundColor: '#060a09',
+      color: '#4f6b5e',
+      borderRight: '1px solid #16211c',
     },
     '.cm-lineNumbers .cm-gutterElement': {
       padding: '0 10px 0 16px',
     },
-    '.cm-activeLine': { backgroundColor: 'rgba(79, 70, 229, 0.13)' },
+    '.cm-activeLine': { backgroundColor: 'rgba(59, 240, 138, 0.07)' },
     '.cm-activeLineGutter': {
-      backgroundColor: 'rgba(79, 70, 229, 0.16)',
-      color: '#c7d2fe',
+      backgroundColor: 'rgba(59, 240, 138, 0.12)',
+      color: '#9dffc4',
     },
-    '&.cm-focused .cm-cursor': { borderLeftColor: '#a5b4fc' },
+    '&.cm-focused .cm-cursor': { borderLeftColor: '#3bf08a' },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
-      backgroundColor: 'rgba(79, 70, 229, 0.32) !important',
+      backgroundColor: 'rgba(59, 240, 138, 0.24) !important',
     },
     '.cm-matchingBracket, &.cm-focused .cm-matchingBracket': {
-      backgroundColor: 'rgba(79, 70, 229, 0.32)',
-      outline: '1px solid rgba(165, 180, 252, 0.55)',
-      color: '#e2e8f0 !important',
+      backgroundColor: 'rgba(59, 240, 138, 0.18)',
+      outline: '1px solid rgba(59, 240, 138, 0.55)',
+      color: '#eafff3 !important',
     },
-    '.cm-selectionMatch': { backgroundColor: 'rgba(13, 148, 136, 0.28)' },
+    '.cm-selectionMatch': { backgroundColor: 'rgba(46, 230, 198, 0.22)' },
     '.cm-cv-target-line': {
-      backgroundColor: 'rgba(129, 140, 248, 0.16)',
-      boxShadow: 'inset 2px 0 0 #818cf8',
+      backgroundColor: 'rgba(59, 240, 138, 0.1)',
+      boxShadow: 'inset 2px 0 0 #3bf08a',
     },
-    '.cm-cv-comment': { color: '#64748b !important', fontStyle: 'italic' },
-    '.cm-cv-string': { color: '#86efac !important' },
-    '.cm-cv-number': { color: '#fcd34d !important' },
-    '.cm-cv-keyword': { color: '#c4b5fd !important' },
-    '.cm-cv-type': { color: '#7dd3fc !important' },
-    '.cm-cv-function': { color: '#93c5fd !important' },
-    '.cm-cv-punct': { color: '#94a3b8 !important' },
-    '.cm-cv-preprocessor': { color: '#f0abfc !important' },
+    '.cm-cv-comment': { color: '#557265 !important', fontStyle: 'italic' },
+    '.cm-cv-string': { color: '#a8f5c0 !important' },
+    '.cm-cv-number': { color: '#ffb454 !important' },
+    '.cm-cv-keyword': { color: '#3bf08a !important', fontWeight: '600' },
+    '.cm-cv-type': { color: '#2ee6c6 !important' },
+    '.cm-cv-function': { color: '#7ce7ff !important' },
+    '.cm-cv-punct': { color: '#7d9a8c !important' },
+    '.cm-cv-preprocessor': { color: '#ff8fd0 !important' },
     '.cm-tooltip': {
-      backgroundColor: '#131c31',
-      border: '1px solid #1e293b',
-      color: '#e2e8f0',
+      backgroundColor: '#0c120f',
+      border: '1px solid #1c2b24',
+      color: '#d7f7e5',
     },
     '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
-      backgroundColor: '#1e293b',
-      color: '#e2e8f0',
+      backgroundColor: '#16211c',
+      color: '#d7f7e5',
     },
   },
   { dark: true },
@@ -378,7 +378,7 @@ export const LabEditor = forwardRef<LabEditorHandle, LabEditorProps>(function La
             <Icon name="upload" size={26} />
           </span>
           <strong>松开以载入代码</strong>
-          <span>支持 .c / .cpp / .h，最多 500 行</span>
+          <span>支持 .c / .cpp / .h，最多 {MAX_CODE_LINES} 行</span>
         </div>
       ) : null}
     </div>

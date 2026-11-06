@@ -51,19 +51,19 @@ export function HeroVisual() {
         >
           <defs>
             <marker id="hero-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0 8 4 0 8z" fill="#94a3b8" />
+              <path d="M0 0 8 4 0 8z" fill="#7d9a8c" />
             </marker>
             <marker id="hero-arrow-teal" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0 8 4 0 8z" fill="#0d9488" />
+              <path d="M0 0 8 4 0 8z" fill="#2ee6c6" />
             </marker>
           </defs>
 
           {/* 开始 */}
-          <rect x="146" y="8" width="88" height="28" rx="14" fill="#0f172a" />
+          <rect x="146" y="8" width="88" height="28" rx="14" fill="#0c120f" stroke="#2d4438" strokeWidth="1" />
           <text x="190" y="26" textAnchor="middle" className="hero-flow-text hero-flow-text--light">
             开始
           </text>
-          <path d="M190 36v20" stroke="#94a3b8" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
+          <path d="M190 36v20" stroke="#7d9a8c" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
 
           {/* 判断 */}
           <path
@@ -83,7 +83,7 @@ export function HeroVisual() {
           </text>
 
           {/* 是 → 处理 */}
-          <path d="M190 140v18" stroke="#94a3b8" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
+          <path d="M190 140v18" stroke="#7d9a8c" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
           <rect x="128" y="160" width="124" height="42" rx="10" fill="var(--primary-soft)" stroke="var(--primary)" strokeWidth="1.6" />
           <text x="190" y="178" textAnchor="middle" className="hero-flow-text hero-flow-text--ink">
             处理 a[i]
@@ -107,7 +107,7 @@ export function HeroVisual() {
           {/* 否 → 输出 */}
           <path
             d="M128 98H100a8 8 0 0 0-8 8v104a8 8 0 0 0 8 8h8"
-            stroke="#94a3b8"
+            stroke="#7d9a8c"
             strokeWidth="1.6"
             markerEnd="url(#hero-arrow)"
           />
@@ -120,8 +120,8 @@ export function HeroVisual() {
           </text>
 
           {/* 结束 */}
-          <path d="M80 250v22" stroke="#94a3b8" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
-          <rect x="36" y="276" width="88" height="28" rx="14" fill="#0f172a" />
+          <path d="M80 250v22" stroke="#7d9a8c" strokeWidth="1.6" markerEnd="url(#hero-arrow)" />
+          <rect x="36" y="276" width="88" height="28" rx="14" fill="#0c120f" stroke="#2d4438" strokeWidth="1" />
           <text x="80" y="294" textAnchor="middle" className="hero-flow-text hero-flow-text--light">
             结束
           </text>

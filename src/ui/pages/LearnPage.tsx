@@ -7,6 +7,7 @@ import { ButtonLink } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
 import { Icon } from '../components/Icon';
 import { ProgressRing } from '../components/Progress';
+import { MAX_CODE_LINES } from '../../engine/types';
 
 const DIFFICULTY_LABEL: Record<Lesson['difficulty'], string> = {
   1: '入门',
@@ -145,7 +146,7 @@ export function LearnPage() {
         </span>
         <div className="learn-banner__copy">
           <h2 className="learn-banner__title">有自己的代码想拆开看看？</h2>
-          <p className="learn-banner__text">粘贴或上传不超过 500 行的 C/C++ 代码，六种视图一次生成。</p>
+          <p className="learn-banner__text">粘贴或上传不超过 {MAX_CODE_LINES} 行的 C/C++ 代码，六种视图一次生成。</p>
         </div>
         <ButtonLink href={hrefFor('/lab')} variant="primary" iconRight="arrow-right">
           进入代码实验室

@@ -376,7 +376,31 @@ int main(void) {
   return 0;
 }
 `
+    },
+    {
+      type: 'pitfalls',
+      title: '易错警示 · 自查清单',
+      items: [
+    {
+      mistake: "循环变量从不改变，变成死循环",
+      wrong: "while (i < 10) { sum += i; }",
+      right: "while (i < 10) { sum += i; i++; }",
+      why: "循环体里必须让条件最终变假，否则程序卡住（在实验室里会触发步数上限）。"
+    },
+    {
+      mistake: "累加器没有清零",
+      wrong: "int sum;  // 随机初值\nfor (...) sum += i;",
+      right: "int sum = 0;\nfor (...) sum += i;",
+      why: "局部变量不初始化是随机值，累加、计数、求最大值之前都要给初值。"
+    },
+    {
+      mistake: "遍历 n 个元素却写成 i <= n",
+      wrong: "for (i = 0; i <= n; i++) a[i];",
+      right: "for (i = 0; i < n; i++) a[i];",
+      why: "合法下标是 0..n-1，<= n 会多访问一格，越界写坏别的变量。"
     }
+      ]
+    },
   ],
   keyPoints: [
     '循环三要素：初值、继续条件、每轮更新；缺少更新就会死循环。',

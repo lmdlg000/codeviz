@@ -402,3 +402,126 @@
     min-width: 460px;
   }
 }
+
+/* ---------------------------- 知识点覆盖矩阵 ---------------------------- */
+
+.coverage-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 14px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.coverage-summary__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-secondary);
+}
+
+.coverage-summary__item strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.coverage-summary__item--covered {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.coverage-summary__item--covered strong {
+  color: var(--teal);
+}
+
+.coverage-summary__item--partial {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.coverage-summary__item--partial strong {
+  color: var(--amber);
+}
+
+.coverage-summary__item--gap {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.coverage-summary__item--gap strong {
+  color: var(--rose);
+}
+
+.coverage-summary__total {
+  margin-left: auto;
+  color: var(--ink-tertiary);
+  font-size: 11.5px;
+}
+
+.coverage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.coverage-table th {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.coverage-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.coverage-table tr:hover td {
+  background: var(--bg-subtle);
+}
+
+.coverage-table__source {
+  width: 52px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--primary);
+}
+
+.coverage-table__lessons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.coverage-table__link {
+  font-size: 12px;
+  color: var(--primary);
+  border-bottom: 1px dashed transparent;
+}
+
+.coverage-table__link:hover {
+  border-bottom-color: var(--primary);
+}
+
+.coverage-table td:last-child {
+  min-width: 180px;
+  font-size: 12.5px;
+}
+
+@media (max-width: 720px) {
+  .coverage-table td:last-child {
+    min-width: 0;
+  }
+}
