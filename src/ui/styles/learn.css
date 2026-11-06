@@ -1,0 +1,316 @@
+/* ==========================================================================
+   课程目录页
+   ========================================================================== */
+
+.learn-page {
+  padding-bottom: 40px;
+}
+
+.learn-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+}
+
+.learn-progress__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.learn-progress__label {
+  font-size: 11px;
+  color: var(--ink-tertiary);
+  letter-spacing: 0.06em;
+}
+
+.learn-progress__value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.learn-chapters {
+  display: flex;
+  flex-direction: column;
+}
+
+.learn-chapter {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 32px;
+  padding: 38px 0;
+  border-top: 1px solid var(--line);
+}
+
+.learn-chapter:first-child {
+  border-top: none;
+  padding-top: 6px;
+}
+
+.learn-chapter__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  align-self: start;
+  min-width: 0;
+}
+
+.learn-chapter__num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--tone, var(--primary));
+  background: var(--tone-soft, var(--primary-soft));
+  padding: 2px 6px;
+  border-radius: 6px;
+  flex: none;
+}
+
+.learn-chapter__titles {
+  min-width: 0;
+}
+
+.learn-chapter__title {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.learn-chapter__subtitle {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-tertiary);
+}
+
+.learn-chapter__count {
+  margin-left: auto;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-tertiary);
+  white-space: nowrap;
+  flex: none;
+}
+
+.learn-chapter__empty {
+  display: flex;
+  align-items: center;
+  min-height: 84px;
+  padding: 18px 20px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--ink-tertiary);
+  font-size: 13px;
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.lesson-grid > li {
+  display: flex;
+  min-width: 0;
+}
+
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 17px 18px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.lesson-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--tone, var(--primary));
+  box-shadow: var(--shadow-md);
+}
+
+.lesson-card.is-completed {
+  border-color: color-mix(in srgb, var(--teal) 40%, var(--line));
+}
+
+.lesson-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.lesson-card__order {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tone, var(--primary));
+  letter-spacing: 0.06em;
+}
+
+.lesson-card__status {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  color: var(--ink-tertiary);
+  flex: none;
+  transition:
+    background 0.16s var(--ease),
+    color 0.16s var(--ease);
+}
+
+.lesson-card:hover .lesson-card__status {
+  background: var(--tone-soft, var(--primary-soft));
+  color: var(--tone, var(--primary));
+}
+
+.lesson-card__status.is-done {
+  background: var(--teal-soft);
+  color: var(--success);
+}
+
+.lesson-card__title {
+  font-size: 16.5px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.lesson-card__desc {
+  margin-top: 5px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lesson-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  color: var(--ink-tertiary);
+  font-size: 11px;
+}
+
+.lesson-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.lesson-card__meta-item .icon {
+  color: var(--ink-tertiary);
+}
+
+/* -------------------------------- 底部横幅 ------------------------------- */
+
+.learn-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 52px;
+  padding: 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 55%),
+    var(--bg-elevated);
+}
+
+.learn-banner__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  flex: none;
+}
+
+.learn-banner__copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.learn-banner__title {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.learn-banner__text {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+}
+
+/* -------------------------------- 响应式 -------------------------------- */
+
+@media (max-width: 1100px) {
+  .learn-chapter {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 30px 0;
+  }
+
+  .lesson-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .learn-progress {
+    width: 100%;
+  }
+
+  .learn-chapter {
+    padding: 26px 0;
+  }
+
+  .lesson-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .learn-chapter__title {
+    font-size: 18px;
+  }
+
+  .learn-chapter__count {
+    display: none;
+  }
+
+  .learn-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 12px;
+  }
+
+  .learn-banner .btn {
+    width: 100%;
+  }
+}
