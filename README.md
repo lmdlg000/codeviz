@@ -39,6 +39,14 @@ pnpm build        # 类型检查 + 生产构建（dist/）
 pnpm preview      # 预览生产构建 http://127.0.0.1:4178
 ```
 
+## 部署
+
+推送到 `main` 分支即触发 `.github/workflows/deploy-pages.yml`：类型检查 → 单元测试 → 构建 → 发布到 GitHub Pages。
+
+- 线上地址：https://lmdlg000.github.io/codeviz/
+- 首次使用需要在仓库 **Settings → Pages → Build and deployment → Source** 里选择 **GitHub Actions**（`GITHUB_TOKEN` 无权自动创建 Pages 站点）。
+- `vite.config.ts` 的 `base` 为相对路径，项目页子路径、自定义域名与本地 `pnpm preview` 都直接可用。
+
 ## 目录
 
 ```

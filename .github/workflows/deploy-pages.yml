@@ -50,11 +50,11 @@ jobs:
       - name: Disable Jekyll processing
         run: touch dist/.nojekyll
 
+      # 说明：GitHub 的 GITHUB_TOKEN 无权创建 Pages 站点，所以首次必须在
+      # 仓库 Settings → Pages → Build and deployment → Source 里选择「GitHub Actions」，
+      # 之后本工作流才能持续发布到这个地址：https://lmdlg000.github.io/codeviz/
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          # 首次运行时自动把 Pages 的 Source 切到 GitHub Actions，省掉手动设置
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
