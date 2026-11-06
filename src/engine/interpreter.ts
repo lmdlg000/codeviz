@@ -1904,6 +1904,8 @@ class Interpreter {
       if (absolute < 0 || absolute >= value.array.elems.length) {
         throw new SimError('指针指向了数组范围之外。', line);
       }
+      // 写入路径也要拦住「释放后使用」：*p = x 与 p[i] = x 都走这里
+      this.assertHeapAlive(value.array, line);
       const label = value.label;
       return arrayElementRef(value.array, absolute, label);
     }

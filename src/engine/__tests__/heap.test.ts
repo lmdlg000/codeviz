@@ -127,3 +127,46 @@ int main() {
     expect(mid!.heap![0].owners.sort()).toEqual(['p', 'q']);
   });
 });
+
+describe('simulate：堆内存的写入路径', () => {
+  it('delete 之后写 *p 也会被拦住', () => {
+    const result = simulate(`
+int main() {
+  int* p = new int(5);
+  delete p;
+  *p = 9;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(false);
+    expect(result.error?.message).toContain('释放后使用');
+  });
+
+  it('对空指针 delete 是安全的', () => {
+    const result = simulate(`
+int main() {
+  int* p = nullptr;
+  delete p;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(true);
+  });
+
+  it('new 出来的结构体可以按成员访问', () => {
+    const result = simulate(`
+#include <stdio.h>
+struct Point { int x; int y; };
+int main() {
+  Point* p = new Point();
+  p->x = 3;
+  p->y = 4;
+  printf("%d\\n", p->x + p->y);
+  delete p;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('7\n');
+  });
+});
