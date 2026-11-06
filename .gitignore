@@ -27,3 +27,6 @@ Thumbs.db
 # temp reference-scan scripts
 pdfscan.py
 pdfrender.py
+
+# DSH agent artifacts
+.dsh/

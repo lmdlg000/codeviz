@@ -214,11 +214,10 @@ export function computeLineStats(code: string): LineStats {
     let i = 0;
     let hasCode = false;
     let hasComment = false;
-    let lineOnlyPreproc = false;
 
     if (inPreproc) {
       hasCode = true;
-      lineOnlyPreproc = true;
+
       const trimmed = rawLine.trimEnd();
       inPreproc = trimmed.endsWith('\\');
       if (!inPreproc) {
@@ -293,7 +292,7 @@ export function computeLineStats(code: string): LineStats {
       }
       if (ch === '#' && rawLine.slice(0, i).trim().length === 0) {
         hasCode = true;
-        lineOnlyPreproc = true;
+
         const trimmed = rawLine.trimEnd();
         inPreproc = trimmed.endsWith('\\');
         break;
@@ -308,7 +307,7 @@ export function computeLineStats(code: string): LineStats {
     else if (hasComment) commentLines++;
     else blankLines++;
 
-    void lineOnlyPreproc;
+
   }
 
   return { totalLines: lines.length, codeLines, commentLines, blankLines };

@@ -18,14 +18,12 @@ import {
   countCodeLines,
   loadCodeFile,
 } from '../lib/files';
+import { clearHandoff, saveDraft } from '../lib/lab';
 import {
-  DEFAULT_LAB_CODE,
-  DEFAULT_LAB_FILENAME,
-  clearHandoff,
-  loadDraft,
-  peekHandoff,
-  saveDraft,
-} from '../lib/lab';
+  resolveLabInitial,
+  sampleFilename,
+  type LabInitialState,
+} from '../lib/labInitial';
 import { PageHeader } from '../layout/PageHeader';
 import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
@@ -33,91 +31,13 @@ import { SamplePicker } from '../components/SamplePicker';
 import { LabEditor, type LabEditorHandle } from '../components/lab/LabEditor';
 import { LabAnalysisPanel, type LabTab } from '../components/lab/LabAnalysisPanel';
 
-interface InitialState {
-  code: string;
-  filename: string;
-  autoAnalyze: boolean;
-  handoff: boolean;
-  sampleId: string | null;
-}
-
-function sampleFilename(sample: CodeSample): string {
-  return `${sample.id}.${sample.language === 'cpp' ? 'cpp' : 'c'}`;
-}
-
-function resolveInitial(search: string): InitialState {
-  const handoff = peekHandoff();
-  if (handoff) {
-    return {
-      code: handoff.code,
-      filename: handoff.filename ?? 'from-lesson.c',
-      autoAnalyze: true,
-      handoff: true,
-      sampleId: null,
-    };
-  }
-
-  const params = new URLSearchParams(search);
-  const sample = getSample(params.get('sample') ?? undefined);
-  if (sample) {
-    return {
-      code: sample.code,
-      filename: sampleFilename(sample),
-      autoAnalyze: true,
-      handoff: false,
-      sampleId: sample.id,
-    };
-  }
-
-  const codeParam = params.get('code');
-  if (codeParam && codeParam.trim().length > 0) {
-    return {
-      code: codeParam,
-      filename: params.get('filename') ?? 'pasted.c',
-      autoAnalyze: true,
-      handoff: false,
-      sampleId: null,
-    };
-  }
-
-  const draft = loadDraft();
-  if (draft) {
-    return {
-      code: draft.code,
-      filename: draft.filename,
-      autoAnalyze: false,
-      handoff: false,
-      sampleId: null,
-    };
-  }
-
-  const firstSample = getSample('bubble-sort') ?? samples[0];
-  if (firstSample) {
-    return {
-      code: firstSample.code,
-      filename: sampleFilename(firstSample),
-      autoAnalyze: false,
-      handoff: false,
-      sampleId: firstSample.id,
-    };
-  }
-
-  return {
-    code: DEFAULT_LAB_CODE,
-    filename: DEFAULT_LAB_FILENAME,
-    autoAnalyze: false,
-    handoff: false,
-    sampleId: null,
-  };
-}
-
 export interface LabPageProps {
   /** hash query（不含 ?），来自 App 的当前路由 */
   search: string;
 }
 
 export function LabPage({ search }: LabPageProps) {
-  const [initial] = useState<InitialState>(() => resolveInitial(search));
+  const [initial] = useState<LabInitialState>(() => resolveLabInitial(search));
   const [code, setCode] = useState(initial.code);
   const [filename, setFilename] = useState(initial.filename);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -149,6 +69,41 @@ export function LabPage({ search }: LabPageProps) {
   const lineCount = useMemo(() => countCodeLines(code), [code]);
   const overLimit = lineCount > MAX_CODE_LINES;
 
+  /** 同步执行一次分析（不经过定时器），供首屏自动分析与定时器复用。 */
+  const analyzeNow = useCallback(
+    (targetCode: string, targetFilename: string): boolean => {
+      if (targetCode.trim().length === 0) {
+        pushToast('请先输入或载入一段代码', 'error');
+        return false;
+      }
+      const targetLines = countCodeLines(targetCode);
+      if (targetLines > MAX_CODE_LINES) {
+        pushToast(`代码有 ${targetLines} 行，超过 ${MAX_CODE_LINES} 行上限，请精简后再分析。`, 'error');
+        return false;
+      }
+
+      const result = analyzeCached(targetCode, targetFilename);
+      setAnalysis(result);
+      setAnalyzed({ code: targetCode, filename: targetFilename });
+      setActiveTab('overview');
+      setFlowFunctionId((previous) => {
+        if (previous && result.flowcharts.some((chart) => chart.functionId === previous)) {
+          return previous;
+        }
+        return result.flowcharts[0]?.functionId ?? null;
+      });
+      const errors = result.diagnostics.filter((item) => item.severity === 'error').length;
+      pushToast(
+        errors > 0
+          ? `分析完成：${result.functions.length} 个函数，${errors} 个错误`
+          : `分析完成：${result.functions.length} 个函数，没有发现错误`,
+        errors > 0 ? 'info' : 'success',
+      );
+      return true;
+    },
+    [pushToast],
+  );
+
   const runAnalysisOn = useCallback(
     (targetCode: string, targetFilename: string) => {
       if (targetCode.trim().length === 0) {
@@ -167,27 +122,11 @@ export function LabPage({ search }: LabPageProps) {
       setTrace(null);
       setTraceCode(null);
       analysisTimer.current = window.setTimeout(() => {
-        const result = analyzeCached(targetCode, targetFilename);
-        setAnalysis(result);
-        setAnalyzed({ code: targetCode, filename: targetFilename });
+        analyzeNow(targetCode, targetFilename);
         setAnalyzing(false);
-        setActiveTab('overview');
-        setFlowFunctionId((previous) => {
-          if (previous && result.flowcharts.some((chart) => chart.functionId === previous)) {
-            return previous;
-          }
-          return result.flowcharts[0]?.functionId ?? null;
-        });
-        const errors = result.diagnostics.filter((item) => item.severity === 'error').length;
-        pushToast(
-          errors > 0
-            ? `分析完成：${result.functions.length} 个函数，${errors} 个错误`
-            : `分析完成：${result.functions.length} 个函数，没有发现错误`,
-          errors > 0 ? 'info' : 'success',
-        );
       }, 40);
     },
-    [pushToast],
+    [analyzeNow],
   );
 
   const runTraceOn = useCallback(
@@ -248,7 +187,8 @@ export function LabPage({ search }: LabPageProps) {
     [pushToast, runAnalysisOn],
   );
 
-  // 首次挂载：处理课程页交接 / URL 中的示例与代码
+  // 首次挂载：处理课程页交接 / URL 中的示例与代码。
+  // 自动分析直接同步执行，不经过会被 StrictMode cleanup 清掉的定时器。
   useEffect(() => {
     if (booted.current) return;
     booted.current = true;
@@ -257,7 +197,10 @@ export function LabPage({ search }: LabPageProps) {
       pushToast('已从课程页载入代码', 'info');
     }
     if (initial.autoAnalyze) {
-      runAnalysisOn(initial.code, initial.filename);
+      setActiveLine(null);
+      setTrace(null);
+      setTraceCode(null);
+      analyzeNow(initial.code, initial.filename);
     }
     // 只在挂载时执行一次
     // eslint-disable-next-line react-hooks/exhaustive-deps

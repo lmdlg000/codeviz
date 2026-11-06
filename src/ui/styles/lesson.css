@@ -693,8 +693,19 @@
   border-radius: var(--radius-md);
   background: var(--bg-inset);
   padding: 10px;
-  overflow-x: auto;
+  overflow: auto;
   min-height: 180px;
+  max-height: 540px;
+  overscroll-behavior: contain;
+}
+
+/* 课程内嵌图卡：收敛图表自身高度，保持正文节奏，同时保留缩放/滚动 */
+.diagram-card__body .cvz-flow__scroll {
+  max-height: 360px;
+}
+
+.diagram-card__body .cvz-trace__code {
+  max-height: 300px;
 }
 
 .diagram-card__hint {
@@ -1316,6 +1327,16 @@
   .diagram-card__body {
     padding: 6px;
     min-height: 150px;
+    max-height: 400px;
+  }
+
+  .diagram-card__body .cvz-flow__scroll {
+    max-height: 300px;
+    min-height: 220px;
+  }
+
+  .diagram-card__body .cvz-trace__code {
+    max-height: 260px;
   }
 
   .key-points {

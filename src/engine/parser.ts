@@ -139,6 +139,9 @@ interface FunctionTailOptions {
   isConstructor?: boolean;
   isDestructor?: boolean;
   isTemplate?: boolean;
+  /** 返回类型上的指针层数（如 char *name()） */
+  pointerDepth?: number;
+  isReference?: boolean;
 }
 
 interface MemberParseResult {
@@ -448,8 +451,6 @@ export class Parser {
         if (alias) {
           this.program.typedefs[alias] = definedName;
           this.knownTypes.add(alias);
-          const list: TypedefNode[] = [];
-          void list;
           const typedefNode: TypedefNode = {
             kind: 'typedef',
             name: alias,
@@ -576,7 +577,7 @@ export class Parser {
       }
     }
 
-    const classNode = this.parseClassBody(kwTok, name, bases, nested);
+    const classNode = this.parseClassBody(kwTok, name, bases);
     if (!name) {
       name = `anon_${kwTok.text}_${this.program.classes.length + 1}`;
       classNode.name = name;
@@ -636,7 +637,6 @@ export class Parser {
     kwTok: Token,
     className: string,
     bases: BaseSpec[],
-    nested: boolean,
   ): ClassDeclNode {
     this.expect('{');
     let access: AccessKind = kwTok.text === 'class' ? 'private' : 'public';
@@ -675,7 +675,6 @@ export class Parser {
       isTemplate: this.pendingTemplate,
       ...this.span(kwTok),
     };
-    void nested;
     return node;
   }
 
@@ -812,6 +811,8 @@ export class Parser {
         startTok: tok,
         quals,
         access,
+        pointerDepth: header.pointerDepth,
+        isReference: header.isReference,
       });
       return { methods: [fn] };
     }
@@ -1174,6 +1175,8 @@ export class Parser {
         returnType: spec.text,
         baseType: spec.base,
         startTok,
+        pointerDepth: header.pointerDepth,
+        isReference: header.isReference,
         quals: {
           specifiers: [],
           isConst: spec.isConst,
@@ -1219,6 +1222,17 @@ export class Parser {
       if (cls.name === base) return true;
     }
     return this.knownTypes.has(base) && !isBuiltinTypeName(base);
+  }
+
+  /** 从类型文本中剔除函数修饰符，得到干净的返回类型 */
+  private cleanReturnTypeText(text: string): string {
+    return text
+      .replace(
+        /\b(virtual|static|inline|explicit|friend|constexpr|consteval|mutable|extern|register|thread_local|typedef)\b/g,
+        '',
+      )
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   /** 解析参数列表（当前 token 是 '('） */
@@ -1306,6 +1320,8 @@ export class Parser {
         continue;
       }
       if (this.check('override') || this.check('final')) {
+        // override 意味着这是一个虚函数（C++11 起）
+        if (this.check('override')) isVirtual = true;
         this.advance();
         continue;
       }
@@ -1367,21 +1383,40 @@ export class Parser {
       const token = this.peek();
       throw new ParseError(`函数 "${options.name}" 的声明无法继续解析。`, 'function-parse');
     }
-    void isVirtual;
 
     const className = options.className;
     const simpleName = className ? lastSegment(className) : '';
     const isConstructor = options.isConstructor === true || (!!className && !options.isDestructor && options.name === simpleName);
     const isDestructor = options.isDestructor === true || options.name.startsWith('~');
     const isOperator = options.name.startsWith('operator');
-    let returnType = isConstructor || isDestructor ? '' : trailingReturn ?? options.returnType;
-    if (!returnType && !isConstructor && !isDestructor) returnType = 'void';
 
+    // 返回类型：去掉 virtual/static/inline 等修饰符，再补回指针 / 引用星号
+    let returnType = '';
+    if (!isConstructor && !isDestructor) {
+      returnType = this.cleanReturnTypeText(trailingReturn ?? options.returnType);
+      const pointerDepth = options.pointerDepth ?? 0;
+      if (pointerDepth > 0) returnType += '*'.repeat(pointerDepth);
+      if (options.isReference) returnType += '&';
+      if (!returnType) returnType = 'void';
+    }
+
+    const modifierText = [
+      isVirtual ? 'virtual' : '',
+      isStatic ? 'static' : '',
+      isInline ? 'inline' : '',
+      isExplicit ? 'explicit' : '',
+    ]
+      .filter((part) => part.length > 0)
+      .join(' ');
     const paramText = params
       .map((p) => (p.name && p.name !== '...' ? `${p.typeText} ${p.name}` : p.typeText))
       .join(', ');
-    const prefix = isConstructor || isDestructor ? '' : `${returnType} `;
-    const signature = `${prefix}${options.name}(${paramText})${isConst ? ' const' : ''}`;
+    const signatureParts = [
+      modifierText,
+      isConstructor || isDestructor ? '' : returnType,
+      `${options.name}(${paramText})`,
+    ].filter((part) => part.length > 0);
+    const signature = `${signatureParts.join(' ')}${isConst ? ' const' : ''}${isPureVirtual ? ' = 0' : ''}`;
 
     return {
       kind: 'function',

@@ -7,7 +7,7 @@
  * - 成员行可点击定位源码行，整盒可聚焦并用 Enter/Space 触发。
  * 布局与成员签名格式化见 classLayout.ts。
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ClassInfo } from '../../engine/types';
 import { truncateText } from './svgUtils';
 import { VizEmpty } from './feedback';
@@ -286,6 +286,28 @@ export function ClassDiagramView({ classes, activeLine, onSelectLine, compact = 
   const [uid] = useState(() => `cvz-class-${++classUid}`);
   const m = useMemo(() => classMetricsFor(compact), [compact]);
   const layout = useMemo(() => buildClassLayout(classes, compact), [classes, compact]);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [availableWidth, setAvailableWidth] = useState(0);
+
+  // 优先整体缩放到容器宽度；最小 0.75，仍然过宽时允许横向滚动
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    const update = () => setAvailableWidth(element.clientWidth);
+    update();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', update);
+      return () => window.removeEventListener('resize', update);
+    }
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const scale =
+    availableWidth > 0 && layout.width > 0
+      ? Math.min(1, Math.max(0.75, (availableWidth - 24) / layout.width))
+      : 1;
 
   if (!classes || layout.boxes.length === 0) {
     return (
@@ -302,15 +324,18 @@ export function ClassDiagramView({ classes, activeLine, onSelectLine, compact = 
 
   return (
     <div className={`cvz cvz-class${compact ? ' is-compact' : ''}`}>
-      <div className="cvz-class__scroll">
+      <div className="cvz-class__scroll" ref={scrollRef}>
         <div className="cvz-class__inner">
           <svg
             className="cvz-class__svg"
-            width={layout.width}
-            height={layout.height}
+            width={layout.width * scale}
+            height={layout.height * scale}
             viewBox={`0 0 ${layout.width} ${layout.height}`}
+            preserveAspectRatio="xMidYMid meet"
             role="group"
-            aria-label={`UML 类图，共 ${layout.boxes.length} 个类`}
+            aria-label={`UML 类图，共 ${layout.boxes.length} 个类${
+              scale < 0.999 ? `，已缩放到 ${Math.round(scale * 100)}%` : ''
+            }`}
           >
             <defs>
               <marker

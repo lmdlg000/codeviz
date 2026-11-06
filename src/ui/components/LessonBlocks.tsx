@@ -104,12 +104,9 @@ function DiagramCard({ diagram, title, caption }: { diagram: DiagramSpec; title?
           functionName={diagram.kind === 'flow' ? diagram.functionName : undefined}
           autoplay={diagram.kind === 'trace' ? diagram.autoplay : undefined}
           onOpenLab={openLab}
+          compact
         />
       </div>
-      <p className="diagram-card__hint">
-        <Icon name="target" size={14} />
-        点击图中的节点，可以把焦点放回对应的代码行。
-      </p>
     </figure>
   );
 }

@@ -43,7 +43,6 @@ import { buildDiagnostics } from './diagnostics';
 import { buildSupportRegistry, findUnsupportedFunction, findUnsupportedProgram } from './support';
 import type { SupportRegistry } from './support';
 import {
-  arraySize,
   byLine,
   safeId,
   scalarSize,
@@ -173,7 +172,7 @@ export function analyzeProgram(input: AnalyzeBuildInput): AnalysisResult {
   const programSupportIssue = findUnsupportedProgram(input.program, supportRegistry, mainRecord?.node);
 
   const stats = computeStats(model, input);
-  const functions = model.records.map((r) => toFunctionInfo(model, r));
+  const functions = model.records.map((r) => toFunctionInfo(r));
   const classes = buildClassInfos(model);
   const flowcharts = buildFlowcharts(
     model.records.filter((r) => r.hasBody).map((r) => ({ id: r.id, displayName: r.displayName, node: r.node })),
@@ -379,7 +378,11 @@ function buildModel(input: AnalyzeBuildInput): AnalysisModel {
     const complexity = computeComplexity(body);
     const maxNesting = computeMaxNesting(body);
     const hasReturnOnAllPaths =
-      isVoidType(node.returnType) || node.name === 'main' || !body
+      isVoidType(node.returnType) ||
+      node.isConstructor ||
+      node.isDestructor ||
+      node.name === 'main' ||
+      !body
         ? true
         : blockAlwaysReturns(body);
     return {
@@ -793,7 +796,7 @@ function computeStats(model: AnalysisModel, input: AnalyzeBuildInput): CodeStats
 
 /* ============================== 函数信息 ============================== */
 
-function toFunctionInfo(model: AnalysisModel, record: FunctionRecord): FunctionInfo {
+function toFunctionInfo(record: FunctionRecord): FunctionInfo {
   const node = record.node;
   let kind: FunctionKind = 'function';
   if (node.isConstructor) kind = 'constructor';
@@ -829,14 +832,12 @@ function toFunctionInfo(model: AnalysisModel, record: FunctionRecord): FunctionI
     hasReturnOnAllPaths: record.hasReturnOnAllPaths,
     interpreterSupported: record.supportIssue === null,
   };
-  void model;
 }
 
 /* ============================== 调用图 ============================== */
 
 function buildCallGraph(model: AnalysisModel): CallGraph {
   const withBody = model.records.filter((r) => r.hasBody);
-  const recordById = new Map(withBody.map((r) => [r.id, r]));
   const byName = new Map<string, FunctionRecord[]>();
   for (const record of withBody) {
     const list = byName.get(record.node.name) ?? [];
@@ -873,7 +874,8 @@ function buildCallGraph(model: AnalysisModel): CallGraph {
     for (const call of caller.calls) {
       const target = resolve(call.callee, caller);
       if (!target) {
-        external.add(call.callee);
+        // 类名调用（隐式构造函数）不算"外部函数"
+        if (!model.classByName.has(call.callee)) external.add(call.callee);
         continue;
       }
       const key = `${caller.id}->${target.id}`;
@@ -958,7 +960,6 @@ function buildCallGraph(model: AnalysisModel): CallGraph {
   let maxDepth = 0;
   for (const node of nodes) maxDepth = Math.max(maxDepth, node.depth);
 
-  void recordById;
   return {
     nodes,
     edges,

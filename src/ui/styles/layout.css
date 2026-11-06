@@ -262,7 +262,7 @@
   border-top: 1px solid var(--line);
   margin-top: 10px;
   font-size: 10.5px;
-  color: var(--ink-tertiary);
+  color: var(--ink-secondary);
 }
 
 .sidebar__meta .mono {

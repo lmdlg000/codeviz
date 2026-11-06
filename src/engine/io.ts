@@ -241,11 +241,13 @@ export function parseFormat(format: string): FormatSpec[] {
       flags += format[i];
       i++;
     }
+    let dynamicWidth = false;
     if (format[i] === '*') {
+      // printf 中表示动态宽度；scanf 中表示跳过该输入
       suppressed = true;
+      dynamicWidth = true;
       i++;
     }
-    let dynamicWidth = false;
     let width: number | null = null;
     if (format[i] === '*') {
       dynamicWidth = true;

@@ -11,6 +11,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
   const timers = useRef(new Map<number, number>());
+  const lastPush = useRef<{ message: string; tone: ToastTone; at: number } | null>(null);
 
   const dismissToast = useCallback((id: number) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -23,9 +24,28 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const pushToast = useCallback(
     (message: string, tone: ToastTone = 'info') => {
+      const now = Date.now();
+      const previous = lastPush.current;
+      // 相同文案在 1.2 秒内只保留一条，避免连续操作时重复提示
+      if (
+        previous &&
+        previous.message === message &&
+        previous.tone === tone &&
+        now - previous.at < 1200
+      ) {
+        return;
+      }
+      lastPush.current = { message, tone, at: now };
+
       const id = nextId.current;
       nextId.current += 1;
-      setToasts((current) => [...current.slice(-(MAX_TOASTS - 1)), { id, message, tone }]);
+      setToasts((current) => {
+        // 同文案的旧通知先移除，避免多条相同内容同时堆叠
+        const deduped = current.filter(
+          (toast) => !(toast.message === message && toast.tone === tone),
+        );
+        return [...deduped.slice(-(MAX_TOASTS - 1)), { id, message, tone }];
+      });
       const timer = window.setTimeout(() => dismissToast(id), TOAST_DURATION);
       timers.current.set(id, timer);
     },

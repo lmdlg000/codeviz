@@ -1,0 +1,1080 @@
+{
+  "generatedAt": "2026-11-06T11:49:26.976Z",
+  "base": "http://127.0.0.1:5178",
+  "phases": [
+    {
+      "name": "initial",
+      "ms": 1524,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "analyze",
+      "ms": 668,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "tabs",
+      "ms": 4296,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "trace",
+      "ms": 6429,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "sample-library",
+      "ms": 8725,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "upload",
+      "ms": 650,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "shortcuts-draft",
+      "ms": 4112,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "diagnostics",
+      "ms": 10874,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "url-query",
+      "ms": 1338,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "mobile",
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "mobile",
+      "ms": 6053,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    }
+  ],
+  "details": {
+    "initial": {
+      "filename": "bubble-sort.c",
+      "status": "尚未分析，点击「分析代码」生成视图",
+      "lines": "24 / 500 行",
+      "emptyPanel": true,
+      "tabs": 0,
+      "editorText": "#include <stdio.h>\n\n\nint main() {\n  int a[8] = {42, 17, 93, 8, 55, 21, 76, 34};\n  int n = 8;\n\n\n  for (int i = 0; i < n - 1; i++) {\n    for (int j = 0; j < n - 1 - i; j++) {\n      if (a[j] > a[j + 1]) {\n        int temp = a[j];\n        a[j] = a[j + 1];\n        a[j + 1] = temp;\n      }\n    }\n  }\n\n\n  printf(\"排序结果：\");\n  for (int i = 0; i < n; i++) {\n    printf(\"%d \", a[i]);\n  }\n  printf(\"\\n\");\n  return 0;\n}\n\n"
+    },
+    "analysis": {
+      "status": "已分析 · 1 个函数 · 0 个错误",
+      "tabs": [
+        "概览",
+        "流程图1",
+        "调用图1",
+        "类图0",
+        "内存",
+        "单步执行",
+        "诊断0"
+      ],
+      "stats": [
+        {
+          "label": "代码行数",
+          "value": "24",
+          "hint": "20 行有效代码"
+        },
+        {
+          "label": "函数",
+          "value": "1",
+          "hint": "1 个分支 · 3 个循环"
+        },
+        {
+          "label": "循环",
+          "value": "3",
+          "hint": "最大嵌套 3 层"
+        },
+        {
+          "label": "诊断",
+          "value": "0",
+          "hint": "0 错误 · 0 警告"
+        }
+      ],
+      "functions": [
+        "main"
+      ],
+      "complexity": "5",
+      "external": [
+        "printf"
+      ]
+    },
+    "flow": {
+      "nodes": 12,
+      "chips": 1,
+      "svg": true,
+      "legend": true
+    },
+    "flowLink": {
+      "targetLine": 17,
+      "snippetLine": "L17",
+      "snippetText": "printf(\"排序结果：\");",
+      "highlighted": 1,
+      "activeNodes": 1,
+      "scrollerTop": 71
+    },
+    "calls": {
+      "nodes": 1,
+      "external": [
+        "printf"
+      ],
+      "legend": true
+    },
+    "callDetail": {
+      "detail": true,
+      "name": "int main()",
+      "locate": true,
+      "highlighted": 1
+    },
+    "classesEmpty": {
+      "empty": true,
+      "emptyText": "这段代码还没有定义 class / struct",
+      "nodes": 0
+    },
+    "memory": {
+      "frames": 1,
+      "cells": 6,
+      "sections": [
+        "全局 / 静态区",
+        "栈区",
+        "堆区"
+      ],
+      "note": "地址与布局为教学示意，不是程序真实运行时的地址。 字节数按 64 位常见模型估算：char / bool = 1、short = 2、int / float = 4、long long / double / 指针 = 8。",
+      "svg": true
+    },
+    "diagnostics": {
+      "summary": "",
+      "items": 0,
+      "empty": "很好，没有发现明显问题"
+    },
+    "traceStart": {
+      "counter1": {
+        "step": 1,
+        "total": 187
+      },
+      "description": "开始执行 main 函数",
+      "vars": [],
+      "chips": 0,
+      "output": "（程序还没有输出）",
+      "activeLine": "3"
+    },
+    "traceEnd": {
+      "counter": "187 / 187",
+      "vars": [],
+      "output": "排序结果：8 17 21 34 42 55 76 93 \n",
+      "changed": 0
+    },
+    "sampleModal": {
+      "title": "示例库",
+      "cards": 30,
+      "tags": 71,
+      "focusedInside": true
+    },
+    "classSampleLoaded": {
+      "filename": "class-rectangle.cpp",
+      "status": "已分析 · 7 个函数 · 0 个错误",
+      "code": "#include <iostream>\n\n\nclass Rectangle {\npublic:\n  Rectangle(double width, double height) {\n    width_ = width > 0 ? width : 0;\n    height_ = height > 0 ? height : 0;\n  }\n\n\n  double area() const {\n    return width_ * height_;\n  }\n\n\n  double perimeter() const {\n    return 2 * (width_ + height_);\n  }\n\n\n  void setWidth(double width) {\n    if (width > 0) {\n      width_ = width;\n    }\n  }\n\n\n  double width() const { return width_; }\n  double height() const { return height_; }\n\n\nprivate:\n  double width_ = 1.0;\n  double height_ = 1.0;\n};\n\n\nint main() {\n  Rectangle rect(4.0, 2.5);\n  std::cout << \"area = \" << rect.area() << std::endl;\n  std::cout << \"perimeter = \" << rect.perimeter() << std::endl;\n\n\n  rect.setWidth(10.0);\n  std::cout << \"new width = \" << rect.width() << std::endl;\n  return 0;\n}",
+      "toast": [
+        "已载入示例「Rectangle：第一个封装类」",
+        "分析完成：7 个函数，没有发现错误"
+      ]
+    },
+    "classDiagram": {
+      "nodes": 1,
+      "names": [
+        "Rectangle"
+      ],
+      "fields": [
+        "width_: double",
+        "height_: double",
+        "Rectangle(double width, double height)",
+        "area() const: double",
+        "perimeter() const: double",
+        "setWidth(double width): void",
+        "width() const: double",
+        "height() const: double"
+      ],
+      "rows": 8,
+      "svg": true
+    },
+    "polymorphism": {
+      "nodes": 3,
+      "names": [
+        "Shape",
+        "Circle",
+        "Rectangle"
+      ],
+      "inheritEdges": 2,
+      "virtualBadges": 7,
+      "bases": [
+        ": Shape",
+        ": Shape"
+      ],
+      "legend": "+public-private#protected继承自virtual虚函数"
+    },
+    "polyCalls": {
+      "nodes": [
+        "Shape::~Shape",
+        "Circle::Circle",
+        "Rectangle::Rectangle",
+        "Rectangle::area",
+        "Rectangle::name",
+        "main",
+        "Circle::name",
+        "totalArea",
+        "Circle::area"
+      ],
+      "external": []
+    },
+    "uploadValid": {
+      "filename": "small.c",
+      "code": "#include <stdio.h>\n\n\nint main(void) {\n  printf(\"upload ok\\n\");\n  return 0;\n}\n\n",
+      "status": "已分析 · 1 个函数 · 0 个错误",
+      "lines": "7 / 500 行"
+    },
+    "uploadBig": {
+      "toast": "文件有 501 行，超过了 500 行的上限。",
+      "filename": "small.c",
+      "code": "#include <stdio.h>\n\n\nint main(void) {\n  printf(\"upload ok\\n\");\n  return 0;\n}\n\n"
+    },
+    "uploadWrongType": {
+      "toast": "只支持 .c / .cpp / .cc / .cxx / .h / .hpp / .txt 文件。",
+      "filename": "small.c"
+    },
+    "draftStored": {
+      "filename": "small.c",
+      "marker": true
+    },
+    "draftRestored": {
+      "filename": "small.c",
+      "code": "#include <stdio.h>\n\n\nint main(void) {\n  printf(\"upload ok\\n\");\n  return 0;\n}\n// QA-EDIT-MARKER\n// QA-DRAFT-MARKER",
+      "status": "尚未分析，点击「分析代码」生成视图"
+    },
+    "diagnosticsFound": {
+      "missing-semicolon": [
+        "这里缺少分号 ;，语句可能没有正确结束。"
+      ],
+      "scanf-no-amper": [
+        "scanf 的 %d 需要变量的地址，应写成 &变量名。"
+      ],
+      "array-out-of-bounds": [
+        "数组下标 5 超出范围，合法下标是 0 ~ 2。",
+        "数组下标 5 超出范围，合法下标是 0 ~ 2。"
+      ],
+      "division-by-zero": [
+        "除数是字面量 0，运行时会出错。"
+      ]
+    },
+    "errorStats": {
+      "status": "已分析 · 1 个函数 · 0 个错误",
+      "diagTile": "诊断10 错误 · 1 警告"
+    },
+    "emptyCode": {
+      "lines": "0 / 500 行",
+      "analyzeDisabled": true,
+      "traceDisabled": true
+    },
+    "unsupportedTrace": {
+      "error": true,
+      "kind": "语法超出支持范围",
+      "message": "函数 fopen() 暂不支持单步执行（文件 / 内存 / STL 等高级用法）。",
+      "suggestion": "可以试着把代码简化到解释器子集：基础类型、循环、分支、数组、函数调用与 printf。"
+    },
+    "urlSample": {
+      "filename": "factorial.c",
+      "status": "已分析 · 2 个函数 · 0 个错误",
+      "code": "#include <stdio.h>\n\n\nint factorial(int n) {\n  if (n <= 1) {\n    return 1;\n  }\n  return n * factorial(n - 1);\n}\n\n\nint main() {\n  for (int i = 1; i <= 6; i++) {\n    printf(\"%d! = %d\\n\", i, factorial(i));\n  }\n  return 0;\n}\n\n",
+      "tabs": 7
+    },
+    "mobileLayout": {
+      "viewport": 390,
+      "editor": {
+        "top": 481,
+        "bottom": 821
+      },
+      "panel": {
+        "top": 835,
+        "bottom": 1375
+      },
+      "scrollWidth": 390,
+      "topbar": true,
+      "sidebarVisible": false
+    },
+    "mobileTrace": {
+      "player": {
+        "left": 34,
+        "right": 356,
+        "width": 322
+      },
+      "tabs": {
+        "left": 21,
+        "right": 369
+      },
+      "counter": "1 / 187",
+      "scrollWidth": 390,
+      "viewport": 390
+    }
+  },
+  "checks": [
+    {
+      "area": "lab",
+      "id": "initial/filename",
+      "ok": true,
+      "detail": "bubble-sort.c"
+    },
+    {
+      "area": "lab",
+      "id": "initial/status",
+      "ok": true,
+      "detail": "尚未分析，点击「分析代码」生成视图"
+    },
+    {
+      "area": "lab",
+      "id": "initial/empty-panel",
+      "ok": true,
+      "detail": "tabs=0"
+    },
+    {
+      "area": "lab",
+      "id": "initial/no-tabs",
+      "ok": true,
+      "detail": "tabs=0"
+    },
+    {
+      "area": "lab",
+      "id": "initial/editor-has-code",
+      "ok": true,
+      "detail": "408 字符"
+    },
+    {
+      "area": "lab",
+      "id": "initial/lines-chip",
+      "ok": true,
+      "detail": "24 / 500 行"
+    },
+    {
+      "area": "lab",
+      "id": "initial/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/status",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/seven-tabs",
+      "ok": true,
+      "detail": "[\"概览\",\"流程图1\",\"调用图1\",\"类图0\",\"内存\",\"单步执行\",\"诊断0\"]"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/four-stat-tiles",
+      "ok": true,
+      "detail": "[{\"label\":\"代码行数\",\"value\":\"24\",\"hint\":\"20 行有效代码\"},{\"label\":\"函数\",\"value\":\"1\",\"hint\":\"1 个分支 · 3 个循环\"},{\"label\":\"循环\",\"value\":\"3\",\"hint\":\"最大嵌套 3 层\"},{\"label\":\"诊断\",\"value\":\"0\",\"hint\":\"0 错误 · 0 警告\"}]"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/function-count-matches-list",
+      "ok": true,
+      "detail": "tile=1 list=1"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/functions-found",
+      "ok": true,
+      "detail": "[\"main\"]"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/external-calls",
+      "ok": true,
+      "detail": "[\"printf\"]"
+    },
+    {
+      "area": "lab",
+      "id": "analyze/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/overview",
+      "ok": true,
+      "detail": "概览统计卡不可见"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/flow-nodes",
+      "ok": true,
+      "detail": "{\"nodes\":12,\"chips\":1,\"svg\":true,\"legend\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/flow-svg",
+      "ok": true,
+      "detail": "缺少流程图 SVG"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/flow-function-chips",
+      "ok": true,
+      "detail": "{\"nodes\":12,\"chips\":1,\"svg\":true,\"legend\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "flow/node-click-snippet",
+      "ok": true,
+      "detail": "期望 L17，实际 L17"
+    },
+    {
+      "area": "lab",
+      "id": "flow/node-click-highlight",
+      "ok": true,
+      "detail": "{\"snippetLine\":\"L17\",\"snippetText\":\"printf(\\\"排序结果：\\\");\",\"highlighted\":1,\"activeNodes\":1,\"scrollerTop\":71}"
+    },
+    {
+      "area": "lab",
+      "id": "flow/node-click-active",
+      "ok": true,
+      "detail": "{\"snippetLine\":\"L17\",\"snippetText\":\"printf(\\\"排序结果：\\\");\",\"highlighted\":1,\"activeNodes\":1,\"scrollerTop\":71}"
+    },
+    {
+      "area": "lab",
+      "id": "flow/node-click-editor-scroll",
+      "ok": true,
+      "detail": "{\"snippetLine\":\"L17\",\"snippetText\":\"printf(\\\"排序结果：\\\");\",\"highlighted\":1,\"activeNodes\":1,\"scrollerTop\":71}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/calls-nodes",
+      "ok": true,
+      "detail": "{\"nodes\":1,\"external\":[\"printf\"],\"legend\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "calls/node-click-detail",
+      "ok": true,
+      "detail": "{\"detail\":true,\"name\":\"int main()\",\"locate\":true,\"highlighted\":1}"
+    },
+    {
+      "area": "lab",
+      "id": "calls/node-click-highlight",
+      "ok": true,
+      "detail": "{\"detail\":true,\"name\":\"int main()\",\"locate\":true,\"highlighted\":1}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/classes-empty-state",
+      "ok": true,
+      "detail": "{\"empty\":true,\"emptyText\":\"这段代码还没有定义 class / struct\",\"nodes\":0}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/memory-rendered",
+      "ok": true,
+      "detail": "{\"frames\":1,\"cells\":6,\"sections\":[\"全局 / 静态区\",\"栈区\",\"堆区\"],\"note\":\"地址与布局为教学示意，不是程序真实运行时的地址。 字节数按 64 位常见模型估算：char / bool = 1、short = 2、int / float = 4、long long / double / 指针 = 8。\",\"svg\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/memory-note",
+      "ok": true,
+      "detail": "地址与布局为教学示意，不是程序真实运行时的地址。 字节数按 64 位常见模型估算：char / bool = 1、short = 2、int / float = 4、long long / double / 指针 = 8。"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/diagnostics-rendered",
+      "ok": true,
+      "detail": "{\"summary\":\"\",\"items\":0,\"empty\":\"很好，没有发现明显问题\"}"
+    },
+    {
+      "area": "lab",
+      "id": "tabs/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/intro",
+      "ok": true,
+      "detail": "{\"intro\":true,\"support\":\"这段代码在解释器支持范围内。\"}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/support-hint",
+      "ok": true,
+      "detail": "{\"intro\":true,\"support\":\"这段代码在解释器支持范围内。\"}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/counter",
+      "ok": true,
+      "detail": "{\"step\":1,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/description",
+      "ok": true,
+      "detail": "开始执行 main 函数"
+    },
+    {
+      "area": "lab",
+      "id": "trace/active-line",
+      "ok": true,
+      "detail": "{\"description\":\"开始执行 main 函数\",\"vars\":[],\"chips\":0,\"output\":\"（程序还没有输出）\",\"activeLine\":\"3\"}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/next-step",
+      "ok": true,
+      "detail": "{\"step\":1,\"total\":187} → {\"step\":2,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/prev-step",
+      "ok": true,
+      "detail": "{\"step\":2,\"total\":187} → {\"step\":1,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/play-advances",
+      "ok": true,
+      "detail": "{\"step\":1,\"total\":187} → {\"step\":2,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/pause-button-visible",
+      "ok": true,
+      "detail": "播放中未显示暂停按钮"
+    },
+    {
+      "area": "lab",
+      "id": "trace/pause-holds",
+      "ok": true,
+      "detail": "{\"step\":2,\"total\":187} → {\"step\":2,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/speed-controls",
+      "ok": true,
+      "detail": "2x=true, 0.5x=true"
+    },
+    {
+      "area": "lab",
+      "id": "trace/output-changes",
+      "ok": true,
+      "detail": "排序结果：8 17 21 34 42 55 76 93 \n"
+    },
+    {
+      "area": "lab",
+      "id": "trace/vars-change",
+      "ok": true,
+      "detail": "start=[] end=[]"
+    },
+    {
+      "area": "lab",
+      "id": "trace/space-toggle",
+      "ok": true,
+      "detail": "暂停 / 播放"
+    },
+    {
+      "area": "lab",
+      "id": "trace/slider",
+      "ok": true,
+      "detail": "slider=93, counter={\"step\":94,\"total\":187}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "library/modal-open",
+      "ok": true,
+      "detail": "示例库"
+    },
+    {
+      "area": "lab",
+      "id": "library/cards",
+      "ok": true,
+      "detail": "cards=30"
+    },
+    {
+      "area": "lab",
+      "id": "library/tags",
+      "ok": true,
+      "detail": "tags=71"
+    },
+    {
+      "area": "lab",
+      "id": "library/focus-search",
+      "ok": true,
+      "detail": "搜索示例"
+    },
+    {
+      "area": "lab",
+      "id": "library/search-filters",
+      "ok": true,
+      "detail": "搜索「Rectangle」后 1 条"
+    },
+    {
+      "area": "lab",
+      "id": "library/language-filter",
+      "ok": true,
+      "detail": "{\"count\":10,\"allCpp\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "library/modal-closes",
+      "ok": true,
+      "detail": "载入示例后弹窗未关闭"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-filename",
+      "ok": true,
+      "detail": "class-rectangle.cpp"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-code",
+      "ok": true,
+      "detail": "编辑器未载入 Rectangle 代码"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-diagram-nodes",
+      "ok": true,
+      "detail": "{\"nodes\":1,\"names\":[\"Rectangle\"],\"fields\":[\"width_: double\",\"height_: double\",\"Rectangle(double width, double height)\",\"area() const: double\",\"perimeter() const: double\",\"setWidth(double width): void\",\"width() const: double\",\"height() const: double\"],\"rows\":8,\"svg\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-diagram-name",
+      "ok": true,
+      "detail": "[\"Rectangle\"]"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-diagram-members",
+      "ok": true,
+      "detail": "[\"width_: double\",\"height_: double\",\"Rectangle(double width, double height)\",\"area() const: double\",\"perimeter() const: double\",\"setWidth(double width): void\"]"
+    },
+    {
+      "area": "lab",
+      "id": "library/class-member-link",
+      "ok": true,
+      "detail": "{\"highlighted\":1,\"activeRows\":1}"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-classes",
+      "ok": true,
+      "detail": "[\"Shape\",\"Circle\",\"Rectangle\"]"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-names",
+      "ok": true,
+      "detail": "[\"Shape\",\"Circle\",\"Rectangle\"]"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-inheritance",
+      "ok": true,
+      "detail": "inherit edges=2"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-virtual",
+      "ok": true,
+      "detail": "virtual badges=7"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-legend",
+      "ok": true,
+      "detail": "+public-private#protected继承自virtual虚函数"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-calls",
+      "ok": true,
+      "detail": "[\"Shape::~Shape\",\"Circle::Circle\",\"Rectangle::Rectangle\",\"Rectangle::area\",\"Rectangle::name\",\"main\",\"Circle::name\",\"totalArea\",\"Circle::area\"]"
+    },
+    {
+      "area": "lab",
+      "id": "library/poly-memory",
+      "ok": true,
+      "detail": "{\"frames\":9,\"cells\":13,\"empty\":\"\"}"
+    },
+    {
+      "area": "lab",
+      "id": "sample-library/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "upload/valid-toast",
+      "ok": true,
+      "detail": "toast=已载入 small.c（7 行）"
+    },
+    {
+      "area": "lab",
+      "id": "upload/valid-filename",
+      "ok": true,
+      "detail": "small.c"
+    },
+    {
+      "area": "lab",
+      "id": "upload/valid-code",
+      "ok": true,
+      "detail": "编辑器未载入 small.c"
+    },
+    {
+      "area": "lab",
+      "id": "upload/valid-auto-analyze",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lab",
+      "id": "upload/valid-lines",
+      "ok": true,
+      "detail": "7 / 500 行"
+    },
+    {
+      "area": "lab",
+      "id": "upload/too-large-toast",
+      "ok": true,
+      "detail": "toast=文件有 501 行，超过了 500 行的上限。"
+    },
+    {
+      "area": "lab",
+      "id": "upload/too-large-rejected",
+      "ok": true,
+      "detail": "\"small.c\""
+    },
+    {
+      "area": "lab",
+      "id": "upload/wrong-type-toast",
+      "ok": true,
+      "detail": "toast=只支持 .c / .cpp / .cc / .cxx / .h / .hpp / .txt 文件。"
+    },
+    {
+      "area": "lab",
+      "id": "upload/wrong-type-rejected",
+      "ok": true,
+      "detail": "small.c"
+    },
+    {
+      "area": "lab",
+      "id": "upload/empty-toast",
+      "ok": true,
+      "detail": "toast=文件是空的，请换一个文件。"
+    },
+    {
+      "area": "lab",
+      "id": "upload/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "shortcut/stale-status",
+      "ok": true,
+      "detail": "代码已修改 · 重新分析可刷新图表"
+    },
+    {
+      "area": "lab",
+      "id": "shortcut/ctrl-enter-analyze",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lab",
+      "id": "shortcut/ctrl-shift-enter-trace",
+      "ok": true,
+      "detail": "{\"tab\":\"单步执行\",\"player\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "draft/persisted-to-storage",
+      "ok": true,
+      "detail": "{\"filename\":\"small.c\",\"marker\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "draft/restored-after-reload",
+      "ok": true,
+      "detail": "small.c / marker=true"
+    },
+    {
+      "area": "lab",
+      "id": "draft/no-auto-analyze",
+      "ok": true,
+      "detail": "尚未分析，点击「分析代码」生成视图"
+    },
+    {
+      "area": "lab",
+      "id": "shortcuts-draft/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/missing-semicolon",
+      "ok": true,
+      "detail": "缺少分号：[\"这里缺少分号 ;，语句可能没有正确结束。\"]"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/missing-semicolon/no-crash",
+      "ok": true,
+      "detail": "诊断后分析面板消失"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/scanf-no-amper",
+      "ok": true,
+      "detail": "scanf 缺少 &：[\"scanf 的 %d 需要变量的地址，应写成 &变量名。\"]"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/scanf-no-amper/no-crash",
+      "ok": true,
+      "detail": "诊断后分析面板消失"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/array-out-of-bounds",
+      "ok": true,
+      "detail": "数组越界：[\"数组下标 5 超出范围，合法下标是 0 ~ 2。\",\"数组下标 5 超出范围，合法下标是 0 ~ 2。\"]"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/array-out-of-bounds/no-crash",
+      "ok": true,
+      "detail": "诊断后分析面板消失"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/division-by-zero",
+      "ok": true,
+      "detail": "除数为 0：[\"除数是字面量 0，运行时会出错。\"]"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/division-by-zero/no-crash",
+      "ok": true,
+      "detail": "诊断后分析面板消失"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/status-error-count",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lab",
+      "id": "empty/lines",
+      "ok": true,
+      "detail": "0 / 500 行"
+    },
+    {
+      "area": "lab",
+      "id": "empty/analyze-disabled",
+      "ok": true,
+      "detail": "{\"lines\":\"0 / 500 行\",\"analyzeDisabled\":true,\"traceDisabled\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "empty/trace-disabled",
+      "ok": true,
+      "detail": "{\"lines\":\"0 / 500 行\",\"analyzeDisabled\":true,\"traceDisabled\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "empty/analyze-toast",
+      "ok": true,
+      "detail": "toast=请先输入或载入一段代码"
+    },
+    {
+      "area": "lab",
+      "id": "trace/unsupported-friendly",
+      "ok": true,
+      "detail": "{\"error\":true,\"kind\":\"语法超出支持范围\",\"message\":\"函数 fopen() 暂不支持单步执行（文件 / 内存 / STL 等高级用法）。\",\"suggestion\":\"可以试着把代码简化到解释器子集：基础类型、循环、分支、数组、函数调用与 printf。\"}"
+    },
+    {
+      "area": "lab",
+      "id": "trace/unsupported-chinese",
+      "ok": true,
+      "detail": "函数 fopen() 暂不支持单步执行（文件 / 内存 / STL 等高级用法）。"
+    },
+    {
+      "area": "lab",
+      "id": "diagnostics/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "query/sample-filename",
+      "ok": true,
+      "detail": "factorial.c"
+    },
+    {
+      "area": "lab",
+      "id": "query/sample-auto-analyzed",
+      "ok": true,
+      "detail": "已分析 · 2 个函数 · 0 个错误"
+    },
+    {
+      "area": "lab",
+      "id": "query/sample-code",
+      "ok": true,
+      "detail": "未载入 factorial 代码"
+    },
+    {
+      "area": "lab",
+      "id": "url-query/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/stacked",
+      "ok": true,
+      "detail": "{\"viewport\":390,\"editor\":{\"top\":481,\"bottom\":821},\"panel\":{\"top\":835,\"bottom\":1375},\"scrollWidth\":390,\"topbar\":true,\"sidebarVisible\":false}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/no-horizontal-scroll",
+      "ok": true,
+      "detail": "{\"viewport\":390,\"editor\":{\"top\":481,\"bottom\":821},\"panel\":{\"top\":835,\"bottom\":1375},\"scrollWidth\":390,\"topbar\":true,\"sidebarVisible\":false}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/sidebar-hidden",
+      "ok": true,
+      "detail": "{\"viewport\":390,\"editor\":{\"top\":481,\"bottom\":821},\"panel\":{\"top\":835,\"bottom\":1375},\"scrollWidth\":390,\"topbar\":true,\"sidebarVisible\":false}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/drawer-opens",
+      "ok": true,
+      "detail": "{\"open\":true,\"focused\":true,\"themeButton\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/drawer-focus",
+      "ok": true,
+      "detail": "{\"open\":true,\"focused\":true,\"themeButton\":true}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/drawer-escape-closes",
+      "ok": true,
+      "detail": "Esc 未关闭抽屉"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/trace-player",
+      "ok": true,
+      "detail": "{\"player\":{\"left\":34,\"right\":356,\"width\":322},\"tabs\":{\"left\":21,\"right\":369},\"counter\":\"1 / 187\",\"scrollWidth\":390,\"viewport\":390}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/no-overflow-after-trace",
+      "ok": true,
+      "detail": "{\"player\":{\"left\":34,\"right\":356,\"width\":322},\"tabs\":{\"left\":21,\"right\":369},\"counter\":\"1 / 187\",\"scrollWidth\":390,\"viewport\":390}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/dark-toggle",
+      "ok": true,
+      "detail": "data-theme=dark"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"failures\":[]}"
+    },
+    {
+      "area": "lab",
+      "id": "mobile/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    }
+  ],
+  "failedChecks": []
+}

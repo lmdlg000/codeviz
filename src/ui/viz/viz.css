@@ -1156,6 +1156,8 @@
   flex-direction: column;
   gap: 9px;
   min-width: 0;
+  /* 为页面 toast / 固定浮层留出底部呼吸空间，避免盖住图例 */
+  padding-bottom: 30px;
 }
 
 .cvz-class__scroll {
@@ -1176,7 +1178,7 @@
   justify-content: center;
   width: max-content;
   min-width: 100%;
-  padding: 8px 10px;
+  padding: 8px 12px;
 }
 
 .cvz-class__svg {
@@ -2148,15 +2150,16 @@
 }
 
 .cvz-trace__vars tr.is-changed td {
+  background: rgba(217, 119, 6, 0.14);
   animation: cvz-var-flash 720ms ease-out;
 }
 
 @keyframes cvz-var-flash {
   0% {
-    background: rgba(217, 119, 6, 0.24);
+    background: rgba(217, 119, 6, 0.3);
   }
   100% {
-    background: transparent;
+    background: rgba(217, 119, 6, 0.14);
   }
 }
 

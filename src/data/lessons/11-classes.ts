@@ -246,6 +246,45 @@ int main() {
       ],
     },
     {
+      type: 'text',
+      body:
+        '数据不一定写死在代码里。下面的程序用 `std::cin` 读入宽和高，再把它们交给构造函数创建对象。输入值会先经过构造函数的校验：负数会被折成 0，所以对象一创建就处于合法状态。运行前在实验室的输入框里填两个数即可。',
+    },
+    {
+      type: 'code',
+      language: 'cpp',
+      title: 'input_rectangle.cpp',
+      code: `#include <iostream>
+
+class Rectangle {
+public:
+  Rectangle(double width, double height) {
+    width_ = width > 0 ? width : 0;
+    height_ = height > 0 ? height : 0;
+  }
+
+  double area() const { return width_ * height_; }
+
+private:
+  double width_;
+  double height_;
+};
+
+int main() {
+  double width = 0.0;
+  double height = 0.0;
+
+  std::cout << "Enter width and height: ";
+  std::cin >> width >> height;
+
+  Rectangle rect(width, height);
+  std::cout << "area = " << rect.area() << std::endl;
+  return 0;
+}`,
+      caption:
+        '`std::cin >>` 把键盘输入写进变量，再作为实参传给构造函数；输入和对象的创建就这样接上了。',
+    },
+    {
       type: 'heading',
       text: '四、this、引用与默认参数',
     },

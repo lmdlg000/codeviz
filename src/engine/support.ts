@@ -159,14 +159,6 @@ function scanStatement(
   if (stmt.kind === 'rangeFor') {
     // 支持，但要求被遍历对象是数组 / 初始化列表 / 字符串
   }
-  if (stmt.kind === 'switch') {
-    for (const caseNode of stmt.cases) {
-      for (const inner of caseNode.statements) {
-        const issue = scanStatement(inner, registry, visited, depth);
-        if (issue) return issue;
-      }
-    }
-  }
   return null;
 }
 

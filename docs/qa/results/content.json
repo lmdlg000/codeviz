@@ -1,0 +1,2452 @@
+{
+  "generatedAt": "2026-11-06T11:37:43.385Z",
+  "base": "http://127.0.0.1:5178",
+  "details": {
+    "files": [
+      "01-hello.ts",
+      "02-data.ts",
+      "03-operators.ts",
+      "04-selection.ts",
+      "05-loops.ts",
+      "06-arrays.ts",
+      "07-functions.ts",
+      "08-pointers.ts",
+      "09-structs.ts",
+      "10-files.ts",
+      "11-classes.ts",
+      "12-inheritance.ts",
+      "13-templates.ts"
+    ],
+    "staticSampleIds": [
+      "bubble-sort",
+      "factorial",
+      "swap-pointer",
+      "student-struct",
+      "score-file",
+      "array-average",
+      "fibonacci",
+      "string-length",
+      "matrix-add",
+      "pointer-array",
+      "hello-world",
+      "circle-area",
+      "temp-convert",
+      "grade-level",
+      "sum-1-to-100",
+      "even-odd",
+      "calculator-switch",
+      "countdown",
+      "multiplication-table",
+      "prime-check",
+      "cpp-hello",
+      "reference-swap",
+      "class-rectangle",
+      "class-student",
+      "inheritance-animal",
+      "shape-polymorphism",
+      "template-max",
+      "template-stack",
+      "stl-vector",
+      "vector-stats"
+    ],
+    "dangerous": [],
+    "externalUrls": [],
+    "data": {
+      "lessonCount": 13,
+      "sampleCount": 30,
+      "chapterCount": 4,
+      "conceptCount": 28,
+      "edgeCount": 28,
+      "glossary": 33
+    },
+    "wordCounts": {
+      "c01-hello": 1462,
+      "c02-data": 1488,
+      "c03-operators": 1470,
+      "c04-selection": 1491,
+      "c05-loops": 1510,
+      "c06-arrays": 1330,
+      "c07-functions": 1318,
+      "c08-pointers": 1265,
+      "c09-structs": 1340,
+      "c10-files": 1257,
+      "c11-classes": 1965,
+      "c12-inheritance": 1670,
+      "c13-templates": 1655
+    },
+    "diagramFailures": []
+  },
+  "checks": [
+    {
+      "area": "content",
+      "id": "files/lesson-count",
+      "ok": true,
+      "detail": "13 个课程文件：01-hello.ts, 02-data.ts, 03-operators.ts, 04-selection.ts, 05-loops.ts, 06-arrays.ts, 07-functions.ts, 08-pointers.ts, 09-structs.ts, 10-files.ts, 11-classes.ts, 12-inheritance.ts, 13-templates.ts"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-01-hello.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-02-data.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-03-operators.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-04-selection.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-05-loops.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-06-arrays.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-07-functions.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-08-pointers.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-09-structs.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-10-files.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-11-classes.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-12-inheritance.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "files/lesson-exists-13-templates.ts",
+      "ok": true,
+      "detail": "缺少课程文件"
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/id",
+      "ok": true,
+      "detail": "id=c01-hello"
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/chapter",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/order",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/labSampleId",
+      "ok": true,
+      "detail": "hello-world"
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c01-hello/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/id",
+      "ok": true,
+      "detail": "id=c02-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/chapter",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/order",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/labSampleId",
+      "ok": true,
+      "detail": "circle-area"
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c02-data/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/id",
+      "ok": true,
+      "detail": "id=c03-operators"
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/chapter",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/order",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/labSampleId",
+      "ok": true,
+      "detail": "temp-convert"
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c03-operators/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/id",
+      "ok": true,
+      "detail": "id=c04-selection"
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/chapter",
+      "ok": true,
+      "detail": "c-control"
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/order",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/labSampleId",
+      "ok": true,
+      "detail": "grade-level"
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c04-selection/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/id",
+      "ok": true,
+      "detail": "id=c05-loops"
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/chapter",
+      "ok": true,
+      "detail": "c-control"
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/order",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/labSampleId",
+      "ok": true,
+      "detail": "sum-1-to-100"
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c05-loops/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/id",
+      "ok": true,
+      "detail": "id=c06-arrays"
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/chapter",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/order",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/labSampleId",
+      "ok": true,
+      "detail": "bubble-sort"
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c06-arrays/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/id",
+      "ok": true,
+      "detail": "id=c07-functions"
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/chapter",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/order",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/labSampleId",
+      "ok": true,
+      "detail": "factorial"
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c07-functions/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/id",
+      "ok": true,
+      "detail": "id=c08-pointers"
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/chapter",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/order",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/labSampleId",
+      "ok": true,
+      "detail": "swap-pointer"
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c08-pointers/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/id",
+      "ok": true,
+      "detail": "id=c09-structs"
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/chapter",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/order",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/labSampleId",
+      "ok": true,
+      "detail": "student-struct"
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c09-structs/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/id",
+      "ok": true,
+      "detail": "id=c10-files"
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/chapter",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/order",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/labSampleId",
+      "ok": true,
+      "detail": "score-file"
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c10-files/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/id",
+      "ok": true,
+      "detail": "id=c11-classes"
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/chapter",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/order",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/labSampleId",
+      "ok": true,
+      "detail": "class-rectangle"
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c11-classes/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/id",
+      "ok": true,
+      "detail": "id=c12-inheritance"
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/chapter",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/order",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/labSampleId",
+      "ok": true,
+      "detail": "shape-polymorphism"
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c12-inheritance/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/id",
+      "ok": true,
+      "detail": "id=c13-templates"
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/chapter",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/order",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/labSampleId",
+      "ok": true,
+      "detail": "stl-vector"
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/no-placeholder",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "file/c13-templates/no-markdown-link",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "files/sample-count",
+      "ok": true,
+      "detail": "30 个样例"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-hello-world",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-circle-area",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-temp-convert",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-grade-level",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-sum-1-to-100",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-bubble-sort",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-factorial",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-swap-pointer",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-student-struct",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-score-file",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-class-rectangle",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-shape-polymorphism",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "files/sample-required-stl-vector",
+      "ok": true,
+      "detail": "缺少契约要求的样例 id"
+    },
+    {
+      "area": "content",
+      "id": "security/no-dangerouslySetInnerHTML",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "security/no-external-urls-in-data",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "cleanup/no-temp-viz-test.log",
+      "ok": true,
+      "detail": "根目录遗留 temp-viz-test.log"
+    },
+    {
+      "area": "content",
+      "id": "data/lesson-count",
+      "ok": true,
+      "detail": "13"
+    },
+    {
+      "area": "content",
+      "id": "data/lesson-ids-unique",
+      "ok": true,
+      "detail": "c01-hello,c02-data,c03-operators,c04-selection,c05-loops,c06-arrays,c07-functions,c08-pointers,c09-structs,c10-files,c11-classes,c12-inheritance,c13-templates"
+    },
+    {
+      "area": "content",
+      "id": "data/chapter-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/chapter-valid",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/title",
+      "ok": true,
+      "detail": "初识 C：从一行代码到一张图"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/minutes",
+      "ok": true,
+      "detail": "25"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/chapter-valid",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/title",
+      "ok": true,
+      "detail": "数据与变量：给内存贴标签"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/minutes",
+      "ok": true,
+      "detail": "28"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/chapter-valid",
+      "ok": true,
+      "detail": "c-basics"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/title",
+      "ok": true,
+      "detail": "运算符与表达式：让数据动起来"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/minutes",
+      "ok": true,
+      "detail": "30"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/objectives-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/chapter-valid",
+      "ok": true,
+      "detail": "c-control"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/title",
+      "ok": true,
+      "detail": "选择结构：程序的岔路口"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/minutes",
+      "ok": true,
+      "detail": "35"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/objectives-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/chapter-valid",
+      "ok": true,
+      "detail": "c-control"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/title",
+      "ok": true,
+      "detail": "循环结构：重复的艺术"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/minutes",
+      "ok": true,
+      "detail": "35"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/objectives-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/chapter-valid",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/title",
+      "ok": true,
+      "detail": "数组与字符串：一排连续的格子"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/minutes",
+      "ok": true,
+      "detail": "24"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/chapter-valid",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/title",
+      "ok": true,
+      "detail": "函数与递归：分而治之"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/minutes",
+      "ok": true,
+      "detail": "25"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/chapter-valid",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/title",
+      "ok": true,
+      "detail": "指针：内存的门牌号"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/minutes",
+      "ok": true,
+      "detail": "26"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/chapter-valid",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/title",
+      "ok": true,
+      "detail": "结构体与自定义类型"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/minutes",
+      "ok": true,
+      "detail": "24"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/chapter-valid",
+      "ok": true,
+      "detail": "c-data"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/title",
+      "ok": true,
+      "detail": "文件：把数据留在磁盘上"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/minutes",
+      "ok": true,
+      "detail": "26"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/chapter-valid",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/title",
+      "ok": true,
+      "detail": "类与对象：从结构体到蓝图"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/minutes",
+      "ok": true,
+      "detail": "40"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/chapter-valid",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/title",
+      "ok": true,
+      "detail": "继承与多态：同一种调用，不同的行为"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/minutes",
+      "ok": true,
+      "detail": "45"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/chapter-valid",
+      "ok": true,
+      "detail": "cpp-oop"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/title",
+      "ok": true,
+      "detail": "模板与 STL：写出通用的代码"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/minutes",
+      "ok": true,
+      "detail": "45"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/objectives-range",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/keypoints-range",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c-basics/order-sequence",
+      "ok": true,
+      "detail": "1,2,3"
+    },
+    {
+      "area": "content",
+      "id": "data/c-control/order-sequence",
+      "ok": true,
+      "detail": "1,2"
+    },
+    {
+      "area": "content",
+      "id": "data/c-data/order-sequence",
+      "ok": true,
+      "detail": "1,2,3,4,5"
+    },
+    {
+      "area": "content",
+      "id": "data/cpp-oop/order-sequence",
+      "ok": true,
+      "detail": "1,2,3"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c01-q1\",\"options\":4,\"answer\":0,\"question\":\"一个 C 程序开始运行时，最先进入哪个位置？\",\"explanation\":\"`main` 是程序唯一的入口。操作系统启动程序后，从 `main` 函数体的第一条语句开始执行；头文件、注释和函数定义本身都不会“先执行”。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c01-q2\",\"options\":4,\"answer\":0,\"question\":\"`printf(\\\"你好\\\\n\\\");` 里的 `\\\\n` 表示什么？\",\"explanation\":\"反斜杠加 n 是换行转义符。它不会出现在屏幕上，而是让光标移到下一行开头。若想真的输出字符 n，直接写 n 即可。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c01-q3\",\"options\":4,\"answer\":0,\"question\":\"下面哪种写法最可能让程序无法通过编译？\",\"explanation\":\"分号是语句的结束标志。漏掉分号后，编译器会把后面的内容接到前一条语句上，往往报出一串位置错乱的信息。其余三种都是正常写法。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/quiz-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c02-q1\",\"options\":4,\"answer\":0,\"question\":\"要保存商品价格 19.9 元，最合适的类型是？\",\"explanation\":\"19.9 带小数，用 `double` 保存才不会丢掉小数部分。`int` 只能存整数，`char` 只能存单个字符，`void` 表示“没有类型”，不能用来声明普通变量。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c02-q2\",\"options\":4,\"answer\":0,\"question\":\"已知 `double price = 4.5;`，想输出 `4.50`，应该用哪个格式说明符？\",\"explanation\":\"`%f` 用于输出小数，`%.2f` 表示保留两位小数，因此输出 4.50。`%d` 用于整数，`%c` 用于字符，`%s` 用于字符串。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c02-q3\",\"options\":4,\"answer\":0,\"question\":\"`int a = 7; a = a + 2;` 执行后，a 的值是多少？\",\"explanation\":\"赋值语句先计算右边的 `a + 2`，得到 9，再把它放回 a 这个格子，于是 a 变成 9。原来的 7 被覆盖。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-q4/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c02-q4\",\"options\":4,\"answer\":0,\"question\":\"下面关于变量 `char tag = 'A';` 的说法，哪一项正确？\",\"explanation\":\"`char` 用来保存单个字符，例如 `'A'`，通常占 1 字节，用 `%c` 输出。双引号包起来的是字符串，不是字符。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/quiz-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c03-q1\",\"options\":4,\"answer\":0,\"question\":\"在 C 语言中，表达式 `17 / 5` 的结果是多少？\",\"explanation\":\"`17` 和 `5` 都是整数，执行的是整数除法，只保留整数部分，因此结果是 3。若写成 `17.0 / 5`，结果才是 3.4。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c03-q2\",\"options\":4,\"answer\":0,\"question\":\"`17 % 5` 的值是多少？\",\"explanation\":\"取余计算的是除完之后剩下的部分：17 除以 5 商 3 余 2，所以 `17 % 5` 等于 2。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c03-q3\",\"options\":4,\"answer\":0,\"question\":\"执行 `int i = 3; int a = i++;` 之后，a 和 i 分别是多少？\",\"explanation\":\"后缀 `i++` 先取出 i 的旧值 3 赋给 a，然后把 i 增加到 4。因此 a 是 3、i 是 4。若写成 `++i`，则 a 和 i 都是 4。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-q4/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c03-q4\",\"options\":4,\"answer\":0,\"question\":\"表达式 `2 + 3 * 4` 的结果是多少？\",\"explanation\":\"乘法优先级高于加法，所以先算 `3 * 4` 得到 12，再加 2，结果是 14。想得到 20，需要写成 `(2 + 3) * 4`。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/quiz-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c04-q1\",\"options\":4,\"answer\":0,\"question\":\"`if (score = 60)` 这条语句实际会发生什么？\",\"explanation\":\"单个 `=` 是赋值，不是比较。它先把 60 写进 score，整个赋值表达式的值也是 60，非 0 即为真，所以分支永远执行。正确写法是 `if (score == 60)`。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c04-q2\",\"options\":4,\"answer\":0,\"question\":\"为什么 `if (0 <= score <= 100)` 不能实现“分数在 0 到 100 之间”？\",\"explanation\":\"C 从左到右计算：`0 <= score` 得到 0 或 1，再拿这个结果与 100 比较——0 和 1 都小于等于 100，所以整个条件恒为真。正确写法是 `sco"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c04-q3\",\"options\":4,\"answer\":0,\"question\":\"switch 中某个 case 末尾忘了写 `break`，会发生什么？\",\"explanation\":\"switch 只根据值决定“从哪里开始”，并不自动结束。缺少 `break` 时会继续往下穿透（fallthrough），执行后面 case 的语句，往往产生意料之外的输出。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-q4/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c04-q4\",\"options\":4,\"answer\":0,\"question\":\"表达式 `a > 0 && b / a > 1` 中，`&&` 的短路求值有什么好处？\",\"explanation\":\"`&&` 从左往右求值，左边为假时右边不会执行。因此当 a 为 0 时，`b / a` 不会被计算，程序不会因除零崩溃。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/quiz-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c05-q1\",\"options\":4,\"answer\":0,\"question\":\"`for (int i = 1; i <= 100; i++)` 这段循环的循环体一共执行多少次？\",\"explanation\":\"i 从 1 开始，每次加一，条件是 `i <= 100`。i 依次取 1 到 100，共 100 个取值，因此循环体执行 100 次。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c05-q2\",\"options\":4,\"answer\":0,\"question\":\"`while (i > 0) { printf(\\\"%d\\\", i); }` 中漏写了 `i--`，会发生什么？\",\"explanation\":\"循环体没有改变 i，条件 `i > 0` 永远成立，程序会一直重复输出。遇到循环卡死，先检查循环变量有没有更新。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c05-q3\",\"options\":4,\"answer\":0,\"question\":\"`do-while` 与 `while` 最主要的区别是什么？\",\"explanation\":\"`do-while` 先执行循环体再判断条件，即使条件一开始为假，循环体也会执行一次；`while` 先判断，条件为假时一次都不执行。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-q4/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c05-q4\",\"options\":4,\"answer\":0,\"question\":\"在循环体里执行 `break;` 和 `continue;` 的区别是？\",\"explanation\":\"`break` 立即跳出当前这一层循环；`continue` 不跳出循环，只是不再执行本轮剩下的语句，直接进入下一轮的条件判断。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c06-q1\",\"options\":4,\"answer\":2,\"question\":\"声明 `int a[5] = {1, 2, 3, 4, 5};` 之后，表达式 `a[5]` 表示什么？\",\"explanation\":\"合法下标是 0 到 4，`a[5]` 已经越过数组末尾。C 不做边界检查，读到的内容不可预测，写入则可能破坏其他数据。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c06-q2\",\"options\":4,\"answer\":1,\"question\":\"冒泡排序的内层循环写成 `for (int j = 0; j < n - 1 - i; j++)`，为什么要减去 `i`？\",\"explanation\":\"`i` 从 0 开始计数：第 i 轮开始时，末尾已经有 i 个元素排好，所以这一轮只需要比较前 n - 1 - i 对相邻元素；每轮结束再把一个"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c06-q3\",\"options\":4,\"answer\":1,\"question\":\"执行 `char s[] = \\\"C\\\";` 之后，`sizeof(s)` 的值是多少？\",\"explanation\":\"编译器会在字符串字面量末尾补一个 `\\\\0`，所以数组里是字符 C 和结束标记两个字符，`sizeof(s)` 为 2，而 `strlen(s)` 为 1。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c07-q1\",\"options\":4,\"answer\":1,\"question\":\"函数 `int f(int n) { if (n == 0) return 0; return n + f(n - 1); }` 被调用 `f(3)` 时返回多少？\",\"explanation\":\"展开为 3 + f(2)，f(2) = 2 + f(1)，f(1) = 1 + f(0)，f(0) ="
+    },
+    {
+      "area": "content",
+      "id": "data/c07-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c07-q2\",\"options\":4,\"answer\":1,\"question\":\"关于实参和形参的关系，下面哪种说法正确？\",\"explanation\":\"C 语言默认按值传递：调用时把实参的值复制给形参，两者占据不同的内存。想让函数修改实参，需要把地址传进去。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c07-q3\",\"options\":4,\"answer\":2,\"question\":\"一个递归函数必须具备下面哪个要素，才能避免无限调用？\",\"explanation\":\"递归必须有终止条件，并且每次递归都要向终止条件靠近。没有终止条件或参数不收敛，调用栈会不断增长直到溢出。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c08-q1\",\"options\":4,\"answer\":1,\"question\":\"执行 `int x = 5; int *p = &x; *p = 8;` 之后，`x` 的值是多少？\",\"explanation\":\"`p` 保存 `x` 的地址，`*p = 8` 把 8 写到 `p` 指向的内存，也就是 `x` 所在的格子，所以 `x` 变成 8。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c08-q2\",\"options\":4,\"answer\":1,\"question\":\"已有 `int x = 3; int y = 8;` 和 `void swap(int *a, int *b);`，正确的调用是哪个？\",\"explanation\":\"swap 的参数类型是 `int *`，需要传变量的地址。`&x`、`&y` 的类型正是 `int *`；直接传 `x`、`y` 会"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c08-q3\",\"options\":4,\"answer\":1,\"question\":\"`int a[5]; int *p = a;` 之后，`*(p + 2)` 与下面哪个表达式等价？\",\"explanation\":\"数组名 `a` 退化为首元素地址，`p + 2` 指向下标 2 的元素，`*(p + 2)` 取出的值就是 `a[2]`。`&a[2]` 是地址而不是值。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c09-q1\",\"options\":4,\"answer\":1,\"question\":\"已有 `struct Student classA[3];`，要访问第二个学生的成绩，正确写法是？\",\"explanation\":\"数组下标从 0 开始，第二个元素是 `classA[1]`；元素本身是结构体变量而不是指针，所以用点号取成员，`->` 是给结构体指针用的。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c09-q2\",\"options\":4,\"answer\":1,\"question\":\"定义结构体时漏掉右花括号后面的分号，通常会怎样？\",\"explanation\":\"结构体定义是一条完整声明，必须以分号结束。漏掉后编译器无法判断声明在哪里结束，往往会在后面几行报出关联错误。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c09-q3\",\"options\":4,\"answer\":1,\"question\":\"`struct Student { int id; char name[16]; int score; };` 中，`s.name` 的类型是什么？\",\"explanation\":\"`name` 是结构体里的字符数组成员，类型为 `char[16]`。它会在某些表达式里退化为 `char *`，但成"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c10-q1\",\"options\":4,\"answer\":1,\"question\":\"如果一个文件已经存在，用 `\\\"w\\\"` 模式打开它会怎样？\",\"explanation\":\"`\\\"w\\\"` 表示只写：文件存在时先清空，不存在时创建。想保留旧内容继续写，应使用追加模式 `\\\"a\\\"`。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c10-q2\",\"options\":4,\"answer\":1,\"question\":\"`fopen` 打开文件失败时，返回值是什么？\",\"explanation\":\"`fopen` 失败时返回空指针 `NULL`，所以打开之后要立刻判断 `fp == NULL`，再决定是否继续读写。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c10-q3\",\"options\":4,\"answer\":1,\"question\":\"读取循环 `while (fscanf(fp, \\\"%d\\\", &x) == 1)` 会在什么时候结束？\",\"explanation\":\"`fscanf` 返回成功读到的项数。读不到整数（到达文件末尾或格式不匹配）时不再返回 1，循环条件为假，循环结束。数值 0 本身是合法数据，不会让它停止。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c11-q1\",\"options\":4,\"answer\":0,\"question\":\"下面关于 class 与 struct 的说法，哪一项正确？\",\"explanation\":\"在 C++ 中 class 和 struct 都能定义数据成员、成员函数、构造与析构，唯一区别是默认访问级别：class 默认 private，struct 默认 public。按值传递与访问级别无关。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c11-q2\",\"options\":4,\"answer\":1,\"question\":\"关于构造函数，下列说法正确的是？\",\"explanation\":\"构造函数的名字与类名相同、没有返回类型，对象创建时由编译器自动调用；它可以重载多个版本，也可以用默认参数。对象创建之后不会再次自动调用构造函数。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c11-q3\",\"options\":4,\"answer\":1,\"question\":\"在成员函数中写 `return *this;`，通常是为了什么？\",\"explanation\":\"this 是指向当前对象的指针，*this 就是当前对象本身。把返回类型写成类引用（如 Counter&）并返回 *this，可以继续在返回值上调用成员函数，形成链式调用。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c12-q1\",\"options\":4,\"answer\":1,\"question\":\"下面哪种情况会触发虚函数的动态绑定？\",\"explanation\":\"动态绑定需要“基类指针或引用 + 虚函数 + 派生类重写”三个条件。直接调用派生类对象、在构造/析构函数中调用、按值复制都会在编译期确定版本，不会发生运行时多态。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c12-q2\",\"options\":4,\"answer\":1,\"question\":\"为什么基类的析构函数通常要声明为 virtual？\",\"explanation\":\"如果析构函数不是虚函数，通过基类指针删除派生对象的行为是未定义的；常见实现只执行基类析构，派生类资源无法释放。因此基类析构应声明为 virtual，让析构链从派生类向基类正确执行。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c12-q3\",\"options\":4,\"answer\":1,\"question\":\"关于纯虚函数与抽象类，下列说法正确的是？\",\"explanation\":\"纯虚函数 `= 0` 使类成为抽象类，无法创建对象，但它可以作为接口类型定义指针或引用，从而支持多态。纯虚函数可以有默认实现，但在接口设计中通常由派生类提供实现。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-q1/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c13-q1\",\"options\":4,\"answer\":1,\"question\":\"函数模板通常在什么时候被实例化？\",\"explanation\":\"模板是一份“图纸”，编译器在看到具体调用（或显式指定模板参数）时，用实际类型替换 T，生成对应的函数版本。实例化发生在编译期，运行时没有查找类型的额外开销。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-q2/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c13-q2\",\"options\":4,\"answer\":1,\"question\":\"执行 `for (int score : scores)` 时，修改 score 会发生什么？\",\"explanation\":\"范围 for 默认把每个元素按值复制给循环变量，修改循环变量只影响副本。若想修改容器元素，应写成 `for (int& score : scores)`，让循环变量成为元素"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-q3/quiz-valid",
+      "ok": true,
+      "detail": "{\"id\":\"c13-q3\",\"options\":4,\"answer\":1,\"question\":\"`std::sort(v.begin(), v.end())` 的作用是？\",\"explanation\":\"sort 接收一对迭代器，对半开区间 `[begin, end)` 内的元素原地排序，默认使用 `<` 比较、结果升序。它返回 void，排序结果直接体现在原容器里。\"}"
+    },
+    {
+      "area": "content",
+      "id": "data/quiz-ids-unique",
+      "ok": true,
+      "detail": "43/43"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-ids-unique",
+      "ok": true,
+      "detail": "bubble-sort,factorial,swap-pointer,student-struct,score-file,array-average,fibonacci,string-length,matrix-add,pointer-array,hello-world,circle-area,temp-convert,grade-level,sum-1-to-100,even-odd,calculator-switch,countdown,multiplication-table,prime-check,cpp-hello,reference-swap,class-rectangle,class-student,inheritance-animal,shape-polymorphism,template-max,template-stack,stl-vector,vector-stats"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-hello-world",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-circle-area",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-temp-convert",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-grade-level",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-sum-1-to-100",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-bubble-sort",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-factorial",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-swap-pointer",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-student-struct",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-score-file",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-class-rectangle",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-shape-polymorphism",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-required-stl-vector",
+      "ok": true,
+      "detail": "缺少契约样例"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-bubble-sort/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"数组\",\"排序\",\"循环\"],\"level\":2,\"lines\":24}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-bubble-sort/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":6,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-factorial/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"递归\",\"函数\",\"调用栈\"],\"level\":2,\"lines\":16}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-factorial/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":2,\"flowcharts\":2,\"callNodes\":2,\"classes\":[],\"memoryCells\":2,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-swap-pointer/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"指针\",\"函数参数\",\"交换\"],\"level\":2,\"lines\":18}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-swap-pointer/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":2,\"flowcharts\":2,\"callNodes\":2,\"classes\":[],\"memoryCells\":5,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-student-struct/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"结构体\",\"数组\",\"遍历\"],\"level\":2,\"lines\":25}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-student-struct/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[{\"name\":\"Student\",\"bases\":[],\"fields\":3,\"methods\":0}],\"memoryCells\":3,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-score-file/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"文件\",\"读写\",\"平均分\"],\"level\":3,\"lines\":39}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-score-file/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":6,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-array-average/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"数组\",\"遍历\",\"最值\"],\"level\":2,\"lines\":23}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-array-average/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":6,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-fibonacci/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"递归\",\"斐波那契\",\"调用图\"],\"level\":3,\"lines\":17}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-fibonacci/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":2,\"flowcharts\":2,\"callNodes\":2,\"classes\":[],\"memoryCells\":2,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-string-length/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"字符串\",\"字符数组\",\"循环\"],\"level\":2,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-string-length/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":2,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-matrix-add/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"二维数组\",\"矩阵\",\"嵌套循环\"],\"level\":3,\"lines\":22}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-matrix-add/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":7,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-pointer-array/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"指针\",\"数组\",\"指针算术\"],\"level\":3,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-pointer-array/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":4,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-hello-world/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"入门\",\"printf\",\"程序结构\"],\"level\":1,\"lines\":9}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-hello-world/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":0,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-circle-area/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"变量\",\"浮点数\",\"格式化输出\"],\"level\":1,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-circle-area/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":4,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-temp-convert/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"运算符\",\"表达式\",\"类型转换\"],\"level\":1,\"lines\":14}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-temp-convert/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":3,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-grade-level/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"选择结构\",\"if\",\"多分支\"],\"level\":2,\"lines\":22}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-grade-level/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":1,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-sum-1-to-100/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"循环\",\"for\",\"累加\"],\"level\":1,\"lines\":17}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-sum-1-to-100/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":3,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-even-odd/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"if\",\"取模\",\"奇偶\"],\"level\":1,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-even-odd/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":2,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-calculator-switch/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"switch\",\"多分支\",\"字符\"],\"level\":2,\"lines\":31}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-calculator-switch/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":3,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-countdown/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"do-while\",\"循环\",\"倒计时\"],\"level\":1,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-countdown/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":1,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-multiplication-table/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"嵌套循环\",\"for\",\"格式化\"],\"level\":2,\"lines\":13}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-multiplication-table/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":2,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-prime-check/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"循环\",\"break\",\"判断\"],\"level\":2,\"lines\":26}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-prime-check/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":3,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-cpp-hello/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"控制台输出\",\"流式输出\",\"命名空间\"],\"level\":2,\"lines\":15}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-cpp-hello/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":4,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-reference-swap/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"引用\",\"函数参数\",\"交换\"],\"level\":2,\"lines\":18}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-reference-swap/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":2,\"flowcharts\":2,\"callNodes\":2,\"classes\":[],\"memoryCells\":5,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-class-rectangle/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"类与对象\",\"封装\",\"构造函数\"],\"level\":2,\"lines\":40}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-class-rectangle/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":7,\"flowcharts\":7,\"callNodes\":7,\"classes\":[{\"name\":\"Rectangle\",\"bases\":[],\"fields\":2,\"methods\":6}],\"memoryCells\":4,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-class-student/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"构造析构\",\"静态成员\",\"对象生命周期\"],\"level\":2,\"lines\":43}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-class-student/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":5,\"flowcharts\":5,\"callNodes\":5,\"classes\":[{\"name\":\"Student\",\"bases\":[],\"fields\":4,\"methods\":4}],\"memoryCells\":6,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-inheritance-animal/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"继承\",\"函数重写\",\"虚函数\"],\"level\":2,\"lines\":42}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-inheritance-animal/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":9,\"flowcharts\":9,\"callNodes\":9,\"classes\":[{\"name\":\"Animal\",\"bases\":[],\"fields\":1,\"methods\":4},{\"name\":\"Dog\",\"bases\":[\"Animal\"],\"fields\":0,\"methods\":2},{\"name\":\"Cat\",\"bases\":[\"An"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-shape-polymorphism/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"多态\",\"抽象类\",\"虚析构\"],\"level\":3,\"lines\":57}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-shape-polymorphism/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":11,\"flowcharts\":9,\"callNodes\":9,\"classes\":[{\"name\":\"Shape\",\"bases\":[],\"fields\":0,\"methods\":3},{\"name\":\"Circle\",\"bases\":[\"Shape\"],\"fields\":1,\"methods\":3},{\"name\":\"Rectangle\",\"bas"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-template-max/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"函数模板\",\"泛型\",\"类型推导\"],\"level\":2,\"lines\":14}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-template-max/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":2,\"flowcharts\":2,\"callNodes\":2,\"classes\":[],\"memoryCells\":2,\"diagnostics\":1}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-template-stack/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"类模板\",\"栈\",\"封装\"],\"level\":3,\"lines\":47}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-template-stack/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":6,\"flowcharts\":6,\"callNodes\":6,\"classes\":[{\"name\":\"Stack\",\"bases\":[],\"fields\":3,\"methods\":5}],\"memoryCells\":5,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-stl-vector/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"动态数组\",\"范围遍历\",\"排序\"],\"level\":2,\"lines\":23}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-stl-vector/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":4,\"diagnostics\":0}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-vector-stats/valid",
+      "ok": true,
+      "detail": "{\"tags\":[\"动态数组\",\"字符串\",\"统计\"],\"level\":3,\"lines\":28}"
+    },
+    {
+      "area": "content",
+      "id": "data/sample-vector-stats/analyzable",
+      "ok": true,
+      "detail": "{\"ok\":true,\"functions\":1,\"flowcharts\":1,\"callNodes\":1,\"classes\":[],\"memoryCells\":6,\"diagnostics\":2}"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/labSample-exists",
+      "ok": true,
+      "detail": "hello-world"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/labSample-exists",
+      "ok": true,
+      "detail": "circle-area"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/labSample-exists",
+      "ok": true,
+      "detail": "temp-convert"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/labSample-exists",
+      "ok": true,
+      "detail": "grade-level"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/labSample-exists",
+      "ok": true,
+      "detail": "sum-1-to-100"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/labSample-exists",
+      "ok": true,
+      "detail": "bubble-sort"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/labSample-exists",
+      "ok": true,
+      "detail": "factorial"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/labSample-exists",
+      "ok": true,
+      "detail": "swap-pointer"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/labSample-exists",
+      "ok": true,
+      "detail": "student-struct"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/labSample-exists",
+      "ok": true,
+      "detail": "score-file"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/labSample-exists",
+      "ok": true,
+      "detail": "class-rectangle"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/labSample-exists",
+      "ok": true,
+      "detail": "shape-polymorphism"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/labSample-exists",
+      "ok": true,
+      "detail": "stl-vector"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/code-blocks",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c01-hello/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1462（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/code-blocks",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/note",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c02-data/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1488（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/code-blocks",
+      "ok": true,
+      "detail": "6"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/note",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c03-operators/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1470（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/code-blocks",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/note",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c04-selection/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1491（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/code-blocks",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/note",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c05-loops/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1510（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c06-arrays/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1330（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c07-functions/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1318（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c08-pointers/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1265（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c09-structs/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1340（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/code-blocks",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c10-files/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1257（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c11-classes/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1965（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/code-blocks",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/note",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c12-inheritance/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1670（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/note",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/try",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "content",
+      "id": "data/c13-templates/word-count",
+      "ok": true,
+      "detail": "text/note/list 汉字 1655（契约约 1200–2200）"
+    },
+    {
+      "area": "content",
+      "id": "data/diagram-code-analyzable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "data/concepts-count",
+      "ok": true,
+      "detail": "28"
+    },
+    {
+      "area": "content",
+      "id": "data/concept-edges-valid",
+      "ok": true,
+      "detail": "0 条悬空边"
+    },
+    {
+      "area": "content",
+      "id": "data/concept-nodes-valid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "content",
+      "id": "data/concept-labels-unique",
+      "ok": true,
+      "detail": "28/28"
+    }
+  ],
+  "failedChecks": []
+}

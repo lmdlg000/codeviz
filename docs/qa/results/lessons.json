@@ -1,0 +1,2180 @@
+{
+  "generatedAt": "2026-11-06T11:50:53.906Z",
+  "base": "http://127.0.0.1:5178",
+  "phases": [
+    {
+      "name": "c01-hello/structure",
+      "ms": 1588,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/toc",
+      "ms": 1961,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/diagrams",
+      "ms": 1628,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/quiz",
+      "ms": 3019,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/complete",
+      "ms": 4103,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/pager",
+      "ms": 1735,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/handoff",
+      "ms": 2253,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/structure",
+      "ms": 1894,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/toc",
+      "ms": 2008,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/diagrams",
+      "ms": 1666,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/quiz",
+      "ms": 3489,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/complete",
+      "ms": 4831,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/pager",
+      "ms": 2016,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c05-loops/handoff",
+      "ms": 2030,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/structure",
+      "ms": 1517,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/toc",
+      "ms": 2130,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/diagrams",
+      "ms": 1649,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/quiz",
+      "ms": 2916,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/complete",
+      "ms": 4155,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/pager",
+      "ms": 1613,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c08-pointers/handoff",
+      "ms": 2294,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/structure",
+      "ms": 1650,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/toc",
+      "ms": 2069,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/diagrams",
+      "ms": 1449,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/quiz",
+      "ms": 3645,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/complete",
+      "ms": 4893,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/pager",
+      "ms": 1851,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/handoff",
+      "ms": 2558,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c01-hello/mobile",
+      "ms": 6047,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "c11-classes/mobile",
+      "ms": 5997,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "name": "dark/lesson-c01",
+      "ms": 2554,
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      }
+    }
+  ],
+  "details": {
+    "c01-hello": {
+      "structure": {
+        "h1": "初识 C：从一行代码到一张图",
+        "subtitle": "写下第一行 printf，看懂程序怎样从源文件变成屏幕上的一行字。",
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "inlineStrong": 0,
+        "inlineCode": 54,
+        "bodyText": "学习编程的第一天，最容易冒出来的疑问是：我敲下的这些英文字母，究竟是怎么跑到屏幕上去的？\n\n先记住一个朴素的比喻：程序是一份写给计算机的说明书。你按顺序写下指令，它就按顺序执行。计算机不会猜你的意思，所以每条指令都必须写得完整、准确、没有歧义。\n\n这一节不急着堆语法。我们只做三件事：写出第一个程序，把它一行一行拆开，再把它变成一张能看懂的图。\n\n一、第一个程序\n\n在代码实验室里新建一个文件，输入下面这段代码。它只有七行，却已经包含了一个 C 程序最核心的骨架。先照着敲一遍，不要复制——敲的过程会让你注意到大小写、括号和分号。\n\nC\nhello.c\n复制\n在实验室打开\n1\n// hello.c —— 第一段完整程序\n2\n#include <stdio.h>\n3\n \n4\nint main(void) {\n5\n  printf(\"Hello, CodeViz!\\n\");\n6\n  printf(\"这是我写下的第一行 C 代码。\\n\");\n7\n  return 0;\n8\n}\n9\n \n两条 printf 语句，就是把两行文字送到屏幕上的两条指令。\n\n运行成功后，屏幕上会出现两行字。恭喜，你已经完成了一个完整程序的“编辑、编译、运行”闭环。接下来我们把这七行拆开，看看每一部分在做什么。\n\n二、七行代码，各司其职\n这一行\t它的工作\n#include <stdio.h>\t把标准输入输出库请进来，printf 就住在这个库里。\nint main(void)\t定义程序的入口函数。无论文件里写了多少函数，执行永远从 main 开始。\n{ 与 }\t一对花括号圈出函数体，里面是真正会被执行的语句。\nprintf(...);\t把引号里的文字打印到屏幕，末尾的分号表示一条语句结束。\nreturn 0;\t向操作系统报告“程序正常结束”，0 代表成功。\n\n#include 是预处理指令，它以井号开头，在正式编译之前由预处理器处理。你可以把它理解成“提前把工具箱搬到桌上”：stdio 是 standard input output 的缩写，printf、scanf 这些常用函数都声明在这个头文件里。没有这一行，编译器就不认识 printf，会报“未声明”的错误。\n\nmain 函数是程序唯一的大门。操作系统启动程序时，第一眼找的就是 main。函数名后面的 (void) 表示这个函数不接收参数；花括号之间的内容，就是它要做的事。最后的 return 0; 把 0 交还给操作系统，表示一切正常。\n\n你可能注意到代码第一行以 // 开头。这是单行注释，编译器会直接忽略它。注释是写给未来的人看的，而那个人往往就是三天后的你自己。从第一段程序开始就试着写一句注释，说明这段代码打算做什么，比事后回忆要轻松得多。\n\n你也许注意到每行 printf 前面留了两个空格。C 语言本身并不在意缩进，但读代码的人很在意。缩进把层次摆在眼前：函数体比函数头低一层，循环体再低一层。现在程序很短，看不出差距；等代码长到几十行，整齐的缩进会直接决定它是否读得下去。\n\n小提示：\n分号是语句的句号\n\nC 语言用分号 ; 表示“这一条说完了”。少一个分号，编译器就会把下一行接到上一行去理解，于是一连串看似莫名其妙的错误都来了。写代码时养成习惯：每敲完一条语句，顺手补上分号。\n\n三、把代码变成流程图\n\n现在把刚才的程序换一种方式来看。下面这段程序连续输出三行文字，没有任何分支和循环，执行路线只有一条：从上往下。\n\n点开下面的流程图，你会发现它和代码之间有一种朴素的对应关系：开始节点对应 main 的入口，一个个方块对应一条条语句，箭头表示执行方向，最后落到结束节点。这就是最基础的“顺序结构”。\n\n函数流程图\n顺序结构：只有一条路\n\n流程图里每个方块都对应一条语句，箭头方向就是程序真实的执行方向。\n\n开始\n输出 \"正在启动CodeViz\\n\"\nL4\n输出 \"加载课程数据\\n\"\nL5\n输出 \"准备就绪，开始学习\\n\"\nL6\n返回 0\nL7\n结束\n点击节点可定位代码行\n在实验室打开\n\n试着用手指沿着箭头走一遍，一边走一边读代码。走完之后你会意识到：所谓“程序在运行”，不过是计算机沿着这条线，把方块代表的事情一件一件做完。后面的课程里，这条线会长出岔路，也会绕成圈，但基本规则始终不变。\n\n四、让程序记住一个数\n\n只会打印固定文字的，还不能算“会计算”的程序。给程序一个可以存放数字的盒子，它就能先记下数据，再加工，最后输出。这个盒子就是变量。\n\n下面的程序先打印一句话，然后把 cups 设为 2，再给它加 1，最后输出结果。注意第 6 行：cups = cups + 1; 并不是数学课本上那种“等式”，它的意思是“先算右边，再把结果放回左边”。\n\nC\ntea.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  printf(\"开始泡茶\\n\");\n5\n  int cups = 2;\n6\n  cups = cups + 1;\n7\n  printf(\"今天喝 %d 杯茶\\n\", cups);\n8\n  return 0;\n9\n}\n10\n \n`%d` 是整数占位符，运行时会用 cups 的值替换它。\n单步执行\n单步执行：看清每一步\n\n拖动播放器，观察 cups 的值从 2 变成 3，以及输出区一行行出现文字的过程。\n\nC\n第 3 行\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  printf(\"开始泡茶\\n\");\n5\n  int cups = 2;\n6\n  cups = cups + 1;\n7\n  printf(\"今天喝 %d 杯茶\\n\", cups);\n8\n  return 0;\n9\n}\n10\n \n开始\nmain()\n深度 0\n\n开始执行 main 函数\n\n变量监视\n0\n\n当前作用域还没有变量\n\n调用栈\n0\n无\n输出\n查看输出（0 行）\n1 / 8\n空格播放 / 暂停，← → 单步\n在实验室打开\n\n单步执行把“编译运行”这件黑盒的事拆成了透明的每一步：执行到哪一行、变量变成了什么、屏幕上多出了什么。以后遇到想不明白的代码，先放进实验室单步走一遍，往往比重读三遍书更有效。\n\n五、换行、制表符与百分号\n\nprintf 的引号里除了普通文字，还能写一些以反斜杠开头的特殊字符。它们看不见，却控制着输出的排版。下面的程序一次演示三个常用写法。\n\nC\nescapes.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  printf(\"第一行\\n\");\n5\n  printf(\"第二行\\t带一个制表符\\n\");\n6\n  printf(\"百分号要写成 100%% 才能显示\\n\");\n7\n  return 0;\n8\n}\n9\n \n`\\n` 换行，`\\t` 让光标跳到下一个制表位，`%%` 输出一个真正的百分号。\n\\n：换到下一行，最常用。没有它，所有输出会挤在同一行。\n\\t：跳到下一个制表位，适合让多列文字大致对齐。\n%%：在格式串里输出一个百分号。因为 % 本身是占位符的开头，必须写两次。\n注意：\n中文标点与大小写\n\n初学者最常踩的两个坑：一是把分号敲成中文全角的 ；，把引号敲成中文的 “”，编译器会报奇怪的错误；二是把 Main、Printf、INT 的大小写写错，C 语言对此非常严格。遇到莫名其妙的报错，先看一眼这两种可能。\n\n六、从源文件到可执行文件\n\n你在实验室点下“运行”时，背后其实发生了四件事。理解这条流水线，能帮你读懂不同类型的报错。\n\n1\n编辑：把代码写进源文件\n\n源文件通常以 .c 结尾，用纯文本保存。文件名建议使用英文小写与下划线，避免空格和中文，减少工具链带来的麻烦。\n\n2\n编译：检查语法并翻译成机器指令\n\n编译器逐行检查语法，把 C 代码翻译成汇编，再汇编成机器码。少了分号、括号不配对这类问题，都会在这一步被拦下来。\n\n3\n链接：把外部函数接进来\n\nprintf 的实现不在你的文件里，链接器负责把标准库中的实现接到你的程序上。这一步失败通常是函数名拼错，或者编译时没有把需要的库接进来；至于忘记包含 stdio.h，问题会更早暴露——编译阶段就找不到 printf 的声明。\n\n4\n运行：操作系统把程序装进内存\n\n运行成功后，操作系统找到 main 作为入口，按顺序执行语句，输出写到屏幕上，最后通过 return 0; 交还控制权。\n\n七、小结\n\n这节课的三件收获：第一，一个完整的 C 程序由头文件、main 函数和若干语句组成；第二，语句按书写顺序从上到下执行，这叫顺序结构；第三，流程图和单步执行能把看不见的执行过程画出来、放慢给你看。\n\n下一节，我们会给程序配上更多种类的“盒子”，让它可以装整数、小数和字符，真正开始处理数据。\n\n动手试一试\n\n把名字换成你自己的，再加一行输出你正在学的科目，然后点“在实验室打开”运行它。试试故意删掉一个分号，看看编译器会怎么提示。\n\nC\nsnippet.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  printf(\"你好，我是小林。\\n\");\n5\n  printf(\"我正在学习 C 语言。\\n\");\n6\n  return 0;\n7\n}\n8\n \n关键要点\n01\n每个 C 程序都必须有且只有一个 main 函数，程序从它的第一条语句开始执行。\n02\n语句以分号结尾；花括号成对出现，圈出函数体与语句块。\n03\nprintf 把引号里的内容输出到屏幕，%d 是整数占位符，\\n 表示换行。\n04\n顺序结构就是自上而下执行，流程图会把这条路线画成一条向下的箭头。\n05\n编译错误先查三处：分号、括号、中英文标点，以及大小写。\nQUIZ\n随堂测验\n共 3 题\n01\n\n一个 C 程序开始运行时，最先进入哪个位置？\n\nA\nmain 函数的第一条语句\nB\n文件最上面的 #include 行\nC\n程序里第一个 printf 调用\nD\n第一行注释\n02\n\nprintf(\"你好\\n\"); 里的 \\n 表示什么？\n\nA\n换到下一行\nB\n输出字母 n\nC\n输出一个反斜杠\nD\n清空整个屏幕\n03\n\n下面哪种写法最可能让程序无法通过编译？\n\nA\n一条语句末尾漏掉了分号\nB\n把两条 printf 写成两行\nC\n把 return 0; 放在 main 的最后\nD\n把 #include <stdio.h> 写在文件第一行\n\n还有 3 题未作答，选择后可以修改。\n\n查看答案\n下一课\n数据与变量：给内存贴标签",
+        "textBodies": [
+          "学习编程的第一天，最容易冒出来的疑问是：我敲下的这些英文字母，究竟是怎么跑到屏幕上去的？",
+          "先记住一个朴素的比喻：程序是一份写给计算机的说明书。你按顺序写下指令，它就按顺序执行。计算机不会猜你的意思，所以每条指令都必须写得完整、准确、没有歧义。",
+          "这一节不急着堆语法。我们只做三件事：写出第一个程序，把它一行一行拆开，再把它变成一张能看懂的图。",
+          "在代码实验室里新建一个文件，输入下面这段代码。它只有七行，却已经包含了一个 C 程序最核心的骨架。先照着敲一遍，不要复制——敲的过程会让你注意到大小写、括号和分号。",
+          "运行成功后，屏幕上会出现两行字。恭喜，你已经完成了一个完整程序的“编辑、编译、运行”闭环。接下来我们把这七行拆开，看看每一部分在做什么。",
+          "#include 是预处理指令，它以井号开头，在正式编译之前由预处理器处理。你可以把它理解成“提前把工具箱搬到桌上”：stdio 是 standard input output 的缩写，printf、scanf 这些常用函数都声明在这个头文件里。没有这一行，编译器就不认识 printf，会报“未声明”的错误。",
+          "main 函数是程序唯一的大门。操作系统启动程序时，第一眼找的就是 main。函数名后面的 (void) 表示这个函数不接收参数；花括号之间的内容，就是它要做的事。最后的 return 0; 把 0 交还给操作系统，表示一切正常。",
+          "你可能注意到代码第一行以 // 开头。这是单行注释，编译器会直接忽略它。注释是写给未来的人看的，而那个人往往就是三天后的你自己。从第一段程序开始就试着写一句注释，说明这段代码打算做什么，比事后回忆要轻松得多。",
+          "你也许注意到每行 printf 前面留了两个空格。C 语言本身并不在意缩进，但读代码的人很在意。缩进把层次摆在眼前：函数体比函数头低一层，循环体再低一层。现在程序很短，看不出差距；等代码长到几十行，整齐的缩进会直接决定它是否读得下去。",
+          "C 语言用分号 ; 表示“这一条说完了”。少一个分号，编译器就会把下一行接到上一行去理解，于是一连串看似莫名其妙的错误都来了。写代码时养成习惯：每敲完一条语句，顺手补上分号。",
+          "现在把刚才的程序换一种方式来看。下面这段程序连续输出三行文字，没有任何分支和循环，执行路线只有一条：从上往下。",
+          "点开下面的流程图，你会发现它和代码之间有一种朴素的对应关系：开始节点对应 main 的入口，一个个方块对应一条条语句，箭头表示执行方向，最后落到结束节点。这就是最基础的“顺序结构”。",
+          "试着用手指沿着箭头走一遍，一边走一边读代码。走完之后你会意识到：所谓“程序在运行”，不过是计算机沿着这条线，把方块代表的事情一件一件做完。后面的课程里，这条线会长出岔路，也会绕成圈，但基本规则始终不变。",
+          "只会打印固定文字的，还不能算“会计算”的程序。给程序一个可以存放数字的盒子，它就能先记下数据，再加工，最后输出。这个盒子就是变量。",
+          "下面的程序先打印一句话，然后把 cups 设为 2，再给它加 1，最后输出结果。注意第 6 行：cups = cups + 1; 并不是数学课本上那种“等式”，它的意思是“先算右边，再把结果放回左边”。",
+          "单步执行把“编译运行”这件黑盒的事拆成了透明的每一步：执行到哪一行、变量变成了什么、屏幕上多出了什么。以后遇到想不明白的代码，先放进实验室单步走一遍，往往比重读三遍书更有效。",
+          "printf 的引号里除了普通文字，还能写一些以反斜杠开头的特殊字符。它们看不见，却控制着输出的排版。下面的程序一次演示三个常用写法。",
+          "初学者最常踩的两个坑：一是把分号敲成中文全角的 ；，把引号敲成中文的 “”，编译器会报奇怪的错误；二是把 Main、Printf、INT 的大小写写错，C 语言对此非常严格。遇到莫名其妙的报错，先看一眼这两种可能。",
+          "你在实验室点下“运行”时，背后其实发生了四件事。理解这条流水线，能帮你读懂不同类型的报错。",
+          "这节课的三件收获：第一，一个完整的 C 程序由头文件、main 函数和若干语句组成；第二，语句按书写顺序从上到下执行，这叫顺序结构；第三，流程图和单步执行能把看不见的执行过程画出来、放慢给你看。",
+          "下一节，我们会给程序配上更多种类的“盒子”，让它可以装整数、小数和字符，真正开始处理数据。"
+        ],
+        "title": "初识 C：从一行代码到一张图 · CodeViz",
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "quiz": 3,
+        "pagerPrev": "",
+        "pagerNext": "下一课数据与变量：给内存贴标签"
+      },
+      "toc": {
+        "beforeY": 0,
+        "scrollY": 1168,
+        "headingTop": 104,
+        "active": "02二、七行代码，各司其职",
+        "progressWidth": "17.3191%"
+      },
+      "diagrams": [
+        {
+          "kind": "函数流程图",
+          "svg": true,
+          "trace": false,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 6,
+          "hint": ""
+        },
+        {
+          "kind": "单步执行",
+          "svg": true,
+          "trace": true,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 0,
+          "hint": ""
+        }
+      ],
+      "quiz": {
+        "explains": 3,
+        "correct": 3,
+        "score": "答对 3 / 3 题，全部正确。",
+        "retry": true,
+        "stored": "{\"answers\":{\"c01-q1\":0,\"c01-q2\":0,\"c01-q3\":0},\"revealed\":true}"
+      },
+      "quizReload": {
+        "beforeReload": true,
+        "explains": 3,
+        "score": "答对 3 / 3 题，全部正确。"
+      },
+      "quizRetry": {
+        "explains": 0,
+        "hint": "还有 3 题未作答，选择后可以修改。",
+        "selected": 0,
+        "stored": "{\"answers\":{},\"revealed\":false}"
+      },
+      "complete": {
+        "button": "已完成本节",
+        "badge": [
+          "C 语言起步",
+          "第 1 课",
+          "已完成"
+        ],
+        "stored": [
+          "c01-hello"
+        ],
+        "chapterCounts": [
+          "1/3",
+          "0/2",
+          "0/5",
+          "0/3"
+        ]
+      },
+      "pager": {
+        "nextHref": "#/learn/c02-data",
+        "hash": "#/learn/c02-data",
+        "title": "数据与变量：给内存贴标签"
+      },
+      "handoff": {
+        "hash": "#/lab",
+        "filename": "hello.c",
+        "status": "已分析 · 1 个函数 · 0 个错误",
+        "toasts": [
+          "已从课程页载入代码",
+          "分析完成：1 个函数，没有发现错误"
+        ],
+        "code": "// hello.c —— 第一段完整程序\n#include <stdio.h>\n\n\nint main(void) {\n  printf(\"Hello, CodeViz!\\n\");\n  printf(\"这是我写下的第一行 C 代码。\\n\");\n  return 0;\n}\n\n"
+      },
+      "mobile": {
+        "layout": {
+          "aside": {
+            "width": 0,
+            "display": "none",
+            "left": 0,
+            "right": 0
+          },
+          "mobileToc": {
+            "width": 350,
+            "display": "block",
+            "left": 20,
+            "right": 370
+          },
+          "topbar": {
+            "width": 390,
+            "display": "flex",
+            "left": 0,
+            "right": 390
+          },
+          "diagram": {
+            "width": 350,
+            "display": "block",
+            "left": 20,
+            "right": 370
+          },
+          "quizOption": {
+            "width": 316,
+            "display": "flex",
+            "left": 37,
+            "right": 353
+          },
+          "scrollWidth": 390,
+          "viewport": 390,
+          "completeMobile": true
+        },
+        "mobileToc": {
+          "scrollY": 1651,
+          "headingTop": 104
+        },
+        "quizMobile": {
+          "selected": 1,
+          "optionWidth": 316,
+          "viewport": 390
+        }
+      }
+    },
+    "c05-loops": {
+      "structure": {
+        "h1": "循环结构：重复的艺术",
+        "subtitle": "while、for、do-while 与 break：把重复交给程序，把思考留给自己。",
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 10,
+        "inlineStrong": 3,
+        "inlineCode": 59,
+        "bodyText": "选择结构解决了“走哪条路”，但还有一类问题它帮不上忙：把同一件事做很多遍。想输出 100 个编号、累加 1 到 100、打印九九乘法表，靠复制粘贴显然不现实。\n\n循环就是为重复而生的结构。它让一小段代码反复执行，直到某个条件不再成立。写循环的核心，是把“重复的动作”和“什么时候停”想清楚。\n\n一、先看看没有循环有多笨\n\n如果要连续输出三次问候，可以老老实实写三条 printf。可如果是一百次呢？代码会变得又长又难改，而且改一处数字就得改一百行。\n\n更麻烦的是，重复次数往往由数据决定：用户输入几就输出几。固定行数的代码根本无法应对。循环把“次数”变成一个可以计算的变量，问题立刻变得灵活。\n\nC\nthree_times.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  printf(\"第 1 次练习\\n\");\n5\n  printf(\"第 2 次练习\\n\");\n6\n  printf(\"第 3 次练习\\n\");\n7\n  return 0;\n8\n}\n9\n \n三行还能接受，一百行就是灾难。循环会把这三行压成一行循环体。\n二、while：条件成立就一直做\n\nwhile 是最朴素的循环：先判断条件，成立就执行循环体，执行完再回来判断，直到条件不成立为止。它的结构是 while (条件) { 循环体 }。\n\n要让循环有结束的一天，循环体里必须有东西在改变条件，通常就是那个控制次数的循环变量。下面的程序用 fuel 记录剩余燃料，每轮减一，减到 0 时条件不成立，循环结束。\n\nC\nfuel.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int fuel = 3;\n5\n \n6\n  while (fuel > 0) {\n7\n    printf(\"剩余燃料 %d\\n\", fuel);\n8\n    fuel--;\n9\n  }\n10\n \n11\n  printf(\"燃料耗尽，着陆\\n\");\n12\n  return 0;\n13\n}\n14\n \n循环体里的 `fuel--` 是循环能停下来的关键。\n\n把循环拆开看，永远只有三件事：初值（fuel 从 3 开始）、条件（fuel 大于 0 才继续）、更新（每轮减一）。这三要素缺一个，循环要么不执行，要么停不下来。写任何循环之前，先把这三件事用一句话说清楚。\n\n注意：\n忘了更新，就是死循环\n\n如果循环体里漏写了 fuel--，fuel 永远是 3，条件永远成立，程序会一直打印下去。遇到程序卡死、输出刷屏，第一反应就是检查循环变量有没有被更新、条件有没有机会变成假。\n\n三、for：把三要素写在一行\n\nfor 循环把初值、条件、更新集中写在括号里，是“知道要循环多少次”时最常用的写法。它的执行顺序是：初始化一次，判断条件，执行循环体，执行更新，再判断条件，如此往复。\n\n下面的程序累加 1 到 100。sum 像一只存钱罐，每轮把当前的 i 放进去。循环结束后，存钱罐里就是总和。\n\nC\nsum.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int sum = 0;\n5\n \n6\n  for (int i = 1; i <= 100; i++) {\n7\n    sum += i;\n8\n  }\n9\n \n10\n  printf(\"1 + 2 + ... + 100 = %d\\n\", sum);\n11\n  return 0;\n12\n}\n13\n \n初值 `i = 1`、条件 `i <= 100`、更新 `i++` 三件事一目了然。\n\n累加是循环最经典的用途：先准备一个初值为 0 的累加器，再在每轮里把新值加进去。想求阶乘，就把累加器初值改成 1、把 sum += i 换成 product *= i，并让循环从 1 走到 n；不过阶乘增长极快，int 很快就会溢出。想只累加偶数，可以把初值改成 2、更新语句改成 i += 2，或者在循环体里用 continue 跳过奇数。同一个骨架，能变出很多程序。\n\n函数流程图\nfor 循环在流程图里是一个环\n\n判断节点在循环体上方，循环体执行完有一条箭头回到判断处，这就是“回边”。\n\n重复\n开始\n声明 int sum\nL4\ni <= 100\nL6\nsum += i\nL7\n输出 \"1 + 2 + ... +…\"\nL10\n返回 0\nL11\n结束\n点击节点可定位代码行\n在实验室打开\n\n流程图里最值得注意的，是那条从循环体指回判断节点的箭头。顺序结构只有一条向下的线，而循环让线绕了回来。只要条件仍然成立，程序就会沿着回边一圈一圈地走。\n\n四、do-while：先做一遍再说\n\nwhile 和 for 都是先判断再执行，如果一开始条件就不成立，循环体一次也不会执行。do-while 反过来：先执行循环体，再判断要不要继续，因此循环体至少执行一次。\n\n它适合“先做一次，再决定要不要重复”的场景，比如倒计时、菜单至少显示一次、读取数据直到遇到结束标记。注意 do-while 的结尾有一个分号，这是它和 while 在写法上最容易忽略的差别。\n\nC\ncountdown.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int seconds = 5;\n5\n \n6\n  do {\n7\n    printf(\"%d...\\n\", seconds);\n8\n    seconds--;\n9\n  } while (seconds > 0);\n10\n \n11\n  printf(\"点火，起飞!\\n\");\n12\n  return 0;\n13\n}\n14\n \n先输出 5，再减一、判断，直到 seconds 变成 0。\n\n两者的差别在边界情况下最明显。把起始值设为 0，while (n > 0) 一次都不会执行，而 do-while 会先执行一遍再退出。下面左右两段程序除了循环写法，其余完全相同，输出却不一样。\n\nC\nwhile-zero.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int n = 0;\n5\n \n6\n  while (n > 0) {\n7\n    printf(\"执行一次\\n\");\n8\n    n--;\n9\n  }\n10\n \n11\n  printf(\"循环结束\\n\");\n12\n  return 0;\n13\n}\n14\n \nC\ndo-while-zero.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int n = 0;\n5\n \n6\n  do {\n7\n    printf(\"执行一次\\n\");\n8\n    n--;\n9\n  } while (n > 0);\n10\n \n11\n  printf(\"循环结束\\n\");\n12\n  return 0;\n13\n}\n14\n \n\n左侧只输出“循环结束”，右侧会多输出一行“执行一次”。\n\n五、嵌套循环：行与列\n\n循环体里还可以再放一个循环，这叫嵌套。外层每走一轮，内层都要完整地跑一遍。打印表格、遍历二维数据、生成图形，都离不开嵌套循环。\n\n下面的程序打印九九乘法表。外层 row 控制第几行，内层 col 从 1 打印到 row，因此每行的列数逐行增加。\n\nC\ntable.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  for (int row = 1; row <= 9; row++) {\n5\n    for (int col = 1; col <= row; col++) {\n6\n      printf(\"%d*%d=%-2d \", row, col, row * col);\n7\n    }\n8\n    printf(\"\\n\");\n9\n  }\n10\n  return 0;\n11\n}\n12\n \n内层循环结束后，外层循环才换到下一行；`%-2d` 让每格至少占两格、左对齐。\n说明：\n内层跑完一整轮，外层才走一步\n\n理解嵌套循环的关键，是分清“谁快谁慢”。外层变量 row 每变化一次，内层变量 col 都要从 1 走到 row。用单步执行走一遍，你会看到 col 反复归 1、反复增加，而 row 一直不动。\n\n六、break 与 continue\n\n循环有时不需要走到最后。break 立刻跳出整个循环，continue 只结束当前这一轮、马上进入下一轮。一个管“整体退出”，一个管“跳过本次”。\n\n判断素数很适合演示 break：只要找到一个因子，就能确定它不是素数，后面的试除没有意义，可以提前收工。\n\nC\nprime.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int number = 97;\n5\n  int isPrime = 1;\n6\n \n7\n  if (number < 2) {\n8\n    isPrime = 0;\n9\n  } else {\n10\n    for (int i = 2; i * i <= number; i++) {\n11\n      if (number % i == 0) {\n12\n        isPrime = 0;\n13\n        break;\n14\n      }\n15\n    }\n16\n  }\n17\n \n18\n  if (isPrime) {\n19\n    printf(\"%d 是素数\\n\", number);\n20\n  } else {\n21\n    printf(\"%d 不是素数\\n\", number);\n22\n  }\n23\n  return 0;\n24\n}\n25\n \n一旦找到因子，`break` 立刻结束 for 循环，不再做无谓的试除。\nC\nskip_even.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  for (int i = 1; i <= 10; i++) {\n5\n    if (i % 2 == 0) {\n6\n      continue;\n7\n    }\n8\n    printf(\"%d \", i);\n9\n  }\n10\n  printf(\"\\n\");\n11\n  return 0;\n12\n}\n13\n \n遇到偶数就 `continue`，跳过本轮的 printf，只打印奇数。\n注意：\nbreak 跳出的是哪一层？\n\nbreak 和 continue 只作用于它们所在的那一层循环。在嵌套循环的内层写 break，只跳出内层，外层仍会继续。如果确实需要一次退出两层，通常用一个标志变量配合条件判断，而不要指望一个 break 解决所有问题。\n\n七、单步看循环\n\n循环最难想象的是“执行到第几圈、变量现在是多少”。文字和流程图都有局限，单步执行可以直接把每一轮摊开给你看。\n\n单步执行\n单步执行：一圈一圈看清 fuel 的变化\n\n每走一轮，fuel 减一；条件变成假时，执行路线离开循环，走向最后的输出。\n\nC\n第 3 行\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int fuel = 3;\n5\n  while (fuel > 0) {\n6\n    printf(\"燃料 %d\\n\", fuel);\n7\n    fuel--;\n8\n  }\n9\n  printf(\"着陆\\n\");\n10\n  return 0;\n11\n}\n12\n \n开始\nmain()\n深度 0\n\n开始执行 main 函数\n\n变量监视\n0\n\n当前作用域还没有变量\n\n调用栈\n0\n无\n输出\n查看输出（0 行）\n1 / 16\n空格播放 / 暂停，← → 单步\n在实验室打开\n\n播放时留意三个信号：当前执行到哪一行、条件判断的结果、变量表里 fuel 的值。把这三者对应起来，任何循环都不再是黑盒。也可以试着把循环体删掉一行，观察结果怎么变。\n\n八、小结\n\n循环把重复的工作交给机器，把设计循环的思考留给人。这一节记住四件事：循环三要素（初值、条件、更新）缺一不可；for 适合次数已知，while 适合由条件驱动；do-while 保证至少执行一次；break 退出整个循环，continue 只跳过本轮。\n\n到这里，C 语言入门最核心的三块内容——顺序、选择、循环——已经齐全。下一章将进入数组与字符串，开始组织一批数据，而不是单个变量。\n\n动手试一试\n\n把 sum.c 改成只累加偶数（提示：如果 i 是奇数就 continue），再把上限从 100 改成 50 看看结果。然后用 for 循环输出 1 到 20 中所有能被 3 整除的数，试着用取余配合条件判断。\n\nC\nsnippet.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main(void) {\n4\n  int sum = 0;\n5\n \n6\n  for (int i = 1; i <= 100; i++) {\n7\n    if (i % 2 != 0) {\n8\n      continue;\n9\n    }\n10\n    sum += i;\n11\n  }\n12\n \n13\n  printf(\"1 到 100 中所有偶数的和是 %d\\n\", sum);\n14\n  return 0;\n15\n}\n16\n \n关键要点\n01\n循环三要素：初值、继续条件、每轮更新；缺少更新就会死循环。\n02\nwhile 先判断再执行，可能一次都不执行；do-while 先执行再判断，至少执行一次。\n03\nfor 把三要素集中在括号里，适合次数已知的循环。\n04\n嵌套循环中，外层每走一步，内层都要完整跑一轮。\n05\nbreak 结束整个循环，continue 只跳过本轮剩余语句。\nQUIZ\n随堂测验\n共 4 题\n01\n\nfor (int i = 1; i <= 100; i++) 这段循环的循环体一共执行多少次？\n\nA\n100 次\nB\n99 次\nC\n101 次\nD\n1 次\n02\n\nwhile (i > 0) { printf(\"%d\", i); } 中漏写了 i--，会发生什么？\n\nA\n陷入死循环，不断输出同一个数\nB\n循环体一次都不执行\nC\n自动把 i 减到 0\nD\n编译器直接报错\n03\n\ndo-while 与 while 最主要的区别是什么？\n\nA\ndo-while 的循环体至少执行一次\nB\ndo-while 不能嵌套\nC\nwhile 的循环体至少执行一次\nD\ndo-while 只能用于计数\n04\n\n在循环体里执行 break; 和 continue; 的区别是？\n\nA\nbreak 结束整个循环，continue 只跳过本轮剩余语句\nB\nbreak 只跳过本轮，continue 结束整个循环\nC\n两者都会重新开始循环\nD\n两者都只能用于 for 循环\n\n还有 4 题未作答，选择后可以修改。\n\n查看答案\n上一课\n选择结构：程序的岔路口\n下一课\n数组与字符串：一排连续的格子",
+        "textBodies": [
+          "选择结构解决了“走哪条路”，但还有一类问题它帮不上忙：把同一件事做很多遍。想输出 100 个编号、累加 1 到 100、打印九九乘法表，靠复制粘贴显然不现实。",
+          "循环就是为重复而生的结构。它让一小段代码反复执行，直到某个条件不再成立。写循环的核心，是把“重复的动作”和“什么时候停”想清楚。",
+          "如果要连续输出三次问候，可以老老实实写三条 printf。可如果是一百次呢？代码会变得又长又难改，而且改一处数字就得改一百行。",
+          "更麻烦的是，重复次数往往由数据决定：用户输入几就输出几。固定行数的代码根本无法应对。循环把“次数”变成一个可以计算的变量，问题立刻变得灵活。",
+          "while 是最朴素的循环：先判断条件，成立就执行循环体，执行完再回来判断，直到条件不成立为止。它的结构是 while (条件) { 循环体 }。",
+          "要让循环有结束的一天，循环体里必须有东西在改变条件，通常就是那个控制次数的循环变量。下面的程序用 fuel 记录剩余燃料，每轮减一，减到 0 时条件不成立，循环结束。",
+          "把循环拆开看，永远只有三件事：初值（fuel 从 3 开始）、条件（fuel 大于 0 才继续）、更新（每轮减一）。这三要素缺一个，循环要么不执行，要么停不下来。写任何循环之前，先把这三件事用一句话说清楚。",
+          "如果循环体里漏写了 fuel--，fuel 永远是 3，条件永远成立，程序会一直打印下去。遇到程序卡死、输出刷屏，第一反应就是检查循环变量有没有被更新、条件有没有机会变成假。",
+          "for 循环把初值、条件、更新集中写在括号里，是“知道要循环多少次”时最常用的写法。它的执行顺序是：初始化一次，判断条件，执行循环体，执行更新，再判断条件，如此往复。",
+          "下面的程序累加 1 到 100。sum 像一只存钱罐，每轮把当前的 i 放进去。循环结束后，存钱罐里就是总和。",
+          "累加是循环最经典的用途：先准备一个初值为 0 的累加器，再在每轮里把新值加进去。想求阶乘，就把累加器初值改成 1、把 sum += i 换成 product *= i，并让循环从 1 走到 n；不过阶乘增长极快，int 很快就会溢出。想只累加偶数，可以把初值改成 2、更新语句改成 i += 2，或者在循环体里用 continue 跳过奇数。同一个骨架，能变出很多程序。",
+          "流程图里最值得注意的，是那条从循环体指回判断节点的箭头。顺序结构只有一条向下的线，而循环让线绕了回来。只要条件仍然成立，程序就会沿着回边一圈一圈地走。",
+          "while 和 for 都是先判断再执行，如果一开始条件就不成立，循环体一次也不会执行。do-while 反过来：先执行循环体，再判断要不要继续，因此循环体至少执行一次。",
+          "它适合“先做一次，再决定要不要重复”的场景，比如倒计时、菜单至少显示一次、读取数据直到遇到结束标记。注意 do-while 的结尾有一个分号，这是它和 while 在写法上最容易忽略的差别。",
+          "两者的差别在边界情况下最明显。把起始值设为 0，while (n > 0) 一次都不会执行，而 do-while 会先执行一遍再退出。下面左右两段程序除了循环写法，其余完全相同，输出却不一样。",
+          "循环体里还可以再放一个循环，这叫嵌套。外层每走一轮，内层都要完整地跑一遍。打印表格、遍历二维数据、生成图形，都离不开嵌套循环。",
+          "下面的程序打印九九乘法表。外层 row 控制第几行，内层 col 从 1 打印到 row，因此每行的列数逐行增加。",
+          "理解嵌套循环的关键，是分清“谁快谁慢”。外层变量 row 每变化一次，内层变量 col 都要从 1 走到 row。用单步执行走一遍，你会看到 col 反复归 1、反复增加，而 row 一直不动。",
+          "循环有时不需要走到最后。break 立刻跳出整个循环，continue 只结束当前这一轮、马上进入下一轮。一个管“整体退出”，一个管“跳过本次”。",
+          "判断素数很适合演示 break：只要找到一个因子，就能确定它不是素数，后面的试除没有意义，可以提前收工。",
+          "break 和 continue 只作用于它们所在的那一层循环。在嵌套循环的内层写 break，只跳出内层，外层仍会继续。如果确实需要一次退出两层，通常用一个标志变量配合条件判断，而不要指望一个 break 解决所有问题。",
+          "循环最难想象的是“执行到第几圈、变量现在是多少”。文字和流程图都有局限，单步执行可以直接把每一轮摊开给你看。",
+          "播放时留意三个信号：当前执行到哪一行、条件判断的结果、变量表里 fuel 的值。把这三者对应起来，任何循环都不再是黑盒。也可以试着把循环体删掉一行，观察结果怎么变。",
+          "循环把重复的工作交给机器，把设计循环的思考留给人。这一节记住四件事：循环三要素（初值、条件、更新）缺一不可；for 适合次数已知，while 适合由条件驱动；do-while 保证至少执行一次；break 退出整个循环，continue 只跳过本轮。",
+          "到这里，C 语言入门最核心的三块内容——顺序、选择、循环——已经齐全。下一章将进入数组与字符串，开始组织一批数据，而不是单个变量。"
+        ],
+        "title": "循环结构：重复的艺术 · CodeViz",
+        "tocButtons": 8,
+        "h2Anchors": 8,
+        "quiz": 4,
+        "pagerPrev": "上一课选择结构：程序的岔路口",
+        "pagerNext": "下一课数组与字符串：一排连续的格子"
+      },
+      "toc": {
+        "beforeY": 0,
+        "scrollY": 1146,
+        "headingTop": 104,
+        "active": "02二、while：条件成立就一直做",
+        "progressWidth": "12.3518%"
+      },
+      "diagrams": [
+        {
+          "kind": "函数流程图",
+          "svg": true,
+          "trace": false,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 7,
+          "hint": ""
+        },
+        {
+          "kind": "单步执行",
+          "svg": true,
+          "trace": true,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 0,
+          "hint": ""
+        }
+      ],
+      "quiz": {
+        "explains": 4,
+        "correct": 4,
+        "score": "答对 4 / 4 题，全部正确。",
+        "retry": true,
+        "stored": null
+      },
+      "quizReload": {
+        "beforeReload": true,
+        "explains": 4,
+        "score": "答对 4 / 4 题，全部正确。"
+      },
+      "quizRetry": {
+        "explains": 0,
+        "hint": "还有 4 题未作答，选择后可以修改。",
+        "selected": 0,
+        "stored": null
+      },
+      "complete": {
+        "button": "已完成本节",
+        "badge": [
+          "控制流程",
+          "第 2 课",
+          "已完成"
+        ],
+        "stored": [
+          "c05-loops"
+        ],
+        "chapterCounts": [
+          "0/3",
+          "1/2",
+          "0/5",
+          "0/3"
+        ]
+      },
+      "pager": {
+        "nextHref": "#/learn/c06-arrays",
+        "hash": "#/learn/c06-arrays",
+        "title": "数组与字符串：一排连续的格子"
+      },
+      "handoff": {
+        "hash": "#/lab",
+        "filename": "three_times.c",
+        "status": "已分析 · 1 个函数 · 0 个错误",
+        "toasts": [
+          "已从课程页载入代码",
+          "分析完成：1 个函数，没有发现错误"
+        ],
+        "code": "#include <stdio.h>\n\n\nint main(void) {\n  printf(\"第 1 次练习\\n\");\n  printf(\"第 2 次练习\\n\");\n  printf(\"第 3 次练习\\n\");\n  return 0;\n}\n\n"
+      }
+    },
+    "c08-pointers": {
+      "structure": {
+        "h1": "指针：内存的门牌号",
+        "subtitle": "用地址间接访问数据，让函数真正修改外面的变量",
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "inlineStrong": 2,
+        "inlineCode": 75,
+        "bodyText": "上一课我们说过，函数收到的参数只是实参的副本，所以在函数里改形参，外面的变量纹丝不动。可如果就是想让函数修改外面的变量呢？C 给出的答案是指针（pointer）：不复制数据本身，而是把数据的地址交给函数。要理解指针，先要接受一件事——内存里的每个字节都有一个编号，这个编号就是地址。\n\n一、地址与指针变量\n\n用取地址运算符 & 可以拿到一个变量的地址，&x 的类型是“指向 int 的指针”，写作 int *。int *p = &x; 声明了一个指针变量 p，它里面存的就是 x 的地址。指针本身也是变量，占一块内存（64 位系统上通常 8 字节），只不过它存的内容是另一个变量的位置。用 *p 可以顺着地址找到目标，这叫解引用（dereference）。\n\n可以把内存想成一排房间，变量是房间里的东西，地址是门牌号。普通变量直接住着值；指针变量则像一张写着门牌号的纸条，纸条本身也是被存放的对象，但顺着号码能找到另一个房间。& 是“问门牌号”，* 是“按门牌号找过去”。\n\nC\naddress.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main() {\n4\n  int x = 42;\n5\n  int *p = &x;\n6\n \n7\n  printf(\"x 的值：%d\\n\", x);\n8\n  printf(\"x 的地址：%p\\n\", (void *)&x);\n9\n  printf(\"p 里存的地址：%p\\n\", (void *)p);\n10\n  printf(\"p 指向的值：%d\\n\", *p);\n11\n  return 0;\n12\n}\n13\n \np 存的是 x 的地址；*p 又把地址“还原”成 x 的值。\n内存布局\n地址与指针箭头\n\n指针变量 p、q 里存的是地址，所以用箭头画出指向关系；地址为教学示意，不是真实运行地址。\n\n全局 / 静态区\n没有全局变量\n栈区\nmain()\nL3\nx\n42\ny\n7\np\n→ x\nq\n→ y\n堆区\n没有发现显式的堆分配（new / malloc）\n\n地址与布局为教学示意，不是真实运行地址。\n\n地址与布局为教学示意，不是程序真实运行时的地址。\n\n字节数按 64 位常见模型估算：char / bool = 1、short = 2、int / float = 4、long long / double / 指针 = 8。\n\n按定义静态估算，非运行期真实地址\n在实验室打开\n\n在内存图里，x 和 y 是两块普通的格子，p 和 q 是另外两块格子，只是它们的内容是一串地址，所以用箭头画出指向关系。p 的类型是 int *，它告诉编译器：顺着这个地址读 4 个字节，并按整数解释。类型不同的指针不能随便互相赋值，因为编译器要靠类型决定读多少字节、怎么解释这些字节。\n\n二、通过指针修改目标\n\n解引用不仅能读，也能写。*p = 100; 的意思是“把 100 写到 p 指向的那块内存”，于是 x 就变成了 100。注意指针本身没有被修改，p 仍然指向 x。如果写的是 p = &y;，那才是让 p 改指向 y。读代码时要分清：这一句改的是指针的指向，还是指针指向的内容。\n\nC\npointer_write.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main() {\n4\n  int x = 42;\n5\n  int y = 7;\n6\n  int *p = &x;\n7\n \n8\n  *p = 100;\n9\n  printf(\"x = %d\\n\", x);\n10\n \n11\n  p = &y;\n12\n  *p = *p + 1;\n13\n  printf(\"y = %d\\n\", y);\n14\n  return 0;\n15\n}\n16\n \n*p 修改的是目标变量；p = &y 只是换了指向。\n三、指针参数：swap 终于能工作了\n\n把指针作为参数，函数拿到的仍然是“地址的副本”，但这个地址指向调用者的变量。于是在函数里解引用，改的就是调用者的数据。经典的 swap(int *a, int *b) 就是这样：a 和 b 分别保存两个变量的地址，交换 *a 与 *b，就交换了外面的值。调用时要传地址，写成 swap(&x, &y)；如果写成 swap(x, y)，编译器会因为类型不匹配而报错。\n\nC\nswap.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nvoid swap(int *a, int *b) {\n4\n  int temp = *a;\n5\n  *a = *b;\n6\n  *b = temp;\n7\n}\n8\n \n9\nint main() {\n10\n  int x = 3;\n11\n  int y = 8;\n12\n \n13\n  printf(\"交换前：x = %d, y = %d\\n\", x, y);\n14\n  swap(&x, &y);\n15\n  printf(\"交换后：x = %d, y = %d\\n\", x, y);\n16\n  return 0;\n17\n}\n18\n \n三步交换交换的是 *a 和 *b，也就是外面的 x 和 y。\n函数流程图\nswap 函数的流程图\n\n函数体只有三步：先备份 *a，再用 *b 覆盖 *a，最后把备份写进 *b。\n\n开始\n声明 int temp；*a =*b；*b = temp\nL2\n结束\n点击节点可定位代码行\n在实验室打开\n\n把 swap 画成流程图，会看到它是一条没有分支的直路：备份、覆盖、写回。真正容易出错的是调用处——忘记写 &，等于把整数当成地址传进去；在函数里少写一个 *，交换的就变成了两个局部指针，外面的 x、y 毫无变化。写完后对着内存图检查一遍：箭头有没有指对，改的是不是箭头另一端的内容。\n\n指针参数的意义不止交换两个数。函数一次只能 return 一个值，但借由指针，可以让函数修改多个变量，把多个结果带回调用者。C 标准库中很多函数要求传地址，例如 scanf(\"%d\", &x) 必须写 &，原因就在这里。\n\n四、指针与数组\n\n数组名在大多数表达式里会“退化”成指向首元素的指针，所以 int *p = a; 是合法的。p + i 表示向后移动 i 个元素（不是 i 个字节），*(p + i) 与 a[i] 完全等价。指针加法会自动按元素大小缩放，这正是指针类型存在的意义之一。但指针不会记住数组边界，越界访问照样不会报错，使用时要自己控制范围。\n\n数组元素本身也有地址，&a[2] 就等于 a + 2。a 与 &a[0] 指向同一个位置，但类型不同：sizeof(a) 得到整个数组的大小，而 sizeof(&a[0]) 只是指针的大小。指针还可以和下标一起用，p[i] 与 *(p + i) 等价，只是前者读起来更像数组。\n\nC\npointer_array.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nint main() {\n4\n  int a[5] = {10, 20, 30, 40, 50};\n5\n  int *p = a;\n6\n \n7\n  for (int i = 0; i < 5; i++) {\n8\n    printf(\"a[%d] = %d\\n\", i, *(p + i));\n9\n  }\n10\n  return 0;\n11\n}\n12\n \np + i 按 int 的大小移动；*(p + i) 等价于 a[i]。\nC\nC：用指针交换\n复制\n在实验室打开\n1\nvoid swap(int *a, int *b) {\n2\n  int temp = *a;\n3\n  *a = *b;\n4\n  *b = temp;\n5\n}\n6\n \n7\n/* 调用：swap(&x, &y); */\n8\n \nC++\nC++：用引用交换\n复制\n在实验室打开\n1\nvoid swap(int &a, int &b) {\n2\n  int temp = a;\n3\n  a = b;\n4\n  b = temp;\n5\n}\n6\n \n7\n/* 调用：swap(x, y); */\n8\n \n\nC++ 的引用是变量的别名，函数里直接写名字就能改到外面；两种写法都能通过 g++ 编译。\n\n易错点：\n野指针与空指针：解引用前先确认指向\n\nint *p; 只声明未初始化，p 里是随机值，此时解引用就是野指针访问；int *p = NULL; 之后解引用同样属于未定义行为。使用指针前必须确认它指向有效内存，解引用前可以用 if (p != NULL) 检查，但检查只能挡住空指针，挡不住未初始化或已经失效的指针。\n\n说明：\n地址是示意，不是固定数字\n\n课程里的内存图会给变量标上一串地址，那只是为了帮助理解“谁挨着谁、谁指向谁”。真实地址由操作系统和运行时决定，同一程序两次运行都可能不同，还有地址随机化机制。不要根据图里的数字写代码，也不要假设变量一定按声明顺序排列。\n\n小结\n\n& 取地址，* 解引用，int *p 里存的是 int 变量的地址。指针本身是变量，p = &y 改指向，*p = 9 改内容。把地址传给函数，函数就能通过解引用修改调用者的变量，这正是 swap 能工作的原因。数组名会退化成首元素指针，*(p + i) 与 a[i] 等价。下一课我们把多个相关变量打包成结构体，用更贴近现实的方式组织数据。\n\n动手试一试\n\n在实验室打开这段代码：先看内存图里两个指针的箭头指向，再单步执行，观察 *a 与 *b 的交换如何改变 x、y；最后把交换三步的顺序打乱，看看结果是否还正确。\n\nC\nsnippet.c\n复制\n在实验室打开\n1\n#include <stdio.h>\n2\n \n3\nvoid swap(int *a, int *b) {\n4\n  int temp = *a;\n5\n  *a = *b;\n6\n  *b = temp;\n7\n}\n8\n \n9\nint main() {\n10\n  int x = 10;\n11\n  int y = 20;\n12\n \n13\n  swap(&x, &y);\n14\n  printf(\"x = %d, y = %d\\n\", x, y);\n15\n  return 0;\n16\n}\n17\n \n关键要点\n01\n& 取地址，* 解引用；int *p 里存的是 int 变量的地址。\n02\n指针本身是变量：p = &y 改指向，*p = 9 改指向的内容。\n03\n指针参数让函数能修改调用者的变量，swap 交换的是 *a 与 *b。\n04\n数组名退化为首元素指针，*(p + i) 与 a[i] 等价，且指针加法按元素大小移动。\n05\n野指针、空指针解引用都是未定义行为，使用前必须确认指向有效内存。\nQUIZ\n随堂测验\n共 3 题\n01\n\n执行 int x = 5; int *p = &x; *p = 8; 之后，x 的值是多少？\n\nA\n5\nB\n8\nC\np 的地址\nD\n无法确定\n02\n\n已有 int x = 3; int y = 8; 和 void swap(int *a, int *b);，正确的调用是哪个？\n\nA\nswap(x, y);\nB\nswap(&x, &y);\nC\nswap(*x, *y);\nD\nswap(x, &y);\n03\n\nint a[5]; int *p = a; 之后，*(p + 2) 与下面哪个表达式等价？\n\nA\na[1]\nB\na[2]\nC\n&a[2]\nD\n2\n\n还有 3 题未作答，选择后可以修改。\n\n查看答案\n上一课\n函数与递归：分而治之\n下一课\n结构体与自定义类型",
+        "textBodies": [
+          "上一课我们说过，函数收到的参数只是实参的副本，所以在函数里改形参，外面的变量纹丝不动。可如果就是想让函数修改外面的变量呢？C 给出的答案是指针（pointer）：不复制数据本身，而是把数据的地址交给函数。要理解指针，先要接受一件事——内存里的每个字节都有一个编号，这个编号就是地址。",
+          "用取地址运算符 & 可以拿到一个变量的地址，&x 的类型是“指向 int 的指针”，写作 int *。int *p = &x; 声明了一个指针变量 p，它里面存的就是 x 的地址。指针本身也是变量，占一块内存（64 位系统上通常 8 字节），只不过它存的内容是另一个变量的位置。用 *p 可以顺着地址找到目标，这叫解引用（dereference）。",
+          "可以把内存想成一排房间，变量是房间里的东西，地址是门牌号。普通变量直接住着值；指针变量则像一张写着门牌号的纸条，纸条本身也是被存放的对象，但顺着号码能找到另一个房间。& 是“问门牌号”，* 是“按门牌号找过去”。",
+          "在内存图里，x 和 y 是两块普通的格子，p 和 q 是另外两块格子，只是它们的内容是一串地址，所以用箭头画出指向关系。p 的类型是 int *，它告诉编译器：顺着这个地址读 4 个字节，并按整数解释。类型不同的指针不能随便互相赋值，因为编译器要靠类型决定读多少字节、怎么解释这些字节。",
+          "解引用不仅能读，也能写。*p = 100; 的意思是“把 100 写到 p 指向的那块内存”，于是 x 就变成了 100。注意指针本身没有被修改，p 仍然指向 x。如果写的是 p = &y;，那才是让 p 改指向 y。读代码时要分清：这一句改的是指针的指向，还是指针指向的内容。",
+          "把指针作为参数，函数拿到的仍然是“地址的副本”，但这个地址指向调用者的变量。于是在函数里解引用，改的就是调用者的数据。经典的 swap(int *a, int *b) 就是这样：a 和 b 分别保存两个变量的地址，交换 *a 与 *b，就交换了外面的值。调用时要传地址，写成 swap(&x, &y)；如果写成 swap(x, y)，编译器会因为类型不匹配而报错。",
+          "把 swap 画成流程图，会看到它是一条没有分支的直路：备份、覆盖、写回。真正容易出错的是调用处——忘记写 &，等于把整数当成地址传进去；在函数里少写一个 *，交换的就变成了两个局部指针，外面的 x、y 毫无变化。写完后对着内存图检查一遍：箭头有没有指对，改的是不是箭头另一端的内容。",
+          "指针参数的意义不止交换两个数。函数一次只能 return 一个值，但借由指针，可以让函数修改多个变量，把多个结果带回调用者。C 标准库中很多函数要求传地址，例如 scanf(\"%d\", &x) 必须写 &，原因就在这里。",
+          "数组名在大多数表达式里会“退化”成指向首元素的指针，所以 int *p = a; 是合法的。p + i 表示向后移动 i 个元素（不是 i 个字节），*(p + i) 与 a[i] 完全等价。指针加法会自动按元素大小缩放，这正是指针类型存在的意义之一。但指针不会记住数组边界，越界访问照样不会报错，使用时要自己控制范围。",
+          "数组元素本身也有地址，&a[2] 就等于 a + 2。a 与 &a[0] 指向同一个位置，但类型不同：sizeof(a) 得到整个数组的大小，而 sizeof(&a[0]) 只是指针的大小。指针还可以和下标一起用，p[i] 与 *(p + i) 等价，只是前者读起来更像数组。",
+          "int *p; 只声明未初始化，p 里是随机值，此时解引用就是野指针访问；int *p = NULL; 之后解引用同样属于未定义行为。使用指针前必须确认它指向有效内存，解引用前可以用 if (p != NULL) 检查，但检查只能挡住空指针，挡不住未初始化或已经失效的指针。",
+          "课程里的内存图会给变量标上一串地址，那只是为了帮助理解“谁挨着谁、谁指向谁”。真实地址由操作系统和运行时决定，同一程序两次运行都可能不同，还有地址随机化机制。不要根据图里的数字写代码，也不要假设变量一定按声明顺序排列。",
+          "& 取地址，* 解引用，int *p 里存的是 int 变量的地址。指针本身是变量，p = &y 改指向，*p = 9 改内容。把地址传给函数，函数就能通过解引用修改调用者的变量，这正是 swap 能工作的原因。数组名会退化成首元素指针，*(p + i) 与 a[i] 等价。下一课我们把多个相关变量打包成结构体，用更贴近现实的方式组织数据。"
+        ],
+        "title": "指针：内存的门牌号 · CodeViz",
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "quiz": 3,
+        "pagerPrev": "上一课函数与递归：分而治之",
+        "pagerNext": "下一课结构体与自定义类型"
+      },
+      "toc": {
+        "beforeY": 0,
+        "scrollY": 1992,
+        "headingTop": 104,
+        "active": "02二、通过指针修改目标",
+        "progressWidth": "29.1271%"
+      },
+      "diagrams": [
+        {
+          "kind": "内存布局",
+          "svg": true,
+          "trace": false,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 0,
+          "hint": ""
+        },
+        {
+          "kind": "函数流程图",
+          "svg": true,
+          "trace": false,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 3,
+          "hint": ""
+        }
+      ],
+      "quiz": {
+        "explains": 3,
+        "correct": 3,
+        "score": "答对 0 / 3 题，可以回看解析再试一次。",
+        "retry": true,
+        "stored": null
+      },
+      "quizReload": {
+        "beforeReload": true,
+        "explains": 3,
+        "score": "答对 0 / 3 题，可以回看解析再试一次。"
+      },
+      "quizRetry": {
+        "explains": 0,
+        "hint": "还有 3 题未作答，选择后可以修改。",
+        "selected": 0,
+        "stored": null
+      },
+      "complete": {
+        "button": "已完成本节",
+        "badge": [
+          "数据组织",
+          "第 3 课",
+          "已完成"
+        ],
+        "stored": [
+          "c08-pointers"
+        ],
+        "chapterCounts": [
+          "0/3",
+          "0/2",
+          "1/5",
+          "0/3"
+        ]
+      },
+      "pager": {
+        "nextHref": "#/learn/c09-structs",
+        "hash": "#/learn/c09-structs",
+        "title": "结构体与自定义类型"
+      },
+      "handoff": {
+        "hash": "#/lab",
+        "filename": "address.c",
+        "status": "已分析 · 1 个函数 · 0 个错误",
+        "toasts": [
+          "已从课程页载入代码",
+          "分析完成：1 个函数，没有发现错误"
+        ],
+        "code": "#include <stdio.h>\n\n\nint main() {\n  int x = 42;\n  int *p = &x;\n\n\n  printf(\"x 的值：%d\\n\", x);\n  printf(\"x 的地址：%p\\n\", (void *)&x);\n  printf(\"p 里存的地址：%p\\n\", (void *)p);\n  printf(\"p 指向的值：%d\\n\", *p);\n  return 0;\n}\n\n"
+      }
+    },
+    "c11-classes": {
+      "structure": {
+        "h1": "类与对象：从结构体到蓝图",
+        "subtitle": "把数据和行为装进同一个类型",
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "inlineStrong": 0,
+        "inlineCode": 88,
+        "bodyText": "上一章我们用结构体（struct）把一名学生的姓名和成绩装在了一起，但计算平均分、打印信息这些操作仍然散落在外面。C++ 的类（class）把数据和对数据的操作放进同一个类型里，既减少了“数据在 A 处、函数在 B 处”的割裂感，也让数据有了自我保护的能力。这一课我们从一个矩形出发，走完从结构体到类的这一步。\n\n一、没有类的世界：数据靠约定对齐\n\n先回忆一下没有类时怎么写。假设要处理两个矩形，我们可能用两个数组分别保存宽和高，再用循环按下标把同一行的数据配成一对。程序能运行，但“第几个宽度对应第几个高度”全靠程序员记着，一旦某个数组少存一项，后面全部错位。更麻烦的是，任何代码都能随手把宽度改成负数，面积函数只能被动接受。\n\n单步执行\n没有类时：两个数组靠下标对齐\n\n单步执行观察 `i`、`area`、`total` 的变化。这段程序没有语法错误，但数据之间的关系只存在于程序员的记忆里。\n\nC++\n第 3 行\n1\n#include <iostream>\n2\n \n3\nint main() {\n4\n  int widths[2] = {4, 6};\n5\n  int heights[2] = {3, 2};\n6\n  int total = 0;\n7\n \n8\n  for (int i = 0; i < 2; i++) {\n9\n    int area = widths[i] * heights[i];\n10\n    std::cout << \"rect \" << i << \" area = \" << area << std::endl;\n11\n    total += area;\n12\n  }\n13\n \n14\n  std::cout << \"total = \" << total << std::endl;\n15\n  return 0;\n16\n}\n开始\nmain()\n深度 0\n\n开始执行 main 函数\n\n变量监视\n0\n\n当前作用域还没有变量\n\n调用栈\n0\n无\n输出\n查看输出（0 行）\n1 / 20\n空格播放 / 暂停，← → 单步\n在实验室打开\n\n这段程序的问题不在语法，而在“数据之间的关系”没有被类型表达出来。C++ 的做法是定义一个 Rectangle 类型，让 width 和 height 成为它的数据成员（data member），让 area 成为它的成员函数（member function）。从此一个 Rectangle 对象（object）就是“一个宽度、一个高度、会算面积”的整体，而不是两个碰巧放得很近的变量。\n\n二、封装：公开接口，隐藏实现\n\n类（class）是一种用户自定义类型，它把数据成员和成员函数写在同一个 {} 里。成员函数的函数体可以直接使用同类的数据成员，不需要像 C 那样把结构体变量作为参数传来传去。\n\n面向对象里最重要的习惯叫封装（encapsulation）：把数据藏起来，只通过公开的函数与外界打交道。C++ 用访问控制（access control）实现这一点：public 成员谁都能用，private 成员只有本类的成员函数能直接访问，protected 留给继承时使用。class 的默认访问级别是 private，而 struct 的默认是 public；此外，未写继承方式时，class 默认是 private 继承、struct 默认是 public 继承。\n\nC++\nrectangle.cpp\n复制\n在实验室打开\n1\n#include <iostream>\n2\n \n3\nclass Rectangle {\n4\npublic:\n5\n  Rectangle(double width, double height) {\n6\n    width_ = width > 0 ? width : 0;\n7\n    height_ = height > 0 ? height : 0;\n8\n  }\n9\n \n10\n  double area() const {\n11\n    return width_ * height_;\n12\n  }\n13\n \n14\n  double perimeter() const {\n15\n    return 2 * (width_ + height_);\n16\n  }\n17\n \n18\n  void setWidth(double width) {\n19\n    if (width > 0) {\n20\n      width_ = width;\n21\n    }\n22\n  }\n23\n \n24\n  double width() const { return width_; }\n25\n  double height() const { return height_; }\n26\n \n27\nprivate:\n28\n  double width_ = 1.0;\n29\n  double height_ = 1.0;\n30\n};\n31\n \n32\nint main() {\n33\n  Rectangle rect(4.0, 2.5);\n34\n  std::cout << \"area = \" << rect.area() << std::endl;\n35\n  std::cout << \"perimeter = \" << rect.perimeter() << std::endl;\n36\n \n37\n  rect.setWidth(10.0);\n38\n  std::cout << \"new width = \" << rect.width() << std::endl;\n39\n  return 0;\n40\n}\n私有数据配合公开接口：外部只能通过 `setWidth` 修改宽度，而它会把非法值挡在门外。\n\n这段代码里，width_、height_ 是私有成员，外部没法写 rect.width_ = -5;。想改宽度只能调用 setWidth，而 setWidth 会先检查参数是否大于 0；构造函数同样把非法值折成 0。这样类就守住了自己的不变量（invariant）——任何一个 Rectangle 对象的宽高都不会是负数。area() 后面的 const 表示这个成员函数承诺不修改对象，因此常量对象也能调用它。\n\n类与对象图\nRectangle 类图\n\n类图把字段和方法的访问权限一目了然地画出来：`+` 是 public，`-` 是 private。\n\n«class»\nRectangle\nL3\n-\nwidth_: double\n-\nheight_: double\n+\nRectangle(double width, double height)\n+\narea() const: double\n+\nperimeter() const: double\n+\nsetWidth(double width): void\n+\nwidth() const: double\n+\nheight() const: double\n点击类或成员定位代码行\n在实验室打开\n\n类图（class diagram）是描述类结构的标准画法：每个方框分三格，依次是类名、数据成员、成员函数，前面的 + 表示 public，- 表示 private。以后读一个大程序时，先看类图就能知道它有哪些类型、每个类型对外提供什么能力。\n\n小提示：\nstruct 也能有成员函数\n\nC++ 中的 struct 同样可以定义构造函数和成员函数，和 class 的区别只在默认访问级别。代码风格上，常把“纯数据集合”写成 struct，把需要封装行为和维护不变量的类型写成 class。看到带函数的 struct 不必意外。\n\n三、对象的生命周期：构造与析构\n\n对象从创建到销毁的过程叫生命周期（lifetime）。C++ 提供了两个特殊成员函数来把握这两个时刻。构造函数（constructor）的名字与类名相同、没有返回类型，在对象创建时自动调用；析构函数（destructor）写作 ~类名，没有参数也没有返回类型，在对象离开作用域或被 delete 时自动调用。它们的调用由语言保证，不要像普通函数那样手动去调。\n\n构造函数的任务是“让对象一出生就处于合法状态”。它可以带参数，也可以重载多个版本；如果没有写任何构造函数，编译器会隐式提供一个默认构造函数。析构函数用来收拾对象用过的资源，例如释放 new 出来的内存、关闭文件。局部对象按创建顺序的逆序销毁；对象里的成员按声明顺序构造、按相反顺序析构。\n\nC++\ntracker.cpp\n复制\n在实验室打开\n1\n#include <iostream>\n2\n \n3\nclass Tracker {\n4\npublic:\n5\n  Tracker(const char* name) {\n6\n    name_ = name;\n7\n    ++alive_;\n8\n    std::cout << \"create \" << name_ << std::endl;\n9\n  }\n10\n \n11\n  ~Tracker() {\n12\n    --alive_;\n13\n    std::cout << \"destroy \" << name_ << std::endl;\n14\n  }\n15\n \n16\n  static int alive() { return alive_; }\n17\n \n18\nprivate:\n19\n  const char* name_;\n20\n  static int alive_;\n21\n};\n22\n \n23\nint Tracker::alive_ = 0;\n24\n \n25\nint main() {\n26\n  Tracker a(\"A\");\n27\n  {\n28\n    Tracker b(\"B\");\n29\n    std::cout << \"inside block: \" << Tracker::alive() << std::endl;\n30\n  }\n31\n  std::cout << \"after block: \" << Tracker::alive() << std::endl;\n32\n  return 0;\n33\n}\n内层块结束时 `b` 立即析构，`main` 结束时 `a` 才析构；`alive_` 是所有对象共享的 static 成员。\n\n这段程序里，Tracker 的构造函数把 alive_ 加一，析构函数把它减一。b 位于内层 {} 中，离开这个块时立刻销毁；a 在 main 结束时销毁。static 数据成员属于类而不是某个对象，所有对象共享同一份，所以用 Tracker::alive() 访问。静态成员要在类外定义并初始化一次：int Tracker::alive_ = 0;，否则链接时会找不到它。\n\n构造函数没有返回类型，写成 void Tracker() 就不再是构造函数。\nstatic 成员函数没有 this 指针，不能直接访问非静态成员。\n对象销毁是自动的，手动调用析构函数几乎总是错误。\n\n数据不一定写死在代码里。下面的程序用 std::cin 读入宽和高，再把它们交给构造函数创建对象。输入值会先经过构造函数的校验：负数会被折成 0，所以对象一创建就处于合法状态。运行前在实验室的输入框里填两个数即可。\n\nC++\ninput_rectangle.cpp\n复制\n在实验室打开\n1\n#include <iostream>\n2\n \n3\nclass Rectangle {\n4\npublic:\n5\n  Rectangle(double width, double height) {\n6\n    width_ = width > 0 ? width : 0;\n7\n    height_ = height > 0 ? height : 0;\n8\n  }\n9\n \n10\n  double area() const { return width_ * height_; }\n11\n \n12\nprivate:\n13\n  double width_;\n14\n  double height_;\n15\n};\n16\n \n17\nint main() {\n18\n  double width = 0.0;\n19\n  double height = 0.0;\n20\n \n21\n  std::cout << \"Enter width and height: \";\n22\n  std::cin >> width >> height;\n23\n \n24\n  Rectangle rect(width, height);\n25\n  std::cout << \"area = \" << rect.area() << std::endl;\n26\n  return 0;\n27\n}\n`std::cin >>` 把键盘输入写进变量，再作为实参传给构造函数；输入和对象的创建就这样接上了。\n四、this、引用与默认参数\n\n每个非静态成员函数都隐藏着一个参数 this，它是指向当前对象的指针。调用 rect.area() 时，this 就是 &rect；在成员函数里写 this->width_ 和直接写 width_ 等价。什么时候需要显式写 this？最常见的是形参和成员同名，需要用 this-> 区分；另一种是希望成员函数返回对象自己，从而支持链式调用。*this 表示当前对象本身，返回 Counter& 而不是 Counter，链式调用才不会复制对象。\n\n引用（reference）是给已有变量起的别名，int& r = x; 之后 r 与 x 是同一块内存。函数参数用 int& 可以修改实参且不产生拷贝，用 const std::string& 则既避免拷贝又禁止函数改动实参。引用在定义时必须绑定，之后不能改绑到别的对象。默认参数（default argument）让调用者可以省略末尾的参数，规则是：带默认值的参数必须从右往左连续排列，同一个参数的默认值只能写一次，通常写在声明处。\n\nC++\ncounter.cpp\n复制\n在实验室打开\n1\n#include <iostream>\n2\n#include <string>\n3\n \n4\nclass Counter {\n5\npublic:\n6\n  Counter(int start = 0) { value_ = start; }\n7\n \n8\n  void add(int step = 1) { value_ += step; }\n9\n \n10\n  Counter& increase(int step = 1) {\n11\n    value_ += step;\n12\n    return *this;\n13\n  }\n14\n \n15\n  void setName(const std::string& name) { name_ = name; }\n16\n \n17\n  void print() const {\n18\n    std::cout << name_ << \": \" << value_ << std::endl;\n19\n  }\n20\n \n21\nprivate:\n22\n  int value_ = 0;\n23\n  std::string name_ = \"counter\";\n24\n};\n25\n \n26\nint main() {\n27\n  Counter c(10);\n28\n  c.add();\n29\n  c.setName(\"demo\");\n30\n  c.increase().increase(3).print();\n31\n  return 0;\n32\n}\n`this` 返回自身、`const std::string&` 避免拷贝、默认参数让调用更简洁，这三样常一起出现。\n\nCounter(int start = 0) 让 Counter c; 和 Counter c(5); 都合法。increase 返回 Counter&，所以 c.increase().increase(3).print(); 能一路调用下去；print() const 里不能修改 value_，这是编译器强制的承诺。默认参数 step = 1 让 add() 与 add(2) 都可用，而 this 在需要区分同名参数时保证我们操作的是成员。\n\n五、易错点\n构造函数误写返回类型，编译器会把它当成普通成员函数，对象反而没有初始化。\nthis 是指针，*this 才是对象；返回 *this 时返回类型要写引用 Counter&。\n在 const 成员函数里修改数据成员会直接编译失败；确实需要修改时可把成员声明为 mutable，但初学阶段先别用。\n默认参数重复写在声明和定义两处，编译器会报重定义错误。\n成员函数返回局部对象的引用会造成悬垂引用，函数结束后引用指向已销毁的内存。\n数据成员尽量在类内给默认值或在构造函数里初始化，未初始化的成员会带来不确定的值。\n注意：\n封装不是把所有成员都设为 private\n\n只读属性提供 const 取值函数，需要修改的属性提供带校验的设值函数；像 area 这种纯计算的方法直接公开即可。判断标准是“外部有没有必要知道内部细节”。过度隐藏会让类变得难用，隐藏不足又会让不变量随时被破坏。\n\n六、小结\n\n这一课的核心只有两句话：类是蓝图，对象是按蓝图造出来的实例；封装让对象自己管理自己的数据。再记住构造与析构的自动调用时机、this 指向当前对象、引用参数避免拷贝、默认参数从右往左。下一课我们让一个类从另一个类那里继承能力，并看看同一句调用如何在不同的对象上产生不同的结果。\n\n动手试一试\n\n在实验室里给 Rectangle 增加 perimeter 成员函数和会校验正数的 setHeight，再把 isSquare 改成 const 成员函数，观察常量对象能否调用它。\n\nC++\nsnippet.cpp\n复制\n在实验室打开\n1\n#include <iostream>\n2\n \n3\nclass Rectangle {\n4\npublic:\n5\n  Rectangle(double width, double height) {\n6\n    width_ = width > 0 ? width : 0;\n7\n    height_ = height > 0 ? height : 0;\n8\n  }\n9\n \n10\n  double area() const { return width_ * height_; }\n11\n  bool isSquare() const { return width_ == height_; }\n12\n \n13\nprivate:\n14\n  double width_;\n15\n  double height_;\n16\n};\n17\n \n18\nint main() {\n19\n  Rectangle a(4.0, 4.0);\n20\n  Rectangle b(3.0, 5.0);\n21\n  std::cout << a.isSquare() << \" \" << b.isSquare() << std::endl;\n22\n  return 0;\n23\n}\n关键要点\n01\n类描述“有哪些数据、能做什么”，对象是类的一个实例，每个对象拥有独立的数据。\n02\n构造函数在对象创建时自动调用，负责把成员带到合法状态；析构函数在对象销毁时自动调用。\n03\nprivate 不是“不能访问”，而是“只能通过类的成员函数访问”，封装的目的是守住不变量。\n04\nthis 指向调用成员函数的当前对象；返回 *this 可以支持链式调用。\n05\n引用参数避免拷贝并允许修改实参；const 成员函数承诺不修改对象状态。\nQUIZ\n随堂测验\n共 3 题\n01\n\n下面关于 class 与 struct 的说法，哪一项正确？\n\nA\nclass 的成员默认是 private，struct 的成员默认是 public\nB\nstruct 不能定义成员函数和构造函数\nC\nclass 的对象不能按值传递给函数\nD\nclass 必须显式写出 public: 才能定义构造函数\n02\n\n关于构造函数，下列说法正确的是？\n\nA\n构造函数有返回值，类型与类名相同\nB\n构造函数在对象创建时自动调用，并且没有返回类型\nC\n对象创建后还可以再次手动调用构造函数来重置自己\nD\n一个类最多只能有一个构造函数\n03\n\n在成员函数中写 return *this;，通常是为了什么？\n\nA\n销毁当前对象并释放它的内存\nB\n返回当前对象的引用，从而支持连续调用\nC\n复制一份当前对象并按值返回\nD\n把 this 指针转换成整数地址\n\n还有 3 题未作答，选择后可以修改。\n\n查看答案\n上一课\n文件：把数据留在磁盘上\n下一课\n继承与多态：同一种调用，不同的行为",
+        "textBodies": [
+          "上一章我们用结构体（struct）把一名学生的姓名和成绩装在了一起，但计算平均分、打印信息这些操作仍然散落在外面。C++ 的类（class）把数据和对数据的操作放进同一个类型里，既减少了“数据在 A 处、函数在 B 处”的割裂感，也让数据有了自我保护的能力。这一课我们从一个矩形出发，走完从结构体到类的这一步。",
+          "先回忆一下没有类时怎么写。假设要处理两个矩形，我们可能用两个数组分别保存宽和高，再用循环按下标把同一行的数据配成一对。程序能运行，但“第几个宽度对应第几个高度”全靠程序员记着，一旦某个数组少存一项，后面全部错位。更麻烦的是，任何代码都能随手把宽度改成负数，面积函数只能被动接受。",
+          "这段程序的问题不在语法，而在“数据之间的关系”没有被类型表达出来。C++ 的做法是定义一个 Rectangle 类型，让 width 和 height 成为它的数据成员（data member），让 area 成为它的成员函数（member function）。从此一个 Rectangle 对象（object）就是“一个宽度、一个高度、会算面积”的整体，而不是两个碰巧放得很近的变量。",
+          "类（class）是一种用户自定义类型，它把数据成员和成员函数写在同一个 {} 里。成员函数的函数体可以直接使用同类的数据成员，不需要像 C 那样把结构体变量作为参数传来传去。",
+          "面向对象里最重要的习惯叫封装（encapsulation）：把数据藏起来，只通过公开的函数与外界打交道。C++ 用访问控制（access control）实现这一点：public 成员谁都能用，private 成员只有本类的成员函数能直接访问，protected 留给继承时使用。class 的默认访问级别是 private，而 struct 的默认是 public；此外，未写继承方式时，class 默认是 private 继承、struct 默认是 public 继承。",
+          "这段代码里，width_、height_ 是私有成员，外部没法写 rect.width_ = -5;。想改宽度只能调用 setWidth，而 setWidth 会先检查参数是否大于 0；构造函数同样把非法值折成 0。这样类就守住了自己的不变量（invariant）——任何一个 Rectangle 对象的宽高都不会是负数。area() 后面的 const 表示这个成员函数承诺不修改对象，因此常量对象也能调用它。",
+          "类图（class diagram）是描述类结构的标准画法：每个方框分三格，依次是类名、数据成员、成员函数，前面的 + 表示 public，- 表示 private。以后读一个大程序时，先看类图就能知道它有哪些类型、每个类型对外提供什么能力。",
+          "C++ 中的 struct 同样可以定义构造函数和成员函数，和 class 的区别只在默认访问级别。代码风格上，常把“纯数据集合”写成 struct，把需要封装行为和维护不变量的类型写成 class。看到带函数的 struct 不必意外。",
+          "对象从创建到销毁的过程叫生命周期（lifetime）。C++ 提供了两个特殊成员函数来把握这两个时刻。构造函数（constructor）的名字与类名相同、没有返回类型，在对象创建时自动调用；析构函数（destructor）写作 ~类名，没有参数也没有返回类型，在对象离开作用域或被 delete 时自动调用。它们的调用由语言保证，不要像普通函数那样手动去调。",
+          "构造函数的任务是“让对象一出生就处于合法状态”。它可以带参数，也可以重载多个版本；如果没有写任何构造函数，编译器会隐式提供一个默认构造函数。析构函数用来收拾对象用过的资源，例如释放 new 出来的内存、关闭文件。局部对象按创建顺序的逆序销毁；对象里的成员按声明顺序构造、按相反顺序析构。",
+          "这段程序里，Tracker 的构造函数把 alive_ 加一，析构函数把它减一。b 位于内层 {} 中，离开这个块时立刻销毁；a 在 main 结束时销毁。static 数据成员属于类而不是某个对象，所有对象共享同一份，所以用 Tracker::alive() 访问。静态成员要在类外定义并初始化一次：int Tracker::alive_ = 0;，否则链接时会找不到它。",
+          "数据不一定写死在代码里。下面的程序用 std::cin 读入宽和高，再把它们交给构造函数创建对象。输入值会先经过构造函数的校验：负数会被折成 0，所以对象一创建就处于合法状态。运行前在实验室的输入框里填两个数即可。",
+          "每个非静态成员函数都隐藏着一个参数 this，它是指向当前对象的指针。调用 rect.area() 时，this 就是 &rect；在成员函数里写 this->width_ 和直接写 width_ 等价。什么时候需要显式写 this？最常见的是形参和成员同名，需要用 this-> 区分；另一种是希望成员函数返回对象自己，从而支持链式调用。*this 表示当前对象本身，返回 Counter& 而不是 Counter，链式调用才不会复制对象。",
+          "引用（reference）是给已有变量起的别名，int& r = x; 之后 r 与 x 是同一块内存。函数参数用 int& 可以修改实参且不产生拷贝，用 const std::string& 则既避免拷贝又禁止函数改动实参。引用在定义时必须绑定，之后不能改绑到别的对象。默认参数（default argument）让调用者可以省略末尾的参数，规则是：带默认值的参数必须从右往左连续排列，同一个参数的默认值只能写一次，通常写在声明处。",
+          "Counter(int start = 0) 让 Counter c; 和 Counter c(5); 都合法。increase 返回 Counter&，所以 c.increase().increase(3).print(); 能一路调用下去；print() const 里不能修改 value_，这是编译器强制的承诺。默认参数 step = 1 让 add() 与 add(2) 都可用，而 this 在需要区分同名参数时保证我们操作的是成员。",
+          "只读属性提供 const 取值函数，需要修改的属性提供带校验的设值函数；像 area 这种纯计算的方法直接公开即可。判断标准是“外部有没有必要知道内部细节”。过度隐藏会让类变得难用，隐藏不足又会让不变量随时被破坏。",
+          "这一课的核心只有两句话：类是蓝图，对象是按蓝图造出来的实例；封装让对象自己管理自己的数据。再记住构造与析构的自动调用时机、this 指向当前对象、引用参数避免拷贝、默认参数从右往左。下一课我们让一个类从另一个类那里继承能力，并看看同一句调用如何在不同的对象上产生不同的结果。"
+        ],
+        "title": "类与对象：从结构体到蓝图 · CodeViz",
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "quiz": 3,
+        "pagerPrev": "上一课文件：把数据留在磁盘上",
+        "pagerNext": "下一课继承与多态：同一种调用，不同的行为"
+      },
+      "toc": {
+        "beforeY": 0,
+        "scrollY": 1455,
+        "headingTop": 104,
+        "active": "02二、封装：公开接口，隐藏实现",
+        "progressWidth": "17.221%"
+      },
+      "diagrams": [
+        {
+          "kind": "单步执行",
+          "svg": true,
+          "trace": true,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 0,
+          "hint": ""
+        },
+        {
+          "kind": "类与对象图",
+          "svg": true,
+          "trace": false,
+          "empty": false,
+          "emptyText": "",
+          "buttons": 1,
+          "hint": ""
+        }
+      ],
+      "quiz": {
+        "explains": 3,
+        "correct": 3,
+        "score": "答对 1 / 3 题，可以回看解析再试一次。",
+        "retry": true,
+        "stored": null
+      },
+      "quizReload": {
+        "beforeReload": true,
+        "explains": 3,
+        "score": "答对 1 / 3 题，可以回看解析再试一次。"
+      },
+      "quizRetry": {
+        "explains": 0,
+        "hint": "还有 3 题未作答，选择后可以修改。",
+        "selected": 0,
+        "stored": null
+      },
+      "complete": {
+        "button": "已完成本节",
+        "badge": [
+          "C++ 面向对象",
+          "第 1 课",
+          "已完成"
+        ],
+        "stored": [
+          "c11-classes"
+        ],
+        "chapterCounts": [
+          "0/3",
+          "0/2",
+          "0/5",
+          "1/3"
+        ]
+      },
+      "pager": {
+        "nextHref": "#/learn/c12-inheritance",
+        "hash": "#/learn/c12-inheritance",
+        "title": "继承与多态：同一种调用，不同的行为"
+      },
+      "handoff": {
+        "hash": "#/lab",
+        "filename": "rectangle.cpp",
+        "status": "已分析 · 7 个函数 · 0 个错误",
+        "toasts": [
+          "已从课程页载入代码",
+          "分析完成：7 个函数，没有发现错误"
+        ],
+        "code": "#include <iostream>\n\n\nclass Rectangle {\npublic:\n  Rectangle(double width, double height) {\n    width_ = width > 0 ? width : 0;\n    height_ = height > 0 ? height : 0;\n  }\n\n\n  double area() const {\n    return width_ * height_;\n  }\n\n\n  double perimeter() const {\n    return 2 * (width_ + height_);\n  }\n\n\n  void setWidth(double width) {\n    if (width > 0) {\n      width_ = width;\n    }\n  }\n\n\n  double width() const { return width_; }\n  double height() const { return height_; }\n\n\nprivate:\n  double width_ = 1.0;\n  double height_ = 1.0;\n};\n\n\nint main() {\n  Rectangle rect(4.0, 2.5);\n  std::cout << \"area = \" << rect.area() << std::endl;\n  std::cout << \"perimeter = \" << rect.perimeter() << std::endl;\n\n"
+      },
+      "mobile": {
+        "layout": {
+          "aside": {
+            "width": 0,
+            "display": "none",
+            "left": 0,
+            "right": 0
+          },
+          "mobileToc": {
+            "width": 350,
+            "display": "block",
+            "left": 20,
+            "right": 370
+          },
+          "topbar": {
+            "width": 390,
+            "display": "flex",
+            "left": 0,
+            "right": 390
+          },
+          "diagram": {
+            "width": 350,
+            "display": "block",
+            "left": 20,
+            "right": 370
+          },
+          "quizOption": {
+            "width": 316,
+            "display": "flex",
+            "left": 37,
+            "right": 353
+          },
+          "scrollWidth": 390,
+          "viewport": 390,
+          "completeMobile": true
+        },
+        "mobileToc": {
+          "scrollY": 1907,
+          "headingTop": 104
+        },
+        "quizMobile": {
+          "selected": 1,
+          "optionWidth": 316,
+          "viewport": 390
+        }
+      }
+    },
+    "dark": {
+      "body": {
+        "color": "rgb(229, 234, 243)",
+        "background": "rgb(10, 15, 29)",
+        "fontSize": "16px"
+      },
+      "text": {
+        "color": "rgb(229, 234, 243)",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontSize": "17px"
+      },
+      "codeBlock": {
+        "color": "rgb(226, 232, 240)",
+        "background": "rgb(7, 12, 23)",
+        "fontSize": "17px"
+      },
+      "diagram": {
+        "color": "rgb(229, 234, 243)",
+        "background": "rgb(17, 26, 46)",
+        "fontSize": "17px"
+      },
+      "quizOption": {
+        "color": "rgb(229, 234, 243)",
+        "background": "rgb(13, 21, 38)",
+        "fontSize": "14px"
+      }
+    }
+  },
+  "checks": [
+    {
+      "area": "lessons",
+      "id": "c01-hello/title",
+      "ok": true,
+      "detail": "初识 C：从一行代码到一张图"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/doc-title",
+      "ok": true,
+      "detail": "初识 C：从一行代码到一张图 · CodeViz"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/objectives",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/keypoints",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/code-blocks",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc-matches",
+      "ok": true,
+      "detail": "7 vs 7"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/inline-format",
+      "ok": true,
+      "detail": "strong=0 code=54"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/no-literal-markdown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/pager-next",
+      "ok": true,
+      "detail": "下一课数据与变量：给内存贴标签"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/structure/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc/scrolls",
+      "ok": true,
+      "detail": "{\"scrollY\":1168,\"headingTop\":104,\"active\":\"02二、七行代码，各司其职\",\"progressWidth\":\"17.3191%\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc/heading-position",
+      "ok": true,
+      "detail": "headingTop=104"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc/active-highlight",
+      "ok": true,
+      "detail": "02二、七行代码，各司其职"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc/reading-progress",
+      "ok": true,
+      "detail": "17.3191%"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/toc/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagram-0/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"函数流程图\",\"svg\":true,\"trace\":false,\"empty\":false,\"emptyText\":\"\",\"buttons\":6,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagram-0/node-click",
+      "ok": true,
+      "detail": "{\"clickedLine\":\"3\",\"snippet\":true,\"line\":\"L3\",\"code\":\"int main(void) {\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagram-0/node-keyboard",
+      "ok": true,
+      "detail": "expected L4, got L4"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagram-1/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"单步执行\",\"svg\":true,\"trace\":true,\"empty\":false,\"emptyText\":\"\",\"buttons\":0,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagram-1/trace-player",
+      "ok": true,
+      "detail": "{\"counter\":\"1 / 8\",\"play\":true,\"next\":true,\"vars\":0}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/diagrams/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/reveal-enabled",
+      "ok": true,
+      "detail": "答完后「查看答案」不可用"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/explain",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 3 / 3 题，全部正确。\",\"retry\":true,\"stored\":\"{\\\"answers\\\":{\\\"c01-q1\\\":0,\\\"c01-q2\\\":0,\\\"c01-q3\\\":0},\\\"revealed\\\":true}\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/correct-marked",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 3 / 3 题，全部正确。\",\"retry\":true,\"stored\":\"{\\\"answers\\\":{\\\"c01-q1\\\":0,\\\"c01-q2\\\":0,\\\"c01-q3\\\":0},\\\"revealed\\\":true}\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/score",
+      "ok": true,
+      "detail": "答对 3 / 3 题，全部正确。"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/retry-visible",
+      "ok": true,
+      "detail": "缺少「再试一次」"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/persisted",
+      "ok": true,
+      "detail": "{\"explains\":3,\"score\":\"答对 3 / 3 题，全部正确。\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/retry-resets",
+      "ok": true,
+      "detail": "{\"explains\":0,\"hint\":\"还有 3 题未作答，选择后可以修改。\",\"selected\":0,\"stored\":\"{\\\"answers\\\":{},\\\"revealed\\\":false}\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/retry-hint",
+      "ok": true,
+      "detail": "还有 3 题未作答，选择后可以修改。"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/quiz/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/initial",
+      "ok": true,
+      "detail": "标记本节完成"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/button",
+      "ok": true,
+      "detail": "已完成本节"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/badge",
+      "ok": true,
+      "detail": "[\"C 语言起步\",\"第 1 课\",\"已完成\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/stored",
+      "ok": true,
+      "detail": "[\"c01-hello\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/sidebar-count",
+      "ok": true,
+      "detail": "[\"1/3\",\"0/2\",\"0/5\",\"0/3\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/persisted-after-reload",
+      "ok": true,
+      "detail": "{\"button\":\"已完成本节\",\"badge\":[\"C 语言起步\",\"第 1 课\",\"已完成\"]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/toggle-off",
+      "ok": true,
+      "detail": "{\"button\":\"标记本节完成\",\"stored\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/complete/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/pager/next-navigates",
+      "ok": true,
+      "detail": "{\"nextHref\":\"#/learn/c02-data\",\"hash\":\"#/learn/c02-data\",\"title\":\"数据与变量：给内存贴标签\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/pager/next-href",
+      "ok": true,
+      "detail": "href=#/learn/c02-data, hash=#/learn/c02-data"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/pager/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/handoff/navigates",
+      "ok": true,
+      "detail": "#/lab"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/handoff/toast",
+      "ok": true,
+      "detail": "[\"已从课程页载入代码\",\"分析完成：1 个函数，没有发现错误\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/handoff/code-loaded",
+      "ok": true,
+      "detail": "137 字符"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/handoff/auto-analyzed",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/handoff/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/title",
+      "ok": true,
+      "detail": "循环结构：重复的艺术"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/doc-title",
+      "ok": true,
+      "detail": "循环结构：重复的艺术 · CodeViz"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/objectives",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/keypoints",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/code-blocks",
+      "ok": true,
+      "detail": "10"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz-count",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc-matches",
+      "ok": true,
+      "detail": "8 vs 8"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/inline-format",
+      "ok": true,
+      "detail": "strong=3 code=59"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/no-literal-markdown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/pager-next",
+      "ok": true,
+      "detail": "下一课数组与字符串：一排连续的格子"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/pager-prev",
+      "ok": true,
+      "detail": "上一课选择结构：程序的岔路口"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/structure/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc/scrolls",
+      "ok": true,
+      "detail": "{\"scrollY\":1146,\"headingTop\":104,\"active\":\"02二、while：条件成立就一直做\",\"progressWidth\":\"12.3518%\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc/heading-position",
+      "ok": true,
+      "detail": "headingTop=104"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc/active-highlight",
+      "ok": true,
+      "detail": "02二、while：条件成立就一直做"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc/reading-progress",
+      "ok": true,
+      "detail": "12.3518%"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/toc/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagram-0/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"函数流程图\",\"svg\":true,\"trace\":false,\"empty\":false,\"emptyText\":\"\",\"buttons\":7,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagram-0/node-click",
+      "ok": true,
+      "detail": "{\"clickedLine\":\"3\",\"snippet\":true,\"line\":\"L3\",\"code\":\"int main(void) {\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagram-0/node-keyboard",
+      "ok": true,
+      "detail": "expected L4, got L4"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagram-1/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"单步执行\",\"svg\":true,\"trace\":true,\"empty\":false,\"emptyText\":\"\",\"buttons\":0,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagram-1/trace-player",
+      "ok": true,
+      "detail": "{\"counter\":\"1 / 16\",\"play\":true,\"next\":true,\"vars\":0}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/diagrams/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/reveal-enabled",
+      "ok": true,
+      "detail": "答完后「查看答案」不可用"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/explain",
+      "ok": true,
+      "detail": "{\"explains\":4,\"correct\":4,\"score\":\"答对 4 / 4 题，全部正确。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/correct-marked",
+      "ok": true,
+      "detail": "{\"explains\":4,\"correct\":4,\"score\":\"答对 4 / 4 题，全部正确。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/score",
+      "ok": true,
+      "detail": "答对 4 / 4 题，全部正确。"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/retry-visible",
+      "ok": true,
+      "detail": "缺少「再试一次」"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/persisted",
+      "ok": true,
+      "detail": "{\"explains\":4,\"score\":\"答对 4 / 4 题，全部正确。\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/retry-resets",
+      "ok": true,
+      "detail": "{\"explains\":0,\"hint\":\"还有 4 题未作答，选择后可以修改。\",\"selected\":0,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/retry-hint",
+      "ok": true,
+      "detail": "还有 4 题未作答，选择后可以修改。"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/quiz/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/initial",
+      "ok": true,
+      "detail": "标记本节完成"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/button",
+      "ok": true,
+      "detail": "已完成本节"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/badge",
+      "ok": true,
+      "detail": "[\"控制流程\",\"第 2 课\",\"已完成\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/stored",
+      "ok": true,
+      "detail": "[\"c05-loops\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/sidebar-count",
+      "ok": true,
+      "detail": "[\"0/3\",\"1/2\",\"0/5\",\"0/3\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/persisted-after-reload",
+      "ok": true,
+      "detail": "{\"button\":\"已完成本节\",\"badge\":[\"控制流程\",\"第 2 课\",\"已完成\"]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/toggle-off",
+      "ok": true,
+      "detail": "{\"button\":\"标记本节完成\",\"stored\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/complete/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/pager/next-navigates",
+      "ok": true,
+      "detail": "{\"nextHref\":\"#/learn/c06-arrays\",\"hash\":\"#/learn/c06-arrays\",\"title\":\"数组与字符串：一排连续的格子\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/pager/next-href",
+      "ok": true,
+      "detail": "href=#/learn/c06-arrays, hash=#/learn/c06-arrays"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/pager/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/handoff/navigates",
+      "ok": true,
+      "detail": "#/lab"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/handoff/toast",
+      "ok": true,
+      "detail": "[\"已从课程页载入代码\",\"分析完成：1 个函数，没有发现错误\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/handoff/code-loaded",
+      "ok": true,
+      "detail": "122 字符"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/handoff/auto-analyzed",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lessons",
+      "id": "c05-loops/handoff/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/title",
+      "ok": true,
+      "detail": "指针：内存的门牌号"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/doc-title",
+      "ok": true,
+      "detail": "指针：内存的门牌号 · CodeViz"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/objectives",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/keypoints",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/code-blocks",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc-matches",
+      "ok": true,
+      "detail": "5 vs 5"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/inline-format",
+      "ok": true,
+      "detail": "strong=2 code=75"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/no-literal-markdown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/pager-next",
+      "ok": true,
+      "detail": "下一课结构体与自定义类型"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/pager-prev",
+      "ok": true,
+      "detail": "上一课函数与递归：分而治之"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/structure/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc/scrolls",
+      "ok": true,
+      "detail": "{\"scrollY\":1992,\"headingTop\":104,\"active\":\"02二、通过指针修改目标\",\"progressWidth\":\"29.1271%\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc/heading-position",
+      "ok": true,
+      "detail": "headingTop=104"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc/active-highlight",
+      "ok": true,
+      "detail": "02二、通过指针修改目标"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc/reading-progress",
+      "ok": true,
+      "detail": "29.1271%"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/toc/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagram-0/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"内存布局\",\"svg\":true,\"trace\":false,\"empty\":false,\"emptyText\":\"\",\"buttons\":0,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagram-1/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"函数流程图\",\"svg\":true,\"trace\":false,\"empty\":false,\"emptyText\":\"\",\"buttons\":3,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagram-1/node-click",
+      "ok": true,
+      "detail": "{\"clickedLine\":\"1\",\"snippet\":true,\"line\":\"L1\",\"code\":\"void swap(int *a, int *b) {\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagram-1/node-keyboard",
+      "ok": true,
+      "detail": "expected L2, got L2"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/diagrams/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/reveal-enabled",
+      "ok": true,
+      "detail": "答完后「查看答案」不可用"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/explain",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 0 / 3 题，可以回看解析再试一次。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/correct-marked",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 0 / 3 题，可以回看解析再试一次。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/score",
+      "ok": true,
+      "detail": "答对 0 / 3 题，可以回看解析再试一次。"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/retry-visible",
+      "ok": true,
+      "detail": "缺少「再试一次」"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/persisted",
+      "ok": true,
+      "detail": "{\"explains\":3,\"score\":\"答对 0 / 3 题，可以回看解析再试一次。\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/retry-resets",
+      "ok": true,
+      "detail": "{\"explains\":0,\"hint\":\"还有 3 题未作答，选择后可以修改。\",\"selected\":0,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/retry-hint",
+      "ok": true,
+      "detail": "还有 3 题未作答，选择后可以修改。"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/quiz/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/initial",
+      "ok": true,
+      "detail": "标记本节完成"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/button",
+      "ok": true,
+      "detail": "已完成本节"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/badge",
+      "ok": true,
+      "detail": "[\"数据组织\",\"第 3 课\",\"已完成\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/stored",
+      "ok": true,
+      "detail": "[\"c08-pointers\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/sidebar-count",
+      "ok": true,
+      "detail": "[\"0/3\",\"0/2\",\"1/5\",\"0/3\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/persisted-after-reload",
+      "ok": true,
+      "detail": "{\"button\":\"已完成本节\",\"badge\":[\"数据组织\",\"第 3 课\",\"已完成\"]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/toggle-off",
+      "ok": true,
+      "detail": "{\"button\":\"标记本节完成\",\"stored\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/complete/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/pager/next-navigates",
+      "ok": true,
+      "detail": "{\"nextHref\":\"#/learn/c09-structs\",\"hash\":\"#/learn/c09-structs\",\"title\":\"结构体与自定义类型\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/pager/next-href",
+      "ok": true,
+      "detail": "href=#/learn/c09-structs, hash=#/learn/c09-structs"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/pager/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/handoff/navigates",
+      "ok": true,
+      "detail": "#/lab"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/handoff/toast",
+      "ok": true,
+      "detail": "[\"已从课程页载入代码\",\"分析完成：1 个函数，没有发现错误\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/handoff/code-loaded",
+      "ok": true,
+      "detail": "208 字符"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/handoff/auto-analyzed",
+      "ok": true,
+      "detail": "已分析 · 1 个函数 · 0 个错误"
+    },
+    {
+      "area": "lessons",
+      "id": "c08-pointers/handoff/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/title",
+      "ok": true,
+      "detail": "类与对象：从结构体到蓝图"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/doc-title",
+      "ok": true,
+      "detail": "类与对象：从结构体到蓝图 · CodeViz"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/objectives",
+      "ok": true,
+      "detail": "4"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/keypoints",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagrams",
+      "ok": true,
+      "detail": "2"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/code-blocks",
+      "ok": true,
+      "detail": "5"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz-count",
+      "ok": true,
+      "detail": "3"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc-matches",
+      "ok": true,
+      "detail": "6 vs 6"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/inline-format",
+      "ok": true,
+      "detail": "strong=0 code=88"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/no-literal-markdown",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/pager-next",
+      "ok": true,
+      "detail": "下一课继承与多态：同一种调用，不同的行为"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/pager-prev",
+      "ok": true,
+      "detail": "上一课文件：把数据留在磁盘上"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/structure/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc/scrolls",
+      "ok": true,
+      "detail": "{\"scrollY\":1455,\"headingTop\":104,\"active\":\"02二、封装：公开接口，隐藏实现\",\"progressWidth\":\"17.221%\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc/heading-position",
+      "ok": true,
+      "detail": "headingTop=104"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc/active-highlight",
+      "ok": true,
+      "detail": "02二、封装：公开接口，隐藏实现"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc/reading-progress",
+      "ok": true,
+      "detail": "17.221%"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/toc/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagram-0/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"单步执行\",\"svg\":true,\"trace\":true,\"empty\":false,\"emptyText\":\"\",\"buttons\":0,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagram-0/trace-player",
+      "ok": true,
+      "detail": "{\"counter\":\"1 / 20\",\"play\":true,\"next\":true,\"vars\":0}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagram-1/rendered",
+      "ok": true,
+      "detail": "{\"kind\":\"类与对象图\",\"svg\":true,\"trace\":false,\"empty\":false,\"emptyText\":\"\",\"buttons\":1,\"hint\":\"\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagram-1/node-click",
+      "ok": true,
+      "detail": "{\"clickedLine\":\"3\",\"snippet\":true,\"line\":\"L5\",\"code\":\"Rectangle(double width, double height) {\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/diagrams/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/reveal-enabled",
+      "ok": true,
+      "detail": "答完后「查看答案」不可用"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/explain",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 1 / 3 题，可以回看解析再试一次。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/correct-marked",
+      "ok": true,
+      "detail": "{\"explains\":3,\"correct\":3,\"score\":\"答对 1 / 3 题，可以回看解析再试一次。\",\"retry\":true,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/score",
+      "ok": true,
+      "detail": "答对 1 / 3 题，可以回看解析再试一次。"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/retry-visible",
+      "ok": true,
+      "detail": "缺少「再试一次」"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/persisted",
+      "ok": true,
+      "detail": "{\"explains\":3,\"score\":\"答对 1 / 3 题，可以回看解析再试一次。\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/retry-resets",
+      "ok": true,
+      "detail": "{\"explains\":0,\"hint\":\"还有 3 题未作答，选择后可以修改。\",\"selected\":0,\"stored\":null}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/retry-hint",
+      "ok": true,
+      "detail": "还有 3 题未作答，选择后可以修改。"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/quiz/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/initial",
+      "ok": true,
+      "detail": "标记本节完成"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/button",
+      "ok": true,
+      "detail": "已完成本节"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/badge",
+      "ok": true,
+      "detail": "[\"C++ 面向对象\",\"第 1 课\",\"已完成\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/stored",
+      "ok": true,
+      "detail": "[\"c11-classes\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/sidebar-count",
+      "ok": true,
+      "detail": "[\"0/3\",\"0/2\",\"0/5\",\"1/3\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/persisted-after-reload",
+      "ok": true,
+      "detail": "{\"button\":\"已完成本节\",\"badge\":[\"C++ 面向对象\",\"第 1 课\",\"已完成\"]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/toggle-off",
+      "ok": true,
+      "detail": "{\"button\":\"标记本节完成\",\"stored\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/complete/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/pager/next-navigates",
+      "ok": true,
+      "detail": "{\"nextHref\":\"#/learn/c12-inheritance\",\"hash\":\"#/learn/c12-inheritance\",\"title\":\"继承与多态：同一种调用，不同的行为\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/pager/next-href",
+      "ok": true,
+      "detail": "href=#/learn/c12-inheritance, hash=#/learn/c12-inheritance"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/pager/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/handoff/navigates",
+      "ok": true,
+      "detail": "#/lab"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/handoff/toast",
+      "ok": true,
+      "detail": "[\"已从课程页载入代码\",\"分析完成：7 个函数，没有发现错误\"]"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/handoff/code-loaded",
+      "ok": true,
+      "detail": "697 字符"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/handoff/auto-analyzed",
+      "ok": true,
+      "detail": "已分析 · 7 个函数 · 0 个错误"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/handoff/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/aside-hidden",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/mobile-toc",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/no-horizontal-scroll",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/complete-button",
+      "ok": true,
+      "detail": "移动端缺少标记完成按钮"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/toc-scroll",
+      "ok": true,
+      "detail": "{\"scrollY\":1651,\"headingTop\":104}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/quiz-clickable",
+      "ok": true,
+      "detail": "{\"selected\":1,\"optionWidth\":316,\"viewport\":390}"
+    },
+    {
+      "area": "lessons",
+      "id": "c01-hello/mobile/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/aside-hidden",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/mobile-toc",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/no-horizontal-scroll",
+      "ok": true,
+      "detail": "{\"aside\":{\"width\":0,\"display\":\"none\",\"left\":0,\"right\":0},\"mobileToc\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"topbar\":{\"width\":390,\"display\":\"flex\",\"left\":0,\"right\":390},\"diagram\":{\"width\":350,\"display\":\"block\",\"left\":20,\"right\":370},\"quizOption\":{\"width\":316,\"display\":\"flex\",\"left\":37,\"right\":353},\"scrollWidth\":390,\"viewport\":390,\"completeMobile\":true}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/complete-button",
+      "ok": true,
+      "detail": "移动端缺少标记完成按钮"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/toc-scroll",
+      "ok": true,
+      "detail": "{\"scrollY\":1907,\"headingTop\":104}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/quiz-clickable",
+      "ok": true,
+      "detail": "{\"selected\":1,\"optionWidth\":316,\"viewport\":390}"
+    },
+    {
+      "area": "lessons",
+      "id": "c11-classes/mobile/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "lessons",
+      "id": "dark/theme-applied",
+      "ok": true,
+      "detail": "dark"
+    },
+    {
+      "area": "lessons",
+      "id": "dark/body-color",
+      "ok": true,
+      "detail": "{\"color\":\"rgb(229, 234, 243)\",\"background\":\"rgb(10, 15, 29)\",\"fontSize\":\"16px\"}"
+    },
+    {
+      "area": "lessons",
+      "id": "dark/no-horizontal-scroll",
+      "ok": true,
+      "detail": "1440"
+    },
+    {
+      "area": "lessons",
+      "id": "dark/no-overflow",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "lessons",
+      "id": "dark/lesson-c01/console-clean",
+      "ok": true,
+      "detail": "{\"errors\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    }
+  ],
+  "failedChecks": []
+}

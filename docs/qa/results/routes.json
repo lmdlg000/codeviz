@@ -1,0 +1,3051 @@
+{
+  "generatedAt": "2026-11-06T11:48:40.705Z",
+  "base": "http://127.0.0.1:5178",
+  "combos": [
+    {
+      "id": "desktop-light",
+      "label": "桌面 1440×900 浅色"
+    },
+    {
+      "id": "desktop-dark",
+      "label": "桌面 1440×900 深色"
+    },
+    {
+      "id": "mobile-light",
+      "label": "移动 390×844 浅色"
+    },
+    {
+      "id": "mobile-dark",
+      "label": "移动 390×844 深色（跟随系统）"
+    }
+  ],
+  "totalChecks": 65,
+  "failedChecks": 0,
+  "failedRoutes": [],
+  "consoleWarnings": [],
+  "results": [
+    {
+      "combo": "desktop-light",
+      "route": "#/",
+      "name": "home",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2909,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "section.home-cta",
+            "text": "START WITH ONE LINE写下的每一行，都值得被看见。从第一节开始，用图形建立直觉；或者直接打开实验室，让手边的代码先跑起来。开",
+            "clientWidth": 1096,
+            "scrollWidth": 1176
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "section.home-cta",
+            "scrollWidth": 1176,
+            "clientWidth": 1096
+          }
+        ],
+        "h1": [
+          "把 C / C++ 代码，变成看得见的图。"
+        ],
+        "mainTextLength": 1462
+      },
+      "details": {
+        "consoleWarnings": [],
+        "capability": 6,
+        "pathCards": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-light-home.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn",
+      "name": "learn",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2173,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "课程"
+        ],
+        "mainTextLength": 1561
+      },
+      "details": {
+        "consoleWarnings": [],
+        "cards": 13,
+        "chapters": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-light-learn.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c01-hello",
+      "name": "lesson-c01-hello",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7644,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "初识 C：从一行代码到一张图"
+        ],
+        "mainTextLength": 4697
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1168,
+          "headingTop": 104
+        },
+        "activeToc": "02二、七行代码，各司其职",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c01-hello.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c02-data",
+      "name": "lesson-c02-data",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8732,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "数据与变量：给内存贴标签"
+        ],
+        "mainTextLength": 5763
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1382,
+          "headingTop": 104
+        },
+        "activeToc": "02二、三种最常用的类型",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c02-data.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c03-operators",
+      "name": "lesson-c03-operators",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9633,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 403,
+            "clientWidth": 371
+          }
+        ],
+        "h1": [
+          "运算符与表达式：让数据动起来"
+        ],
+        "mainTextLength": 6113
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 9,
+        "quizQuestions": 4,
+        "tocButtons": 9,
+        "h2Anchors": 9,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1979,
+          "headingTop": 104
+        },
+        "activeToc": "02二、取余：除法剩下的那一截",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c03-operators.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c04-selection",
+      "name": "lesson-c04-selection",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9674,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "选择结构：程序的岔路口"
+        ],
+        "mainTextLength": 6875
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1687,
+          "headingTop": 104
+        },
+        "activeToc": "02二、if 与 else：两条路",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c04-selection.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c05-loops",
+      "name": "lesson-c05-loops",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 10178,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "循环结构：重复的艺术"
+        ],
+        "mainTextLength": 6391
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 10,
+        "quizQuestions": 4,
+        "tocButtons": 8,
+        "h2Anchors": 8,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1146,
+          "headingTop": 104
+        },
+        "activeToc": "02二、while：条件成立就一直做",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c05-loops.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c06-arrays",
+      "name": "lesson-c06-arrays",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7896,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "数组与字符串：一排连续的格子"
+        ],
+        "mainTextLength": 5719
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1957,
+          "headingTop": 104
+        },
+        "activeToc": "02二、遍历：让循环替你走遍每一格",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c06-arrays.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c07-functions",
+      "name": "lesson-c07-functions",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7502,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "函数与递归：分而治之"
+        ],
+        "mainTextLength": 4857
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1478,
+          "headingTop": 104
+        },
+        "activeToc": "02二、参数、返回值与函数声明",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c07-functions.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c08-pointers",
+      "name": "lesson-c08-pointers",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7739,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "指针：内存的门牌号"
+        ],
+        "mainTextLength": 4942
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1992,
+          "headingTop": 104
+        },
+        "activeToc": "02二、通过指针修改目标",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c08-pointers.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c09-structs",
+      "name": "lesson-c09-structs",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8425,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "结构体与自定义类型"
+        ],
+        "mainTextLength": 5907
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 2066,
+          "headingTop": 104
+        },
+        "activeToc": "02二、成员访问与修改",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c09-structs.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c10-files",
+      "name": "lesson-c10-files",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7905,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "文件：把数据留在磁盘上"
+        ],
+        "mainTextLength": 5159
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1060,
+          "headingTop": 104
+        },
+        "activeToc": "02二、写入：把分数存进文件",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c10-files.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c11-classes",
+      "name": "lesson-c11-classes",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9349,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 468,
+            "clientWidth": 416
+          }
+        ],
+        "h1": [
+          "类与对象：从结构体到蓝图"
+        ],
+        "mainTextLength": 8685
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1455,
+          "headingTop": 104
+        },
+        "activeToc": "02二、封装：公开接口，隐藏实现",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c11-classes.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c12-inheritance",
+      "name": "lesson-c12-inheritance",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8466,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "继承与多态：同一种调用，不同的行为"
+        ],
+        "mainTextLength": 7505
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1698,
+          "headingTop": 104
+        },
+        "activeToc": "02二、访问控制与继承方式",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c12-inheritance.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/c13-templates",
+      "name": "lesson-c13-templates",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8916,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 418,
+            "clientWidth": 371
+          }
+        ],
+        "h1": [
+          "模板与 STL：写出通用的代码"
+        ],
+        "mainTextLength": 7921
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1534,
+          "headingTop": 104
+        },
+        "activeToc": "02二、类模板：带类型的容器",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-c13-templates.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/lab",
+      "name": "lab",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 921,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "代码实验室"
+        ],
+        "mainTextLength": 698
+      },
+      "details": {
+        "consoleWarnings": [],
+        "status": "尚未分析，点击「分析代码」生成视图",
+        "filename": "bubble-sort.c",
+        "screenshot": "docs/qa/shots/routes/desktop-light-lab.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/map",
+      "name": "map",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 1195,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "知识图谱"
+        ],
+        "mainTextLength": 325
+      },
+      "details": {
+        "consoleWarnings": [],
+        "svgNodes": 28,
+        "mobileItems": 28,
+        "mapSelected": "编译与运行",
+        "screenshot": "docs/qa/shots/routes/desktop-light-map.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/about",
+      "name": "about",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2495,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "让抽象的代码结构，变成可以看见、可以触摸的东西。"
+        ],
+        "mainTextLength": 1420
+      },
+      "details": {
+        "consoleWarnings": [],
+        "refs": 2,
+        "shortcutRows": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-light-about.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/nope",
+      "name": "notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 900,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "这段代码没有对应的页面。"
+        ],
+        "mainTextLength": 142
+      },
+      "details": {
+        "consoleWarnings": [],
+        "code": "404",
+        "screenshot": "docs/qa/shots/routes/desktop-light-notfound.png"
+      }
+    },
+    {
+      "combo": "desktop-light",
+      "route": "#/learn/not-a-lesson",
+      "name": "lesson-notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 900,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "没有找到这节课。"
+        ],
+        "mainTextLength": 141
+      },
+      "details": {
+        "consoleWarnings": [],
+        "screenshot": "docs/qa/shots/routes/desktop-light-lesson-notfound.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/",
+      "name": "home",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2909,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "section.home-cta",
+            "text": "START WITH ONE LINE写下的每一行，都值得被看见。从第一节开始，用图形建立直觉；或者直接打开实验室，让手边的代码先跑起来。开",
+            "clientWidth": 1096,
+            "scrollWidth": 1176
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "section.home-cta",
+            "scrollWidth": 1176,
+            "clientWidth": 1096
+          }
+        ],
+        "h1": [
+          "把 C / C++ 代码，变成看得见的图。"
+        ],
+        "mainTextLength": 1462
+      },
+      "details": {
+        "consoleWarnings": [],
+        "capability": 6,
+        "pathCards": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-dark-home.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn",
+      "name": "learn",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2173,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "课程"
+        ],
+        "mainTextLength": 1561
+      },
+      "details": {
+        "consoleWarnings": [],
+        "cards": 13,
+        "chapters": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-dark-learn.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c01-hello",
+      "name": "lesson-c01-hello",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7644,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "初识 C：从一行代码到一张图"
+        ],
+        "mainTextLength": 4697
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1168,
+          "headingTop": 104
+        },
+        "activeToc": "02二、七行代码，各司其职",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c01-hello.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c02-data",
+      "name": "lesson-c02-data",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8732,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "数据与变量：给内存贴标签"
+        ],
+        "mainTextLength": 5763
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1382,
+          "headingTop": 104
+        },
+        "activeToc": "02二、三种最常用的类型",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c02-data.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c03-operators",
+      "name": "lesson-c03-operators",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9633,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 403,
+            "clientWidth": 371
+          }
+        ],
+        "h1": [
+          "运算符与表达式：让数据动起来"
+        ],
+        "mainTextLength": 6113
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 9,
+        "quizQuestions": 4,
+        "tocButtons": 9,
+        "h2Anchors": 9,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1979,
+          "headingTop": 104
+        },
+        "activeToc": "02二、取余：除法剩下的那一截",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c03-operators.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c04-selection",
+      "name": "lesson-c04-selection",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9674,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "选择结构：程序的岔路口"
+        ],
+        "mainTextLength": 6875
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1687,
+          "headingTop": 104
+        },
+        "activeToc": "02二、if 与 else：两条路",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c04-selection.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c05-loops",
+      "name": "lesson-c05-loops",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 10178,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "循环结构：重复的艺术"
+        ],
+        "mainTextLength": 6391
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 10,
+        "quizQuestions": 4,
+        "tocButtons": 8,
+        "h2Anchors": 8,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1146,
+          "headingTop": 104
+        },
+        "activeToc": "02二、while：条件成立就一直做",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c05-loops.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c06-arrays",
+      "name": "lesson-c06-arrays",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7896,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "数组与字符串：一排连续的格子"
+        ],
+        "mainTextLength": 5719
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1957,
+          "headingTop": 104
+        },
+        "activeToc": "02二、遍历：让循环替你走遍每一格",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c06-arrays.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c07-functions",
+      "name": "lesson-c07-functions",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7502,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "函数与递归：分而治之"
+        ],
+        "mainTextLength": 4857
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1478,
+          "headingTop": 104
+        },
+        "activeToc": "02二、参数、返回值与函数声明",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c07-functions.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c08-pointers",
+      "name": "lesson-c08-pointers",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7739,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "指针：内存的门牌号"
+        ],
+        "mainTextLength": 4942
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1992,
+          "headingTop": 104
+        },
+        "activeToc": "02二、通过指针修改目标",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c08-pointers.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c09-structs",
+      "name": "lesson-c09-structs",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8425,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "结构体与自定义类型"
+        ],
+        "mainTextLength": 5907
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 2066,
+          "headingTop": 104
+        },
+        "activeToc": "02二、成员访问与修改",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c09-structs.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c10-files",
+      "name": "lesson-c10-files",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 7905,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "文件：把数据留在磁盘上"
+        ],
+        "mainTextLength": 5159
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1060,
+          "headingTop": 104
+        },
+        "activeToc": "02二、写入：把分数存进文件",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c10-files.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c11-classes",
+      "name": "lesson-c11-classes",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 9349,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 468,
+            "clientWidth": 416
+          }
+        ],
+        "h1": [
+          "类与对象：从结构体到蓝图"
+        ],
+        "mainTextLength": 8685
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1455,
+          "headingTop": 104
+        },
+        "activeToc": "02二、封装：公开接口，隐藏实现",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c11-classes.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c12-inheritance",
+      "name": "lesson-c12-inheritance",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8466,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "继承与多态：同一种调用，不同的行为"
+        ],
+        "mainTextLength": 7505
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1698,
+          "headingTop": 104
+        },
+        "activeToc": "02二、访问控制与继承方式",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c12-inheritance.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/c13-templates",
+      "name": "lesson-c13-templates",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 8916,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 418,
+            "clientWidth": 371
+          }
+        ],
+        "h1": [
+          "模板与 STL：写出通用的代码"
+        ],
+        "mainTextLength": 7921
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "tocScroll": {
+          "beforeY": 0,
+          "afterY": 1534,
+          "headingTop": 104
+        },
+        "activeToc": "02二、类模板：带类型的容器",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-c13-templates.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/lab",
+      "name": "lab",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 921,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "代码实验室"
+        ],
+        "mainTextLength": 698
+      },
+      "details": {
+        "consoleWarnings": [],
+        "status": "尚未分析，点击「分析代码」生成视图",
+        "filename": "bubble-sort.c",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lab.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/map",
+      "name": "map",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 1195,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "知识图谱"
+        ],
+        "mainTextLength": 325
+      },
+      "details": {
+        "consoleWarnings": [],
+        "svgNodes": 28,
+        "mobileItems": 28,
+        "mapSelected": "编译与运行",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-map.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/about",
+      "name": "about",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 2495,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "让抽象的代码结构，变成可以看见、可以触摸的东西。"
+        ],
+        "mainTextLength": 1420
+      },
+      "details": {
+        "consoleWarnings": [],
+        "refs": 2,
+        "shortcutRows": 4,
+        "screenshot": "docs/qa/shots/routes/desktop-dark-about.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/nope",
+      "name": "notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 900,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "这段代码没有对应的页面。"
+        ],
+        "mainTextLength": 142
+      },
+      "details": {
+        "consoleWarnings": [],
+        "code": "404",
+        "screenshot": "docs/qa/shots/routes/desktop-dark-notfound.png"
+      }
+    },
+    {
+      "combo": "desktop-dark",
+      "route": "#/learn/not-a-lesson",
+      "name": "lesson-notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pageScrollWidth": 1440,
+        "pageScrollHeight": 900,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "没有找到这节课。"
+        ],
+        "mainTextLength": 141
+      },
+      "details": {
+        "consoleWarnings": [],
+        "screenshot": "docs/qa/shots/routes/desktop-dark-lesson-notfound.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/",
+      "name": "home",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 5104,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "section.home-cta",
+            "text": "START WITH ONE LINE写下的每一行，都值得被看见。从第一节开始，用图形建立直觉；或者直接打开实验室，让手边的代码先跑起来。开",
+            "clientWidth": 350,
+            "scrollWidth": 430
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "section.home-cta",
+            "scrollWidth": 430,
+            "clientWidth": 350
+          }
+        ],
+        "h1": [
+          "把 C / C++ 代码，变成看得见的图。"
+        ],
+        "mainTextLength": 1446
+      },
+      "details": {
+        "consoleWarnings": [],
+        "capability": 6,
+        "pathCards": 4,
+        "screenshot": "docs/qa/shots/routes/mobile-light-home.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn",
+      "name": "learn",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 3510,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "课程"
+        ],
+        "mainTextLength": 1529
+      },
+      "details": {
+        "consoleWarnings": [],
+        "cards": 13,
+        "chapters": 4,
+        "screenshot": "docs/qa/shots/routes/mobile-light-learn.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c01-hello",
+      "name": "lesson-c01-hello",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9773,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 354,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "初识 C：从一行代码到一张图"
+        ],
+        "mainTextLength": 4585
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0,
+        "screenshot": "docs/qa/shots/routes/mobile-light-lesson-c01-hello.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c02-data",
+      "name": "lesson-c02-data",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 10783,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 542,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-memory__scroll",
+            "scrollWidth": 660,
+            "clientWidth": 312
+          }
+        ],
+        "h1": [
+          "数据与变量：给内存贴标签"
+        ],
+        "mainTextLength": 5640
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c03-operators",
+      "name": "lesson-c03-operators",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 11881,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 366,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 346,
+            "clientWidth": 314
+          }
+        ],
+        "h1": [
+          "运算符与表达式：让数据动起来"
+        ],
+        "mainTextLength": 5987
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 9,
+        "quizQuestions": 4,
+        "tocButtons": 9,
+        "h2Anchors": 9,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c04-selection",
+      "name": "lesson-c04-selection",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 11764,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 478,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "选择结构：程序的岔路口"
+        ],
+        "mainTextLength": 6735
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 6,
+        "quizQuestions": 4,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c05-loops",
+      "name": "lesson-c05-loops",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 12520,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 374,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "循环结构：重复的艺术"
+        ],
+        "mainTextLength": 6243
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 5,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 10,
+        "quizQuestions": 4,
+        "tocButtons": 8,
+        "h2Anchors": 8,
+        "emptyDiagrams": 0,
+        "screenshot": "docs/qa/shots/routes/mobile-light-lesson-c05-loops.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c06-arrays",
+      "name": "lesson-c06-arrays",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9725,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 571,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-memory__scroll",
+            "scrollWidth": 660,
+            "clientWidth": 312
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "数组与字符串：一排连续的格子"
+        ],
+        "mainTextLength": 5620
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c07-functions",
+      "name": "lesson-c07-functions",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9213,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 430,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-call__scroll",
+            "scrollWidth": 586,
+            "clientWidth": 312
+          }
+        ],
+        "h1": [
+          "函数与递归：分而治之"
+        ],
+        "mainTextLength": 4767
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c08-pointers",
+      "name": "lesson-c08-pointers",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9539,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 364,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-memory__scroll",
+            "scrollWidth": 660,
+            "clientWidth": 312
+          }
+        ],
+        "h1": [
+          "指针：内存的门牌号"
+        ],
+        "mainTextLength": 4858
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0,
+        "screenshot": "docs/qa/shots/routes/mobile-light-lesson-c08-pointers.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c09-structs",
+      "name": "lesson-c09-structs",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 10278,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 359,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-memory__scroll",
+            "scrollWidth": 660,
+            "clientWidth": 312
+          },
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 358,
+            "clientWidth": 314
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "结构体与自定义类型"
+        ],
+        "mainTextLength": 5812
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c10-files",
+      "name": "lesson-c10-files",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9574,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 553,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "文件：把数据留在磁盘上"
+        ],
+        "mainTextLength": 5073
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 5,
+        "h2Anchors": 5,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c11-classes",
+      "name": "lesson-c11-classes",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 11945,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "span.code-block__filename.mono",
+            "text": "input_rectangle.cpp",
+            "clientWidth": 111,
+            "scrollWidth": 128
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 468,
+            "clientWidth": 314
+          },
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 528,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "类与对象：从结构体到蓝图"
+        ],
+        "mainTextLength": 8575
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 5,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0,
+        "screenshot": "docs/qa/shots/routes/mobile-light-lesson-c11-classes.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c12-inheritance",
+      "name": "lesson-c12-inheritance",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 10720,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 498,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-class__scroll",
+            "scrollWidth": 444,
+            "clientWidth": 312
+          },
+          {
+            "selector": "div.cvz-diagram__chips",
+            "scrollWidth": 452,
+            "clientWidth": 314
+          }
+        ],
+        "h1": [
+          "继承与多态：同一种调用，不同的行为"
+        ],
+        "mainTextLength": 7413
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/c13-templates",
+      "name": "lesson-c13-templates",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 11608,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 652,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.cvz-trace__code",
+            "scrollWidth": 333,
+            "clientWidth": 314
+          }
+        ],
+        "h1": [
+          "模板与 STL：写出通用的代码"
+        ],
+        "mainTextLength": 7818
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 7,
+        "quizQuestions": 3,
+        "tocButtons": 6,
+        "h2Anchors": 6,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/lab",
+      "name": "lab",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 1411,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.cm-scroller",
+            "scrollWidth": 433,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "代码实验室"
+        ],
+        "mainTextLength": 668
+      },
+      "details": {
+        "consoleWarnings": [],
+        "status": "尚未分析，点击「分析代码」生成视图",
+        "filename": "bubble-sort.c",
+        "screenshot": "docs/qa/shots/routes/mobile-light-lab.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/map",
+      "name": "map",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 3024,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "C 程序由预处理、函数与语句组成，main 是执行的入口。",
+            "clientWidth": 240,
+            "scrollWidth": 279
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "源代码经过预处理、编译、汇编、链接，最终变成可执行文件。",
+            "clientWidth": 227,
+            "scrollWidth": 308
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "int、double、char 等类型决定数据的表示方式与可用的运算。",
+            "clientWidth": 240,
+            "scrollWidth": 301
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "算术、关系、逻辑与赋值运算符把数据组合成表达式。",
+            "clientWidth": 253,
+            "scrollWidth": 264
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "break 提前跳出循环，continue 跳过本轮剩余语句。",
+            "clientWidth": 195,
+            "scrollWidth": 251
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "把一段逻辑封装成可复用的模块，通过参数与返回值通信。",
+            "clientWidth": 266,
+            "scrollWidth": 286
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "变量在哪个范围内可见、何时创建与销毁。",
+            "clientWidth": 188,
+            "scrollWidth": 209
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "对象创建时初始化、销毁时清理的特殊成员函数。",
+            "clientWidth": 227,
+            "scrollWidth": 242
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "div.map-canvas",
+            "scrollWidth": 632,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "知识图谱"
+        ],
+        "mainTextLength": 1184
+      },
+      "details": {
+        "consoleWarnings": [],
+        "svgNodes": 28,
+        "mobileItems": 28,
+        "screenshot": "docs/qa/shots/routes/mobile-light-map.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/about",
+      "name": "about",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 3819,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.about-keys",
+            "scrollWidth": 460,
+            "clientWidth": 350
+          }
+        ],
+        "h1": [
+          "让抽象的代码结构，变成可以看见、可以触摸的东西。"
+        ],
+        "mainTextLength": 1420
+      },
+      "details": {
+        "consoleWarnings": [],
+        "refs": 2,
+        "shortcutRows": 4,
+        "screenshot": "docs/qa/shots/routes/mobile-light-about.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/nope",
+      "name": "notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 898,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "这段代码没有对应的页面。"
+        ],
+        "mainTextLength": 142
+      },
+      "details": {
+        "consoleWarnings": [],
+        "code": "404",
+        "screenshot": "docs/qa/shots/routes/mobile-light-notfound.png"
+      }
+    },
+    {
+      "combo": "mobile-light",
+      "route": "#/learn/not-a-lesson",
+      "name": "lesson-notfound",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "light",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 898,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [],
+        "h1": [
+          "没有找到这节课。"
+        ],
+        "mainTextLength": 141
+      },
+      "details": {
+        "consoleWarnings": [],
+        "screenshot": "docs/qa/shots/routes/mobile-light-lesson-notfound.png"
+      }
+    },
+    {
+      "combo": "mobile-dark",
+      "route": "#/",
+      "name": "home",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 5104,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "section.home-cta",
+            "text": "START WITH ONE LINE写下的每一行，都值得被看见。从第一节开始，用图形建立直觉；或者直接打开实验室，让手边的代码先跑起来。开",
+            "clientWidth": 350,
+            "scrollWidth": 430
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "section.home-cta",
+            "scrollWidth": 430,
+            "clientWidth": 350
+          }
+        ],
+        "h1": [
+          "把 C / C++ 代码，变成看得见的图。"
+        ],
+        "mainTextLength": 1446
+      },
+      "details": {
+        "consoleWarnings": [],
+        "capability": 6,
+        "pathCards": 4
+      }
+    },
+    {
+      "combo": "mobile-dark",
+      "route": "#/learn/c01-hello",
+      "name": "lesson-c01-hello",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 9773,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.table-wrap",
+            "scrollWidth": 480,
+            "clientWidth": 348
+          },
+          {
+            "selector": "div.code-block__scroll",
+            "scrollWidth": 352,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "初识 C：从一行代码到一张图"
+        ],
+        "mainTextLength": 4585
+      },
+      "details": {
+        "consoleWarnings": [],
+        "objectives": 4,
+        "keyPoints": 5,
+        "diagrams": 2,
+        "codeBlocks": 4,
+        "quizQuestions": 3,
+        "tocButtons": 7,
+        "h2Anchors": 7,
+        "emptyDiagrams": 0
+      }
+    },
+    {
+      "combo": "mobile-dark",
+      "route": "#/lab",
+      "name": "lab",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 1411,
+        "horizontalScroll": false,
+        "truncated": [],
+        "scrollContainers": [
+          {
+            "selector": "div.cm-scroller",
+            "scrollWidth": 433,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "代码实验室"
+        ],
+        "mainTextLength": 668
+      },
+      "details": {
+        "consoleWarnings": [],
+        "status": "尚未分析，点击「分析代码」生成视图",
+        "filename": "bubble-sort.c"
+      }
+    },
+    {
+      "combo": "mobile-dark",
+      "route": "#/map",
+      "name": "map",
+      "failures": [],
+      "issues": {
+        "consoleErrors": [],
+        "consoleWarnings": [],
+        "pageErrors": [],
+        "requestFailures": []
+      },
+      "warnings": [],
+      "audit": {
+        "theme": "dark",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pageScrollWidth": 390,
+        "pageScrollHeight": 3024,
+        "horizontalScroll": false,
+        "truncated": [
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "C 程序由预处理、函数与语句组成，main 是执行的入口。",
+            "clientWidth": 240,
+            "scrollWidth": 279
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "源代码经过预处理、编译、汇编、链接，最终变成可执行文件。",
+            "clientWidth": 227,
+            "scrollWidth": 308
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "int、double、char 等类型决定数据的表示方式与可用的运算。",
+            "clientWidth": 240,
+            "scrollWidth": 301
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "算术、关系、逻辑与赋值运算符把数据组合成表达式。",
+            "clientWidth": 253,
+            "scrollWidth": 264
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "break 提前跳出循环，continue 跳过本轮剩余语句。",
+            "clientWidth": 195,
+            "scrollWidth": 251
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "把一段逻辑封装成可复用的模块，通过参数与返回值通信。",
+            "clientWidth": 266,
+            "scrollWidth": 286
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "变量在哪个范围内可见、何时创建与销毁。",
+            "clientWidth": 188,
+            "scrollWidth": 209
+          },
+          {
+            "selector": "span.map-mobile-item__desc",
+            "text": "对象创建时初始化、销毁时清理的特殊成员函数。",
+            "clientWidth": 227,
+            "scrollWidth": 242
+          }
+        ],
+        "scrollContainers": [
+          {
+            "selector": "div.map-canvas",
+            "scrollWidth": 632,
+            "clientWidth": 348
+          }
+        ],
+        "h1": [
+          "知识图谱"
+        ],
+        "mainTextLength": 1184
+      },
+      "details": {
+        "consoleWarnings": [],
+        "svgNodes": 28,
+        "mobileItems": 28
+      }
+    }
+  ]
+}

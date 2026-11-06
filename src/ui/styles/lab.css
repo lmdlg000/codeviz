@@ -1141,8 +1141,15 @@
 
 .sample-picker__tags {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+}
+
+.sample-picker__tags .filter-chip {
+  flex: none;
 }
 
 .sample-grid {
@@ -1246,15 +1253,30 @@
 
 /* -------------------------------- 响应式 -------------------------------- */
 
-@media (max-width: 1400px) {
-  .lab-panel .segmented__tab .icon {
-    display: none;
-  }
+/* 分析面板的 tabs 始终完整可见：隐藏图标、允许换行，不依赖横向裁切 */
+.lab-panel .segmented {
+  width: 100%;
+  flex-wrap: wrap;
+  overflow: visible;
+}
 
-  .lab-panel .segmented__tab {
-    padding: 0 9px;
-    gap: 4px;
-  }
+.lab-panel .segmented__tab {
+  flex: 1 0 auto;
+  justify-content: center;
+  padding: 0 9px;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.lab-panel .segmented__tab .icon {
+  display: none;
+}
+
+.lab-panel .segmented__count {
+  height: 16px;
+  min-width: 16px;
+  padding: 0 4px;
+  font-size: 9.5px;
 }
 
 @media (max-width: 1180px) {

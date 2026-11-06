@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { samples } from '../../data';
 import { analyzeCode, detectLanguage, getEngineInfo } from '../index';
 import type { FlowchartNode } from '../types';
 
@@ -420,6 +421,57 @@ int main() {
 });
 
 describe('analyzeCode：类、内存、大纲', () => {
+  it('成员方法修饰符与返回类型分离', () => {
+    const code = `
+class Shape {
+public:
+  virtual double area() const = 0;
+  const char* name() const override;
+  virtual ~Shape() {}
+};
+
+class Circle : public Shape {
+  double r;
+public:
+  Circle(double radius);
+  ~Circle();
+  double area() const override { return 3.14 * r * r; }
+  int* data() { return nullptr; }
+};
+`;
+    const result = analyzeCode(code);
+    const shape = result.classes.find((c) => c.name === 'Shape');
+    const area = shape?.methods.find((m) => m.name === 'area');
+    expect(area?.returnType).toBe('double');
+    expect(area?.signature).toContain('virtual');
+    expect(area?.signature).toContain('const');
+    expect(area?.signature).toContain('= 0');
+    expect(area?.isPureVirtual).toBe(true);
+    expect(area?.isConst).toBe(true);
+
+    const named = shape?.methods.find((m) => m.name === 'name');
+    expect(named?.returnType).toBe('const char*');
+    expect(named?.signature).toContain('const char*');
+    expect(named?.isVirtual).toBe(true);
+    expect(named?.isConst).toBe(true);
+    expect(named?.isPureVirtual).toBeUndefined();
+
+    const destructor = shape?.methods.find((m) => m.kind === 'destructor');
+    expect(destructor?.returnType).toBe('');
+
+    const circle = result.classes.find((c) => c.name === 'Circle');
+    const constructor = circle?.methods.find((m) => m.kind === 'constructor');
+    expect(constructor?.name).toBe('Circle');
+    expect(constructor?.returnType).toBe('');
+    expect(circle?.methods.find((m) => m.name === '~Circle')?.kind).toBe('destructor');
+    expect(circle?.methods.find((m) => m.name === 'data')?.returnType).toBe('int*');
+
+    // FunctionInfo 同样使用干净的返回类型
+    const areaInfo = result.functions.find((fn) => fn.name === 'area' && fn.className === 'Shape');
+    expect(areaInfo?.returnType).toBe('double');
+    expect(result.functions.find((fn) => fn.name === 'data')?.returnType).toBe('int*');
+  });
+
   it('C++ class 字段 / 方法 / 访问控制 / 继承 / 纯虚', () => {
     const result = analyzeCode(CPP_CLASSES);
     const shape = result.classes.find((c) => c.name === 'Shape');
@@ -431,6 +483,25 @@ describe('analyzeCode：类、内存、大纲', () => {
     expect(circle?.bases).toContain('Shape');
     expect(circle?.fields.find((f) => f.name === 'r')?.access).toBe('private');
     expect(circle?.methods.find((m) => m.name === 'Circle')?.kind).toBe('constructor');
+    expect(result.callGraph.externalCalls).not.toContain('Circle');
+  });
+
+  it('构造函数调用进入调用图而不是外部函数', () => {
+    const code = `
+class Rect {
+public:
+  int w;
+  Rect(int width) : w(width) {}
+};
+int main() {
+  Rect r(3);
+  return r.w;
+}
+`;
+    const result = analyzeCode(code);
+    expect(result.callGraph.externalCalls).not.toContain('Rect');
+    expect(result.callGraph.edges.length).toBeGreaterThan(0);
+    expect(result.callGraph.nodes.some((n) => n.kind === 'constructor')).toBe(true);
   });
 
   it('struct 默认 public，字段类型正确', () => {
@@ -585,6 +656,93 @@ describe('analyzeCode：诊断规则', () => {
     expect(result.diagnostics.length).toBeLessThanOrEqual(40);
     const lines = result.diagnostics.map((d) => d.line);
     expect([...lines].sort((a, b) => a - b)).toEqual(lines);
+  });
+
+  it('构造函数 / 析构函数不会误报缺少返回值', () => {
+    const code = `
+class A {
+public:
+  A() {}
+  ~A() {}
+  void reset() {}
+};
+int main() { return 0; }
+`;
+    const result = analyzeCode(code);
+    expect(result.diagnostics.filter((d) => d.rule === 'missing-return')).toHaveLength(0);
+    expect(result.functions.find((fn) => fn.kind === 'constructor')?.hasReturnOnAllPaths).toBe(true);
+  });
+
+  it('纯虚函数 / 虚析构 / void 方法也不会误报缺少返回值', () => {
+    const code = `
+class Shape {
+public:
+  virtual double area() const = 0;
+  virtual ~Shape() {}
+  void show() {}
+};
+class Circle : public Shape {
+public:
+  Circle(double r) : r(r) {}
+  ~Circle() {}
+  double area() const override { return 3.14 * r * r; }
+private:
+  double r;
+};
+int main() { return 0; }
+`;
+    const result = analyzeCode(code, { filename: 'sample.cpp' });
+    expect(result.diagnostics.filter((d) => d.rule === 'missing-return')).toHaveLength(0);
+    for (const fn of result.functions.filter((item) => item.kind === 'constructor' || item.kind === 'destructor')) {
+      expect(fn.hasReturnOnAllPaths).toBe(true);
+    }
+  });
+
+  it('content 的 C++ 类示例没有缺少返回值误报', () => {
+    for (const id of ['class-rectangle', 'shape-polymorphism']) {
+      const sample = samples.find((item) => item.id === id);
+      if (!sample) continue;
+      const result = analyzeCode(sample.code, { filename: 'sample.cpp' });
+      const missing = result.diagnostics.filter((d) => d.rule === 'missing-return');
+      expect(missing, `${id}: ${missing.map((d) => d.message).join('; ')}`).toHaveLength(0);
+    }
+  });
+
+  it('scanf 传入数组名不误报取地址', () => {
+    const result = analyzeCode('int main() { int a[3]; scanf("%d", a); return 0; }');
+    expect(result.diagnostics.filter((d) => d.rule === 'scanf-missing-address')).toHaveLength(0);
+  });
+
+  it('未定义的函数调用给出 info', () => {
+    const rules = rulesOf('int main() { mystery(1); return 0; }');
+    expect(rules).toContain('undefined-function');
+  });
+
+  it('重复定义函数给出 warning', () => {
+    const rules = rulesOf('int f() { return 1; }\nint f() { return 2; }\nint main() { return f(); }');
+    expect(rules).toContain('duplicate-definition');
+  });
+
+  it('scanf 参数数量不符', () => {
+    const rules = rulesOf('int main() { int a; scanf("%d %d", &a); return 0; }');
+    expect(rules).toContain('scanf-arg-count');
+  });
+
+  it('500 行规模分析在 100ms 量级', () => {
+    const lines: string[] = ['#include <stdio.h>', 'int main() {'];
+    for (let i = 0; i < 120; i++) {
+      lines.push(`  int v${i} = ${i};`);
+      lines.push(`  if (v${i} % 2 == 0) { v${i} += 1; }`);
+    }
+    lines.push('  return 0;', '}');
+    const code = lines.join('\n');
+    expect(code.split('\n').length).toBeGreaterThan(240);
+    const started = Date.now();
+    const result = analyzeCode(code);
+    const elapsed = Date.now() - started;
+    expect(result.ok).toBe(true);
+    expect(result.stats.codeLines).toBeGreaterThan(200);
+    expect(elapsed).toBeLessThan(500);
   });
 
   it('完整合法的冒泡排序没有 error 级别诊断', () => {

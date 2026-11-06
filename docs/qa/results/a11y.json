@@ -1,0 +1,489 @@
+{
+  "generatedAt": "2026-11-06T11:51:14.364Z",
+  "base": "http://127.0.0.1:5178",
+  "details": {
+    "home": {
+      "interactiveCount": 38,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 0,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 1,
+        "skipLink": true
+      }
+    },
+    "learn": {
+      "interactiveCount": 29,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 0,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 1,
+        "skipLink": true
+      }
+    },
+    "lesson": {
+      "interactiveCount": 67,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 6,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 4,
+        "skipLink": true
+      }
+    },
+    "map": {
+      "interactiveCount": 75,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 28,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 1,
+        "skipLink": true
+      }
+    },
+    "about": {
+      "interactiveCount": 17,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 0,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 1,
+        "skipLink": true
+      }
+    },
+    "lab": {
+      "interactiveCount": 44,
+      "unnamed": [],
+      "imgs": 0,
+      "imgsWithoutAlt": 0,
+      "duplicateIds": [],
+      "badAriaRefs": [],
+      "positiveTabIndex": 0,
+      "svgButtons": 12,
+      "svgWithoutLabel": 0,
+      "svgWithoutTabIndex": 0,
+      "h1": 1,
+      "landmarks": {
+        "main": 1,
+        "nav": 1,
+        "skipLink": true
+      }
+    },
+    "contrastLight": [
+      {
+        "selector": ".page-header__description",
+        "ratio": 7.08,
+        "fontSize": 16,
+        "large": false,
+        "color": "rgb(71, 85, 105)"
+      },
+      {
+        "selector": ".sidebar__meta",
+        "ratio": 7.58,
+        "fontSize": 10.5,
+        "large": false,
+        "color": "rgb(71, 85, 105)"
+      },
+      {
+        "selector": ".eyebrow",
+        "ratio": 7.08,
+        "fontSize": 12,
+        "large": false,
+        "color": "rgb(71, 85, 105)"
+      }
+    ],
+    "contrastDark": [
+      {
+        "selector": ".page-header__description",
+        "ratio": 8.81,
+        "fontSize": 16,
+        "large": false
+      },
+      {
+        "selector": ".sidebar__meta",
+        "ratio": 8,
+        "fontSize": 10.5,
+        "large": false
+      },
+      {
+        "selector": ".eyebrow",
+        "ratio": 8.81,
+        "fontSize": 12,
+        "large": false
+      }
+    ],
+    "reducedMotion": {
+      "scrollBehavior": "auto",
+      "animationDuration": "1e-06s",
+      "media": true
+    }
+  },
+  "checks": [
+    {
+      "area": "a11y",
+      "id": "home/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "home/img-alt",
+      "ok": true,
+      "detail": "0 张图片缺 alt"
+    },
+    {
+      "area": "a11y",
+      "id": "home/unique-ids",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "home/aria-refs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "home/no-positive-tabindex",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "area": "a11y",
+      "id": "home/landmarks",
+      "ok": true,
+      "detail": "{\"main\":1,\"nav\":1,\"skipLink\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "home/h1",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "a11y",
+      "id": "home/tab-sequence",
+      "ok": true,
+      "detail": "[{\"tag\":\"BUTTON\",\"label\":\"跳到主内容\",\"outline\":\"solid 2px\",\"rect\":3},{\"tag\":\"A\",\"label\":\"CodeViz 首页\",\"outline\":\"solid 2px\",\"rect\":18},{\"tag\":\"A\",\"label\":\"首页\",\"outline\":\"solid 2px\",\"rect\":70}]"
+    },
+    {
+      "area": "a11y",
+      "id": "home/focus-visible",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "learn/img-alt",
+      "ok": true,
+      "detail": "0 张图片缺 alt"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/unique-ids",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "learn/aria-refs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "learn/no-positive-tabindex",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/landmarks",
+      "ok": true,
+      "detail": "{\"main\":1,\"nav\":1,\"skipLink\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/h1",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/tab-sequence",
+      "ok": true,
+      "detail": "[{\"tag\":\"BUTTON\",\"label\":\"跳到主内容\",\"outline\":\"solid 2px\",\"rect\":-5},{\"tag\":\"A\",\"label\":\"CodeViz 首页\",\"outline\":\"solid 2px\",\"rect\":18},{\"tag\":\"A\",\"label\":\"首页\",\"outline\":\"solid 2px\",\"rect\":70}]"
+    },
+    {
+      "area": "a11y",
+      "id": "learn/focus-visible",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/img-alt",
+      "ok": true,
+      "detail": "0 张图片缺 alt"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/unique-ids",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/aria-refs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/no-positive-tabindex",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/landmarks",
+      "ok": true,
+      "detail": "{\"main\":1,\"nav\":4,\"skipLink\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/h1",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/tab-sequence",
+      "ok": true,
+      "detail": "[{\"tag\":\"BUTTON\",\"label\":\"跳到主内容\",\"outline\":\"solid 2px\",\"rect\":-5},{\"tag\":\"A\",\"label\":\"CodeViz 首页\",\"outline\":\"solid 2px\",\"rect\":18},{\"tag\":\"A\",\"label\":\"首页\",\"outline\":\"solid 2px\",\"rect\":70}]"
+    },
+    {
+      "area": "a11y",
+      "id": "lesson/focus-visible",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "map/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "map/img-alt",
+      "ok": true,
+      "detail": "0 张图片缺 alt"
+    },
+    {
+      "area": "a11y",
+      "id": "map/unique-ids",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "map/aria-refs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "map/no-positive-tabindex",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "area": "a11y",
+      "id": "map/landmarks",
+      "ok": true,
+      "detail": "{\"main\":1,\"nav\":1,\"skipLink\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "map/h1",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "a11y",
+      "id": "map/tab-sequence",
+      "ok": true,
+      "detail": "[{\"tag\":\"BUTTON\",\"label\":\"跳到主内容\",\"outline\":\"solid 2px\",\"rect\":-5},{\"tag\":\"A\",\"label\":\"CodeViz 首页\",\"outline\":\"solid 2px\",\"rect\":18},{\"tag\":\"A\",\"label\":\"首页\",\"outline\":\"solid 2px\",\"rect\":70}]"
+    },
+    {
+      "area": "a11y",
+      "id": "map/focus-visible",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "about/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "about/img-alt",
+      "ok": true,
+      "detail": "0 张图片缺 alt"
+    },
+    {
+      "area": "a11y",
+      "id": "about/unique-ids",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "about/aria-refs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "about/no-positive-tabindex",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "area": "a11y",
+      "id": "about/landmarks",
+      "ok": true,
+      "detail": "{\"main\":1,\"nav\":1,\"skipLink\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "about/h1",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "area": "a11y",
+      "id": "about/tab-sequence",
+      "ok": true,
+      "detail": "[{\"tag\":\"BUTTON\",\"label\":\"跳到主内容\",\"outline\":\"solid 2px\",\"rect\":-5},{\"tag\":\"A\",\"label\":\"CodeViz 首页\",\"outline\":\"solid 2px\",\"rect\":18},{\"tag\":\"A\",\"label\":\"首页\",\"outline\":\"solid 2px\",\"rect\":70}]"
+    },
+    {
+      "area": "a11y",
+      "id": "about/focus-visible",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "lab/names",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "area": "a11y",
+      "id": "lab/svg-buttons",
+      "ok": true,
+      "detail": "{\"total\":12,\"noLabel\":0,\"noTab\":0}"
+    },
+    {
+      "area": "a11y",
+      "id": "lab/tablist-arrow",
+      "ok": true,
+      "detail": "{\"beforeTab\":\"流程图\\n1\",\"tab\":\"调用图1\",\"focused\":\"tab\"}"
+    },
+    {
+      "area": "a11y",
+      "id": "lab/contrast-light",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "lab/contrast-dark",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "area": "a11y",
+      "id": "lab/console-clean",
+      "ok": true,
+      "detail": "{\"consoleErrors\":[],\"consoleWarnings\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    },
+    {
+      "area": "a11y",
+      "id": "reduced-motion/match",
+      "ok": true,
+      "detail": "{\"scrollBehavior\":\"auto\",\"animationDuration\":\"1e-06s\",\"media\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "reduced-motion/scroll",
+      "ok": true,
+      "detail": "{\"scrollBehavior\":\"auto\",\"animationDuration\":\"1e-06s\",\"media\":true}"
+    },
+    {
+      "area": "a11y",
+      "id": "reduced-motion/console-clean",
+      "ok": true,
+      "detail": "{\"consoleErrors\":[],\"consoleWarnings\":[],\"pageErrors\":[],\"requestFailures\":[]}"
+    }
+  ],
+  "failedChecks": []
+}

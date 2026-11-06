@@ -279,7 +279,9 @@ export function MemoryTab({ analysis }: { analysis: AnalysisResult }) {
       <MemoryView memory={memory} />
       <p className="lab-inline-note lab-inline-note--memory">
         <Icon name="info" size={14} />
-        内存按定义静态估算，不是运行期真实地址。{memory.notes.join(' ')}
+        {memory.notes.length > 0
+          ? memory.notes.join(' ')
+          : '内存按定义静态估算，不是运行期真实地址。'}
       </p>
     </div>
   );

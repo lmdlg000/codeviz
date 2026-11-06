@@ -67,6 +67,13 @@ scripts/           截图与验收脚本
 1. 谭浩强《C程序设计教程（第3版）》，清华大学出版社
 2. 软件开发技术联盟 编著《C++自学视频教程》，清华大学出版社
 
+## 验收与测试
+
+- 引擎单元测试：`pnpm test`（99 个用例）
+- 类型检查 / 生产构建：`pnpm build`
+- 独立 QA（无头 Edge，需先 `pnpm dev`）：`node tests/qa/run-routes.mjs`、`node tests/qa/run-lab.mjs`、`node tests/qa/run-lessons.mjs`、`node tests/qa/run-a11y.mjs`
+- QA 报告：[docs/qa/report.md](docs/qa/report.md)（P0=0，P1=0；65 路由组合、116 项实验室检查、212 项课程检查、54 项可访问性检查全部通过）
+
 ## 原创与使用
 
 本项目为学习/教学用途的原创实现。示例代码可自由用于学习；教材文字与插图版权归原作者及出版社所有。

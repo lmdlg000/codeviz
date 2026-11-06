@@ -129,6 +129,21 @@ int main() {
     expect(outputOf(code)).toBe('ab');
   });
 
+  it('逻辑运算短路避免除零', () => {
+    const code = `
+int main() {
+  int x = 0;
+  if (x != 0 && 10 / x > 1) {
+    printf("bad");
+  } else {
+    printf("ok");
+  }
+  return 0;
+}
+`;
+    expect(outputOf(code)).toBe('ok');
+  });
+
   it('三元、位运算与复合赋值', () => {
     const code = `
 int main() {
@@ -367,6 +382,28 @@ int main() {
 }
 `;
     expect(outputOf(code)).toBe('hello 5');
+  });
+
+  it('字符指针可以当字符串输出', () => {
+    const code = `
+int main() {
+  char s[] = "hi";
+  char *p = s;
+  printf("%s", p);
+  return 0;
+}
+`;
+    expect(outputOf(code)).toBe('hi');
+  });
+
+  it('printf 动态宽度 %*d', () => {
+    const code = `
+int main() {
+  printf("[%*d]", 4, 7);
+  return 0;
+}
+`;
+    expect(outputOf(code)).toBe('[   7]');
   });
 });
 

@@ -5,9 +5,10 @@
  * 视图只负责 UML 盒子绘制与交互，布局计算集中在这里便于校验。
  */
 import type { ClassInfo, ClassMemberInfo, MethodInfo, ParameterInfo } from '../../engine/types';
-import { roundedOrthoPath, type Point } from './svgUtils';
+import { clamp, measureText, roundedOrthoPath, type Point } from './svgUtils';
 
 export interface Metrics {
+  compact: boolean;
   boxW: number;
   headerH: number;
   baseRowH: number;
@@ -59,6 +60,7 @@ export interface ClassLayout {
 export function classMetricsFor(compact: boolean): Metrics {
   return compact
     ? {
+        compact: true,
         boxW: 236,
         headerH: 42,
         baseRowH: 13,
@@ -74,6 +76,7 @@ export function classMetricsFor(compact: boolean): Metrics {
         tagFont: 8.5,
       }
     : {
+        compact: false,
         boxW: 278,
         headerH: 48,
         baseRowH: 15,
@@ -97,26 +100,69 @@ export function shortName(name: string): string {
 }
 
 export function formatParam(param: ParameterInfo): string {
-  const type = (param.typeText || '').trim() || 'int';
+  const rawType = (param.typeText || '').trim() || 'int';
+  let type = rawType;
+  if (param.isPointer && !/[*&]$/.test(type)) type += '*';
+  if (param.isReference && !/&$/.test(type)) type += '&';
   const name = (param.name || '').trim();
   if (!name) return type;
   const glue = /[*&]$/.test(type) ? '' : ' ';
   return `${type}${glue}${name}`;
 }
 
+/** 清洗引擎可能混入的修饰符，returnType 只保留真正的返回类型 */
+export function cleanReturnType(typeText: string | undefined): string {
+  let text = (typeText || '').trim();
+  const noise = /^(?:virtual|static|inline|explicit|constexpr|friend)\b\s*/i;
+  let guard = 0;
+  while (noise.test(text) && guard < 8) {
+    text = text.replace(noise, '').trim();
+    guard += 1;
+  }
+  text = text.replace(/\s*=\s*0\s*$/, '').trim();
+  text = text.replace(/\s+(?:override|final)\s*$/i, '').trim();
+  return text || 'void';
+}
+
 export function methodSignature(method: MethodInfo): string {
   const params = (method.params ?? []).map(formatParam).join(', ');
   const isCtor = method.kind === 'constructor' || method.kind === 'destructor';
-  const virtual = method.isVirtual && method.kind === 'method' ? 'virtual ' : '';
   const constPart = method.isConst ? ' const' : '';
   const pure = method.isPureVirtual ? ' = 0' : '';
-  if (isCtor) return `${virtual}${method.name}(${params})${pure}`;
-  return `${virtual}${method.name}(${params})${constPart}: ${method.returnType || 'void'}${pure}`;
+  if (isCtor) return `${method.name}(${params})${pure}`;
+  const returnType = cleanReturnType(method.returnType);
+  return `${method.name}(${params})${constPart}: ${returnType}${pure}`;
 }
 
 export function fieldSignature(field: ClassMemberInfo): string {
   const suffix = `${field.isStatic ? ' static' : ''}${field.isConst ? ' const' : ''}`;
   return `${field.name}: ${field.typeText || 'auto'}${suffix}`;
+}
+
+/** 按成员签名自适应盒子宽度：长签名加宽，上限 360 / compact 300 */
+function boxWidthFor(cls: ClassInfo, m: Metrics): number {
+  const minWidth = m.compact ? 236 : 278;
+  const maxWidth = m.compact ? 300 : 360;
+  const virtualRoom = (cls.methods ?? []).some((method) => method.isVirtual || method.isPureVirtual)
+    ? m.compact
+      ? 34
+      : 42
+    : 0;
+  const nameWidth = measureText(cls.name, m.nameFont) + 62;
+  const baseWidth = (cls.bases ?? []).length
+    ? measureText(`: ${(cls.bases ?? []).join(', ')}`, m.tagFont) + 28
+    : 0;
+  let width = Math.max(nameWidth, baseWidth);
+  for (const field of cls.fields ?? []) {
+    width = Math.max(width, measureText(fieldSignature(field), m.memberFont) + 30 + 14);
+  }
+  for (const method of cls.methods ?? []) {
+    width = Math.max(
+      width,
+      measureText(methodSignature(method), m.memberFont) + 30 + 14 + virtualRoom,
+    );
+  }
+  return clamp(Math.ceil(width), minWidth, maxWidth);
 }
 
 function buildLocalBox(cls: ClassInfo, m: Metrics): LocalBox {
@@ -131,7 +177,7 @@ function buildLocalBox(cls: ClassInfo, m: Metrics): LocalBox {
   const h = methodsTop + methodsAreaH + 11;
   return {
     cls,
-    w: m.boxW,
+    w: boxWidthFor(cls, m),
     headerH,
     h,
     fieldsTop,

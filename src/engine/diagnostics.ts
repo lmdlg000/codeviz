@@ -140,11 +140,21 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
     for (const local of record.locals) {
       if (local.isArray && local.arrayDims) arraysInScope.set(local.name, local.arrayDims);
     }
+    const pointerNames = new Set<string>();
+    for (const global of model.globals) if (global.isPointer) pointerNames.add(global.name);
+    for (const local of record.locals) if (local.isPointer) pointerNames.add(local.name);
+    for (const param of record.params) if (param.isPointer) pointerNames.add(param.name);
 
-    // 2. 非 void 函数缺少返回值
+    // 2. 非 void 函数缺少返回值（构造函数 / 析构函数不算）
+    const returnTypeText = record.node.returnType.trim();
+    const voidLike =
+      returnTypeText === '' ||
+      record.node.isConstructor === true ||
+      record.node.isDestructor === true ||
+      /^void$/.test(returnTypeText);
     if (
       record.node.name !== 'main' &&
-      !/^\s*void\s*$/.test(record.node.returnType) &&
+      !voidLike &&
       !record.hasReturnOnAllPaths
     ) {
       add(
@@ -225,7 +235,11 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
           const spec = conversions[i];
           const arg = args[i];
           if (scanfNeedsAddress(spec)) {
-            if (!(arg.kind === 'unary' && arg.op === '&')) {
+            const isAddress = arg.kind === 'unary' && arg.op === '&';
+            // 数组 / 指针本身就会退化成地址，scanf("%d", arr) 是合法的
+            const isDecayedPointer =
+              arg.kind === 'ident' && (arraysInScope.has(arg.name) || pointerNames.has(arg.name));
+            if (!isAddress && !isDecayedPointer) {
               add(
                 'warning',
                 `scanf 的 %${spec.conv} 需要变量的地址，应写成 &变量名。`,
@@ -235,7 +249,9 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
               );
             }
           } else if (spec.conv === 's') {
-            if (!(arg.kind === 'ident' && arraysInScope.has(arg.name)) && !(arg.kind === 'unary' && arg.op === '&')) {
+            const isArrayArg = arg.kind === 'ident' && arraysInScope.has(arg.name);
+            const isPointerArg = arg.kind === 'ident' && pointerNames.has(arg.name);
+            if (!isArrayArg && !isPointerArg && !(arg.kind === 'unary' && arg.op === '&')) {
               add(
                 'info',
                 'scanf 的 %s 需要字符数组（或已指向缓冲区的指针）。',

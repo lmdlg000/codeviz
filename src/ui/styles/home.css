@@ -106,8 +106,12 @@
 .hero-visual {
   position: relative;
   min-height: 430px;
+  max-width: 100%;
+  min-width: 0;
   border-radius: var(--radius-xl);
   isolation: isolate;
+  /* 约束叠层卡片与浮动 badge，任何宽度下都不越出视觉容器 */
+  overflow: hidden;
 }
 
 .hero-visual__grid {
@@ -133,16 +137,16 @@
 
 .hero-code-card {
   position: absolute;
-  left: 0;
+  left: 8px;
   top: 18px;
-  width: 76%;
+  width: 74%;
   max-width: 420px;
   border-radius: 15px;
   overflow: hidden;
   background: var(--code-bg);
   border: 1px solid rgba(148, 163, 184, 0.18);
   box-shadow: 0 28px 60px -32px rgba(15, 23, 42, 0.6);
-  transform: rotate(-2deg);
+  transform: rotate(-1.6deg);
   z-index: 1;
 }
 
@@ -185,16 +189,16 @@
 
 .hero-flow-card {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 72%;
+  right: 20px;
+  bottom: 10px;
+  width: 70%;
   max-width: 348px;
   padding: 13px 14px 10px;
   background: var(--bg-elevated);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  transform: rotate(1.4deg);
+  transform: rotate(1.2deg);
   z-index: 2;
 }
 
@@ -279,8 +283,8 @@
 }
 
 .hero-badge--decision {
-  top: 30px;
-  right: 6px;
+  top: 28px;
+  right: 26px;
 }
 
 .hero-badge--loop {

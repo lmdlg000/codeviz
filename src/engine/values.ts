@@ -261,7 +261,20 @@ export function charsOf(value: RValue): string | null {
     }
     return chars.join('');
   }
-  if (value.t === 'pointer' && value.str !== undefined) return value.str;
+  if (value.t === 'pointer') {
+    if (value.str !== undefined) return value.str;
+    // 指向字符数组的指针也能当字符串使用
+    if (value.array && /char/i.test(value.array.elemType)) {
+      const chars: string[] = [];
+      for (let i = value.offset; i < value.array.elems.length; i++) {
+        const element = value.array.elems[i];
+        if (element.t !== 'int') return null;
+        if (element.v === 0) break;
+        chars.push(String.fromCharCode(element.v));
+      }
+      return chars.join('');
+    }
+  }
   return null;
 }
 

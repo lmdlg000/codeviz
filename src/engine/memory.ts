@@ -101,7 +101,6 @@ function pointerTargetOf(init: ExprNode | undefined): string | undefined {
 }
 
 function cellFromVariable(
-  model: AnalysisModel,
   variableId: string,
   name: string,
   typeText: string,
@@ -133,7 +132,6 @@ function cellFromVariable(
       if (target) cell.pointerTarget = target;
     }
   }
-  void model;
   return cell;
 }
 
@@ -217,7 +215,6 @@ function collectHeap(model: AnalysisModel): MemoryCell[] {
 export function buildMemoryModel(model: AnalysisModel): MemoryModel {
   const globals: MemoryCell[] = model.globals.map((variable) =>
     cellFromVariable(
-      model,
       variable.id,
       variable.name,
       variable.typeText,
@@ -254,7 +251,6 @@ export function buildMemoryModel(model: AnalysisModel): MemoryModel {
     for (const local of record.locals) {
       cells.push(
         cellFromVariable(
-          model,
           local.id,
           local.name,
           local.typeText,

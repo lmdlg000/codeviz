@@ -149,6 +149,8 @@ class Interpreter {
   private input: string;
   private inputPos = 0;
   private currentLine = 1;
+  /** 全局变量初始化期间不记录步骤，保证首步是 start */
+  private quiet = false;
   private functionMap = new Map<string, FuncDeclNode>();
   private classMap = new Map<string, ClassDeclNode>();
   private enumValues: Map<string, number>;
@@ -180,7 +182,9 @@ class Interpreter {
       return this.unsupportedResult(1, '没有找到 main 函数，无法执行。');
     }
     try {
+      this.quiet = true;
       this.initGlobals();
+      this.quiet = false;
       this.emit({ event: 'start', description: '开始执行 main 函数', line: mainFn.line }, true);
       this.callFunction(mainFn, [], mainFn.line);
       this.finishEnd(false);
@@ -302,6 +306,7 @@ class Interpreter {
     },
     force = false,
   ): void {
+    if (this.quiet) return;
     if (!force && this.steps.length >= this.stepLimit) {
       this.truncated = true;
       throw new StepLimitError();
@@ -453,7 +458,6 @@ class Interpreter {
           declarator,
           decl.typeSpec.base,
           typeText,
-          decl.typeSpec.isConst,
         );
         this.declareGlobal(declarator.name, value, typeText);
       }
@@ -585,7 +589,7 @@ class Interpreter {
     for (const declarator of stmt.decl.declarators) {
       if (!declarator.name) continue;
       const typeText = this.declTypeText(typeSpec.text, declarator);
-      const value = this.instantiateDeclarator(declarator, typeSpec.base, typeText, typeSpec.isConst);
+      const value = this.instantiateDeclarator(declarator, typeSpec.base, typeText);
       this.declare(declarator.name, value, typeText, typeSpec.isConst);
       this.emit({
         event: 'declare',
@@ -777,9 +781,7 @@ class Interpreter {
     declarator: { name: string; pointerDepth: number; isReference: boolean; arrayDims: (number | null)[]; init?: ExprNode },
     base: string,
     typeText: string,
-    isConst: boolean,
   ): RValue {
-    void isConst;
     if (declarator.arrayDims.length > 0) {
       const dims = declarator.arrayDims.map((d) => (d === null ? 0 : d));
       return this.createArray(base, declarator.pointerDepth, dims, declarator.init);
@@ -1165,10 +1167,10 @@ class Interpreter {
     }
     const left = this.evalExpr(expr.left);
     const right = this.evalExpr(expr.right);
-    return this.binaryOp(expr.op, left, right, expr.line, expr);
+    return this.binaryOp(expr.op, left, right, expr.line);
   }
 
-  private binaryOp(op: string, left: RValue, right: RValue, line: number, expr?: ExprNode): RValue {
+  private binaryOp(op: string, left: RValue, right: RValue, line: number): RValue {
     // 字符串拼接 / 比较
     if (op === '+' && (left.t === 'string' || right.t === 'string')) {
       return stringValue(this.toText(left) + this.toText(right));
@@ -1189,16 +1191,16 @@ class Interpreter {
       return boolValue(op === '==' ? equal : !equal);
     }
     if (right.t === 'pointer' && (op === '==' || op === '!=')) {
-      return this.binaryOp(op, right, left, line, expr);
+      return this.binaryOp(op, right, left, line);
     }
 
     switch (op) {
       case '+':
-        return this.arithmetic(left, right, (a, b) => a + b, line);
+        return this.arithmetic(left, right, (a, b) => a + b);
       case '-':
-        return this.arithmetic(left, right, (a, b) => a - b, line);
+        return this.arithmetic(left, right, (a, b) => a - b);
       case '*':
-        return this.arithmetic(left, right, (a, b) => a * b, line);
+        return this.arithmetic(left, right, (a, b) => a * b);
       case '/': {
         const divisor = asNumber(right);
         if (divisor === 0) throw new SimError('除数为 0，无法继续执行。', line);
@@ -1240,14 +1242,12 @@ class Interpreter {
       default:
         throw new SimError(`运算符 ${op} 暂不支持单步执行。`, line, 'unsupported');
     }
-    void expr;
   }
 
   private arithmetic(
     left: RValue,
     right: RValue,
     operation: (a: number, b: number) => number,
-    line: number,
   ): RValue {
     const a = asNumber(left);
     const b = asNumber(right);
@@ -1255,7 +1255,6 @@ class Interpreter {
     if (left.t === 'float' || right.t === 'float') {
       return floatValue(result, this.resultFloatType(left, right));
     }
-    void line;
     return intValue(result, this.resultIntType(left, right));
   }
 
@@ -1286,7 +1285,7 @@ class Interpreter {
     if (baseOp === '+' && (current.t === 'string' || right.t === 'string')) {
       next = stringValue(this.toText(current) + this.toText(right));
     } else {
-      next = this.binaryOp(baseOp, current, right, expr.line, expr);
+      next = this.binaryOp(baseOp, current, right, expr.line);
     }
     const value = this.coerceForRef(next, ref);
     ref.set(value);
@@ -1694,14 +1693,14 @@ class Interpreter {
       if (!argExpr) {
         throw new SimError(`printf 的格式串需要更多参数（缺少第 ${argIndex - 1} 个）。`, expr.line);
       }
-      out += this.formatSpecValue(spec, this.evalExpr(argExpr), expr.line);
+      out += this.formatSpecValue(spec, this.evalExpr(argExpr));
     }
     out += format.slice(cursor);
     this.printOutput(out, expr.line);
     return intValue(out.length);
   }
 
-  private formatSpecValue(spec: FormatSpec, value: RValue, line: number): string {
+  private formatSpecValue(spec: FormatSpec, value: RValue): string {
     let text: string;
     switch (spec.conv) {
       case 'd':
@@ -1758,7 +1757,6 @@ class Interpreter {
       default:
         return spec.raw;
     }
-    void line;
     return this.padText(text, spec);
   }
 
