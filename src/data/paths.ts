@@ -44,6 +44,7 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c10-files',
       'c14-bits',
       'cpp-first',
+      'cpp-memory',
       'c11-classes',
       'c12-inheritance',
       'c13-templates'
@@ -66,6 +67,7 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c05-loops',
       'c06-arrays',
       'c07-functions',
+      'cpp-memory',
       'c11-classes',
       'c12-inheritance',
       'c13-templates'
@@ -77,6 +79,7 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c03-operators': '运算符两边完全一致，只是输出改成 `cout`。',
       'c06-arrays': '先用 `std::vector<int>` 完成同样的遍历与排序，数组留作理解内存布局的底层视角。',
       'c07-functions': 'C++ 还支持函数重载与默认参数：函数名可以相同，参数表不同即可。',
+      'cpp-memory': '堆内存必须先学：`new` / `delete`、泄漏与重复释放，单步执行里能直接看到堆块。',
       'c11-classes': 'C++ 的真正主场：从这里开始，`struct` 与 `class` 只差默认访问权限。',
       'c12-inheritance': '多态必须靠虚函数，记得把基类析构函数写成 `virtual`。',
       'c13-templates': '模板 + STL 是 C++ 生产力的来源，`vector` / `map` / `sort` 要能熟练用。'

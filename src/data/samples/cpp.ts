@@ -8,6 +8,63 @@ import type { CodeSample } from '../types';
  */
 const samples: CodeSample[] = [
   {
+    id: 'cpp-heap-array',
+    title: '堆上开一个数组',
+    description: '长度在运行时才确定：new int[n] 申请、下标读写、求和、delete[] 归还，单步执行里能看见堆块。',
+    language: 'cpp',
+    code: `#include <iostream>
+
+int main() {
+  int n = 5;
+  int* a = new int[n];
+
+  for (int i = 0; i < n; i++) {
+    a[i] = i * i;
+  }
+
+  int sum = 0;
+  for (int i = 0; i < n; i++) {
+    sum += a[i];
+  }
+
+  std::cout << "sum = " << sum << std::endl;
+
+  delete[] a;
+  a = nullptr;
+  return 0;
+}`,
+    tags: ['动态内存', 'new', 'delete[]'],
+    level: 2,
+    focus: 'trace'
+  },
+  {
+    id: 'cpp-heap-leak',
+    title: '忘了 delete 会怎样',
+    description: '同一段逻辑，一个函数释放了内存、另一个没有。运行单步执行，看「堆内存检查」如何指出泄漏。',
+    language: 'cpp',
+    code: `#include <iostream>
+
+int* makeBlock(int value) {
+  int* p = new int(value);
+  return p;
+}
+
+int main() {
+  int* a = makeBlock(11);
+  std::cout << "*a = " << *a << std::endl;
+  delete a;
+  a = nullptr;
+
+  int* b = makeBlock(22);
+  std::cout << "*b = " << *b << std::endl;
+  // 故意不释放 b：堆内存检查会报告 1 处泄漏
+  return 0;
+}`,
+    tags: ['动态内存', '内存泄漏', '自查'],
+    level: 3,
+    focus: 'trace'
+  },
+  {
     id: 'cpp-hello',
     title: 'C++ 的第一次问候',
     description: '用固定变量演示 cout 的链式输出：文本与数值交替拼接，最后算出一个带小数的结果。',

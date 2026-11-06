@@ -384,6 +384,35 @@ export interface RuntimeVar {
   scopeDepth?: number;
 }
 
+/** 单步执行时的堆块快照（new 出来的内存） */
+export interface HeapBlockSnapshot {
+  id: number;
+  /** 展示名，例如 heap#1 */
+  label: string;
+  /** 元素类型，例如 int / Student */
+  elemType: string;
+  isArray: boolean;
+  /** 元素个数，标量为 1 */
+  length: number;
+  /** 元素文本，最多展示前 16 个 */
+  values: string[];
+  /** 还有多少元素没展示 */
+  hidden: number;
+  freed: boolean;
+  /** 申请时的源码行 */
+  line: number;
+  /** 当前指向它的变量名 */
+  owners: string[];
+}
+
+/** 堆内存问题：泄漏 / 重复释放 / 释放后使用 */
+export interface TraceHeapIssue {
+  kind: 'leak' | 'double-free' | 'use-after-free' | 'invalid-free';
+  message: string;
+  line?: number;
+  blockId?: number;
+}
+
 export interface TraceStep {
   index: number;
   line: number;
@@ -401,6 +430,8 @@ export interface TraceStep {
   /** 可选：对应流程图节点 id，用于联动高亮 */
   flowNodeId?: string;
   conditionResult?: boolean;
+  /** 堆上的内存块（没有 new 时不出现） */
+  heap?: HeapBlockSnapshot[];
 }
 
 export interface TraceError {
@@ -421,6 +452,10 @@ export interface TraceResult {
   interpreterNote?: string;
   /** 执行过程中从 stdin 消费掉的输入 */
   stdinConsumed?: string;
+  /** 堆内存问题（泄漏、重复释放等） */
+  heapIssues?: TraceHeapIssue[];
+  /** 运行期间同时存在的最大堆块数 */
+  heapPeak?: number;
 }
 
 export interface SimulateOptions {

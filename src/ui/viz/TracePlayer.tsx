@@ -225,6 +225,10 @@ export function TracePlayer({
   const shownVars = compact ? vars.slice(0, 8) : vars;
   const hiddenVars = vars.length - shownVars.length;
   const callStack = current?.callStack ?? [];
+  const heap = current?.heap ?? [];
+  const liveHeap = heap.filter((block) => !block.freed);
+  const heapIssues = trace.heapIssues ?? [];
+  const heapLeaks = heapIssues.filter((issue) => issue.kind === 'leak');
   const stdout = current?.stdout ?? '';
   const outputLines = stdout.length === 0 ? 0 : stdout.split('\n').length;
   const stepNumber = Math.min(index, steps.length - 1) + 1;
@@ -404,6 +408,57 @@ export function TracePlayer({
             </div>
           </div>
 
+          {heap.length > 0 ? (
+            <div className="cvz-trace__section">
+              <div className="cvz-trace__section-head">
+                <span>堆</span>
+                <span className="cvz-trace__count">
+                  {liveHeap.length} 块在用 / 共 {heap.length} 块
+                </span>
+              </div>
+              <div className="cvz-heap">
+                {heap.map((block) => (
+                  <div
+                    className={`cvz-heap__block${block.freed ? ' is-freed' : ''}`}
+                    key={block.id}
+                  >
+                    <div className="cvz-heap__head">
+                      <span className="cvz-heap__label">{block.label}</span>
+                      <span className="cvz-heap__type">
+                        {block.elemType}
+                        {block.isArray ? `[${block.length}]` : ''}
+                      </span>
+                      {block.freed ? (
+                        <span className="cvz-heap__state cvz-heap__state--freed">已释放</span>
+                      ) : block.owners.length === 0 ? (
+                        <span className="cvz-heap__state cvz-heap__state--orphan">无指针引用</span>
+                      ) : (
+                        <span className="cvz-heap__state">在用</span>
+                      )}
+                    </div>
+                    <div className="cvz-heap__cells" aria-label={`${block.label} 的元素`}>
+                      {block.values.map((value, valueIndex) => (
+                        <span className="cvz-heap__cell" key={valueIndex}>
+                          <span className="cvz-heap__cell-index">{valueIndex}</span>
+                          <span className="cvz-heap__cell-value">{value}</span>
+                        </span>
+                      ))}
+                      {block.hidden > 0 ? (
+                        <span className="cvz-heap__more">+{block.hidden}</span>
+                      ) : null}
+                    </div>
+                    <div className="cvz-heap__meta">
+                      <span className="cvz-heap__line">L{block.line} new</span>
+                      <span className="cvz-heap__owners">
+                        {block.owners.length > 0 ? `← ${block.owners.join(', ')}` : '没有变量指向它'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="cvz-trace__section cvz-trace__output">
             <div className="cvz-trace__section-head">
               <span>输出</span>
@@ -422,6 +477,40 @@ export function TracePlayer({
               </pre>
             )}
           </div>
+          {heapIssues.length > 0 ? (
+            <div className="cvz-trace__section cvz-trace__heap-issues">
+              <div className="cvz-trace__section-head">
+                <span>堆内存检查</span>
+                <span className="cvz-trace__count">
+                  {heapLeaks.length > 0 ? `${heapLeaks.length} 处泄漏` : `${heapIssues.length} 条`}
+                </span>
+              </div>
+              <ul className="cvz-heap-issues">
+                {heapIssues.map((issue, issueIndex) => (
+                  <li
+                    className={`cvz-heap-issues__item cvz-heap-issues__item--${issue.kind}`}
+                    key={`${issue.kind}-${issueIndex}`}
+                  >
+                    <span className="cvz-heap-issues__kind">
+                      {issue.kind === 'leak'
+                        ? '泄漏'
+                        : issue.kind === 'double-free'
+                          ? '重复释放'
+                          : issue.kind === 'use-after-free'
+                            ? '释放后使用'
+                            : '非法释放'}
+                    </span>
+                    <span className="cvz-heap-issues__text">{issue.message}</span>
+                  </li>
+                ))}
+              </ul>
+              {heapLeaks.length > 0 ? (
+                <p className="cvz-heap-issues__hint">
+                  程序已经结束，但这些内存还在堆上。C++ 不会自动回收 new 出来的内存，记得配对写 delete。
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </section>
       </div>
 

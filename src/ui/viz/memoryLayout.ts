@@ -246,7 +246,7 @@ export function buildMemoryLayout(memory: MemoryModel | null | undefined, compac
       bytes: sumBytes(globals),
       cells: flow.boxes,
       frames: [],
-      emptyText: '没有全局变量',
+      emptyText: globals.length === 0 ? '没有全局变量' : '',
     });
     cursor += h + sectionGap;
   }
@@ -310,7 +310,7 @@ export function buildMemoryLayout(memory: MemoryModel | null | undefined, compac
       bytes: sumBytes(heap),
       cells: flow.boxes,
       frames: [],
-      emptyText: '没有发现显式的堆分配（new / malloc）',
+      emptyText: heap.length === 0 ? '没有发现显式的堆分配（new / malloc）' : '',
     });
     cursor += h;
   }

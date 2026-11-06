@@ -80,9 +80,9 @@ function checkExpression(
 ): UnsupportedIssue | null {
   switch (expr.kind) {
     case 'new':
-      return { line: expr.line, message: '动态内存 new / delete 暂不支持单步执行。' };
     case 'delete':
-      return { line: expr.line, message: 'delete 暂不支持单步执行。' };
+      // 堆内存已支持：解释器会分配真实堆块、跟踪 delete，并在结束时报告泄漏
+      return null;
     case 'lambda':
       return { line: expr.line, message: 'lambda 表达式暂不支持单步执行。' };
     case 'unknown':

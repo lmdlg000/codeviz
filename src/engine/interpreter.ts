@@ -8,7 +8,16 @@
  * - 指针用 Ref（可读写引用）表示，支持 &x、*p、指针交换、指向数组元素；
  * - 只支持教学子集，遇到不支持的写法立即返回 supported=false。
  */
-import type { SimulateOptions, TraceError, TraceEvent, TraceResult, TraceStep, RuntimeVar } from './types';
+import type {
+  HeapBlockSnapshot,
+  RuntimeVar,
+  SimulateOptions,
+  TraceError,
+  TraceEvent,
+  TraceHeapIssue,
+  TraceResult,
+  TraceStep,
+} from './types';
 import type { ClassDeclNode, ExprNode, FieldDeclNode, FuncDeclNode, ParamNode, ProgramNode, StmtNode } from './ast';
 import type { FormatSpec } from './io';
 import { flattenBinaryChain, parseFormat, rootName } from './io';
@@ -135,6 +144,22 @@ function collectEnums(program: ProgramNode): Map<string, number> {
   return values;
 }
 
+/** 解释器内部的堆块：用 ArrayValue 统一承载，标量也当成 1 个元素的数组 */
+interface HeapBlock {
+  id: number;
+  label: string;
+  elemType: string;
+  isArray: boolean;
+  array: ArrayValue;
+  /** 指向数组第 0 个元素的引用，标量指针就用它 */
+  ref: Ref;
+  freed: boolean;
+  line: number;
+}
+
+const MAX_HEAP_BLOCKS = 64;
+const HEAP_PREVIEW = 16;
+
 /** 解释器主类 */
 class Interpreter {
   private program: ProgramNode;
@@ -154,6 +179,14 @@ class Interpreter {
   private functionMap = new Map<string, FuncDeclNode>();
   private classMap = new Map<string, ClassDeclNode>();
   private enumValues: Map<string, number>;
+  /** new 出来的堆块，按申请顺序排列 */
+  private heapBlocks: HeapBlock[] = [];
+  /** 数组对象 → 所属堆块，用于判断指针是否指向已释放内存 */
+  private heapIndex = new Map<ArrayValue, HeapBlock>();
+  private nextHeapId = 1;
+  private heapPeak = 0;
+  private heapIssues: TraceHeapIssue[] = [];
+  private leaksCollected = false;
 
   constructor(program: ProgramNode, options: SimulateOptions) {
     this.program = program;
@@ -221,6 +254,7 @@ class Interpreter {
   /* ============================== 结果 / 步骤 ============================== */
 
   private successResult(): TraceResult {
+    this.collectLeaks();
     return {
       ok: true,
       supported: true,
@@ -228,12 +262,16 @@ class Interpreter {
       output: this.outputText,
       truncated: this.truncated,
       maxSteps: this.stepLimit,
-      interpreterNote: '教学解释器子集：整数 / 浮点 / 字符 / 字符串、数组、循环、递归、指针基础与 struct 读写。',
+      interpreterNote:
+        '教学解释器子集：整数 / 浮点 / 字符 / 字符串、数组、循环、递归、指针基础、struct 读写，以及 new / delete 的堆内存。',
       stdinConsumed: this.input.slice(0, this.inputPos),
+      heapIssues: this.heapIssues,
+      heapPeak: this.heapPeak,
     };
   }
 
   private failureResult(error: TraceError, supported: boolean, truncated: boolean): TraceResult {
+    this.collectLeaks();
     return {
       ok: false,
       supported,
@@ -243,6 +281,8 @@ class Interpreter {
       truncated,
       maxSteps: this.stepLimit,
       stdinConsumed: this.input.slice(0, this.inputPos),
+      heapIssues: this.heapIssues,
+      heapPeak: this.heapPeak,
     };
   }
 
@@ -325,6 +365,8 @@ class Interpreter {
       callStack: this.frames.map((f) => ({ functionName: f.name, line: f.line })),
       stdout: this.outputText,
     };
+    const heap = this.heapSnapshot();
+    if (heap) step.heap = heap;
     if (options.conditionResult !== undefined) step.conditionResult = options.conditionResult;
     if (options.outputChunk !== undefined) step.outputChunk = options.outputChunk;
     this.steps.push(step);
@@ -1028,9 +1070,9 @@ class Interpreter {
       case 'sizeof':
         return intValue(this.sizeOfExpr(expr), 'int');
       case 'new':
-        throw new SimError('new 动态内存暂不支持单步执行。', expr.line, 'unsupported');
+        return this.evalNew(expr);
       case 'delete':
-        throw new SimError('delete 暂不支持单步执行。', expr.line, 'unsupported');
+        return this.evalDelete(expr);
       case 'initlist': {
         const elems = expr.items.map((item) =>
           item.kind === 'initlist' ? this.evalExpr({ ...item, kind: 'initlist' }) : this.evalExpr(item),
@@ -1480,6 +1522,189 @@ class Interpreter {
     return this.callFunction(fn, args, expr.line);
   }
 
+  /* ============================== 堆内存 ============================== */
+
+  /** new T / new T(初值) / new T[n]：分配一块堆内存并返回指向它的指针 */
+  private evalNew(expr: ExprNode & { kind: 'new' }): RValue {
+    const rawType = (expr.typeText || 'int').replace(/\s+/g, '');
+    const elemType = baseTypeName(rawType);
+    const base = lastSegment(elemType);
+    const isArray = Boolean(expr.arraySize);
+    const alive = this.heapBlocks.filter((block) => !block.freed).length;
+    if (alive >= MAX_HEAP_BLOCKS) {
+      throw new SimError(`堆上同时存在的内存块超过 ${MAX_HEAP_BLOCKS} 个，教学解释器停止继续分配。`, expr.line);
+    }
+
+    let length = 1;
+    if (isArray) {
+      length = expr.arraySize ? asInt(this.evalExpr(expr.arraySize)) : 0;
+      if (length <= 0) throw new SimError('new[] 的长度必须大于 0。', expr.line);
+    }
+
+    const cls = this.classMap.get(base);
+    const makeDefault = (): RValue =>
+      cls ? this.createStructValue(cls.name, undefined) : this.defaultScalar(base, elemType);
+    const elems: RValue[] = [];
+    for (let i = 0; i < length; i++) elems.push(makeDefault());
+
+    const typeText = isArray ? `${elemType}[${length}]` : elemType;
+    const array: ArrayValue = { t: 'array', elems, dims: [length], elemType, typeText };
+    const id = this.nextHeapId++;
+    const label = `heap#${id}`;
+    const block: HeapBlock = {
+      id,
+      label,
+      elemType,
+      isArray,
+      array,
+      ref: arrayElementRef(array, 0, `${label}[0]`),
+      freed: false,
+      line: expr.line,
+    };
+
+    // new int(5)：带初值；evaluate 放在登记之后，异常时也能在堆视图里看到这块内存
+    this.heapBlocks.push(block);
+    this.heapIndex.set(array, block);
+    this.heapPeak = Math.max(this.heapPeak, this.heapBlocks.filter((b) => !b.freed).length);
+
+    if (!isArray && expr.args.length > 0) {
+      array.elems[0] = coerceValue(this.evalExpr(expr.args[0]), elemType);
+    }
+
+    this.emit({
+      event: 'declare',
+      description: `new ${typeText} → ${label}（${length} 个 ${elemType}${isArray ? '' : '，值 ' + formatValue(array.elems[0])}）`,
+      line: expr.line,
+    });
+
+    return {
+      t: 'pointer',
+      label: `${label}[0]`,
+      target: block.ref,
+      elemType,
+      typeText: `${elemType}*`,
+      array,
+      offset: 0,
+    };
+  }
+
+  /** delete p / delete[] p：释放并标记，重复释放或释放后使用都给明确报错 */
+  private evalDelete(expr: ExprNode & { kind: 'delete' }): RValue {
+    const value = this.evalExpr(expr.expr);
+    if (value.t === 'null') {
+      this.emit({ event: 'assign', description: 'delete 空指针：什么也不会发生', line: expr.line });
+      return voidValue();
+    }
+    if (value.t !== 'pointer') {
+      throw new SimError(`delete 需要指针，${exprToText(expr.expr)} 不是指针。`, expr.line);
+    }
+    const block = value.array ? this.heapIndex.get(value.array) : undefined;
+    if (!block) {
+      this.heapIssues.push({
+        kind: 'invalid-free',
+        message: `第 ${expr.line} 行 delete 的地址不是 new 分配的`,
+        line: expr.line,
+      });
+      throw new SimError('这个地址不是 new 出来的，不能 delete。', expr.line);
+    }
+    if (block.freed) {
+      this.heapIssues.push({
+        kind: 'double-free',
+        message: `${block.label} 被重复释放（第 ${expr.line} 行，最初在第 ${block.line} 行 new）`,
+        line: expr.line,
+        blockId: block.id,
+      });
+      throw new SimError(
+        `${block.label} 已经在之前的 delete 里释放过了：重复释放是未定义行为，程序可能崩溃。`,
+        expr.line,
+      );
+    }
+    if (expr.isArray !== block.isArray) {
+      throw new SimError(
+        block.isArray
+          ? `${block.label} 是 new[] 申请的数组，必须用 delete[] 释放。`
+          : `${block.label} 是单个对象，应该用 delete 而不是 delete[]。`,
+        expr.line,
+      );
+    }
+    block.freed = true;
+    this.emit({
+      event: 'assign',
+      description: `delete${block.isArray ? '[]' : ''} ${block.label}（释放 ${block.array.elems.length} 个 ${block.elemType}）`,
+      line: expr.line,
+    });
+    return voidValue();
+  }
+
+  /** 指针指向的堆块是否已经被释放 */
+  private assertHeapAlive(array: ArrayValue | undefined, line: number): void {
+    if (!array) return;
+    const block = this.heapIndex.get(array);
+    if (!block || !block.freed) return;
+    this.heapIssues.push({
+      kind: 'use-after-free',
+      message: `第 ${line} 行使用了已释放的 ${block.label}（在第 ${block.line} 行 new，已 delete）`,
+      line,
+      blockId: block.id,
+    });
+    throw new SimError(
+      `${block.label} 已经被 delete 了，再去读写它就是「释放后使用」，结果不可预期。`,
+      line,
+    );
+  }
+
+  /** 当前堆状态快照，供 UI 逐步展示 */
+  private heapSnapshot(): HeapBlockSnapshot[] | undefined {
+    if (this.heapBlocks.length === 0) return undefined;
+    const owners = new Map<number, string[]>();
+    const note = (name: string, value: RValue): void => {
+      if (value.t !== 'pointer' || !value.array) return;
+      const block = this.heapIndex.get(value.array);
+      if (!block) return;
+      const list = owners.get(block.id) ?? [];
+      if (!list.includes(name)) list.push(name);
+      owners.set(block.id, list);
+    };
+    for (const slot of this.globalScope.vars.values()) note(slot.name, slot.value);
+    for (const frame of this.frames) {
+      for (const scope of frame.scopes) {
+        for (const slot of scope.vars.values()) note(slot.name, slot.value);
+      }
+    }
+
+    return this.heapBlocks.map((block) => {
+      const all = arrayElementTexts(block.array);
+      const values = all.slice(0, HEAP_PREVIEW);
+      return {
+        id: block.id,
+        label: block.label,
+        elemType: block.elemType,
+        isArray: block.isArray,
+        length: block.array.elems.length,
+        values,
+        hidden: Math.max(0, all.length - values.length),
+        freed: block.freed,
+        line: block.line,
+        owners: owners.get(block.id) ?? [],
+      };
+    });
+  }
+
+  /** 结束时统计泄漏：new 了但没有 delete 的块 */
+  private collectLeaks(): void {
+    if (this.leaksCollected) return;
+    this.leaksCollected = true;
+    for (const block of this.heapBlocks) {
+      if (block.freed) continue;
+      this.heapIssues.push({
+        kind: 'leak',
+        message: `${block.label}（${block.isArray ? `${block.elemType}[${block.array.elems.length}]` : block.elemType}）在第 ${block.line} 行 new 出来，程序结束前一直没有 delete`,
+        line: block.line,
+        blockId: block.id,
+      });
+    }
+  }
+
   private isTypeCastName(name: string): boolean {
     return /^(int|long|short|char|float|double|bool|unsigned|signed|size_t)$/.test(name);
   }
@@ -1565,6 +1790,7 @@ class Interpreter {
         if (absolute < 0 || absolute >= object.array.elems.length) {
           throw new SimError(`指针下标 ${index} 越界。`, line);
         }
+        this.assertHeapAlive(object.array, line);
         return object.array.elems[absolute];
       }
       if (index === 0 && object.target) return object.target.get();
@@ -1658,6 +1884,7 @@ class Interpreter {
       if (absolute < 0 || absolute >= value.array.elems.length) {
         throw new SimError('指针指向了数组范围之外。', line);
       }
+      this.assertHeapAlive(value.array, line);
       return value.array.elems[absolute];
     }
     if (value.target) return value.target.get();
