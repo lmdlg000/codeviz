@@ -10,8 +10,78 @@
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>CodeViz · C/C++ 图解工坊</title>
+    <style>
+      /* 兜底界面：样式必须内联，因为外链 CSS 也可能加载失败 */
+      .boot-fallback {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background: #070b09;
+        color: #d7f7e5;
+        font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei UI", monospace;
+        line-height: 1.7;
+      }
+
+      .boot-fallback__box {
+        max-width: 560px;
+        border: 1px solid #2d4438;
+        border-left: 2px solid #ffb454;
+        padding: 22px 24px;
+        background: #0c120f;
+      }
+
+      .boot-fallback__title {
+        margin: 0 0 10px;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+        color: #ffb454;
+      }
+
+      .boot-fallback__text {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: #8fb0a1;
+      }
+
+      .boot-fallback__code {
+        display: block;
+        margin: 0 0 16px;
+        padding: 8px 10px;
+        border-left: 2px solid #2d4438;
+        background: #050807;
+        color: #a8f5c0;
+        font-size: 12px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .boot-fallback__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .boot-fallback__btn {
+        padding: 8px 14px;
+        border: 1px solid #3bf08a;
+        background: #3bf08a;
+        color: #04150c;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .boot-fallback__btn--ghost {
+        background: transparent;
+        color: #3bf08a;
+      }
+    </style>
     <script>
-      // 首屏前决定主题：默认终端深色，用户显式切换过则尊重存储值
+      // 1) 首屏前决定主题：默认终端深色，用户显式切换过则尊重存储值
       (function () {
         try {
           var stored = localStorage.getItem('codeviz.theme');
@@ -20,10 +90,101 @@
           document.documentElement.dataset.theme = 'dark';
         }
       })();
+
+      // 2) 白屏兜底
+      // 发布后重新构建会换掉带 hash 的 JS 文件名；如果浏览器还缓存着旧的 HTML，
+      // 页面就会去请求已经不存在的 chunk，表现为「打开一片空白」。
+      // 这里捕获脚本加载失败与超时：先尝试带新参数重载一次（绕过 HTML 缓存），
+      // 仍然失败才显示可读的提示，绝不留白屏。
+      (function () {
+        var RELOAD_KEY = 'codeviz.boot.reloadAt';
+        var settled = false;
+
+        function rootIsEmpty() {
+          var root = document.getElementById('root');
+          return !root || root.childElementCount === 0;
+        }
+
+        function showFallback(detail) {
+          if (settled || !rootIsEmpty()) return;
+          settled = true;
+          var root = document.getElementById('root');
+          if (!root) return;
+          var box = document.createElement('div');
+          box.className = 'boot-fallback';
+          box.setAttribute('role', 'alert');
+          box.innerHTML =
+            '<div class="boot-fallback__box">' +
+            '<p class="boot-fallback__title">页面没能启动</p>' +
+            '<p class="boot-fallback__text">页面资源没有加载成功，通常是站点刚更新、浏览器缓存里还是旧版本。刷新一次即可。</p>' +
+            (detail ? '<code class="boot-fallback__code">' + detail + '</code>' : '') +
+            '<div class="boot-fallback__actions">' +
+            '<button type="button" class="boot-fallback__btn" id="boot-reload">重新加载</button>' +
+            '<button type="button" class="boot-fallback__btn boot-fallback__btn--ghost" id="boot-home">回到首页</button>' +
+            '</div></div>';
+          root.appendChild(box);
+          var reload = document.getElementById('boot-reload');
+          if (reload) reload.onclick = function () { hardReload(); };
+          var home = document.getElementById('boot-home');
+          if (home) home.onclick = function () { window.location.href = window.location.pathname; };
+        }
+
+        function hardReload() {
+          var url = window.location.pathname + '?r=' + Date.now() + window.location.hash;
+          window.location.replace(url);
+        }
+
+        function tryRecover(detail) {
+          if (settled || !rootIsEmpty()) return;
+          var last = 0;
+          try {
+            last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
+          } catch (error) {
+            last = 0;
+          }
+          // 30 秒内只自动重载一次，避免死循环
+          if (Date.now() - last > 30000) {
+            try {
+              sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+            } catch (error) {
+              /* ignore */
+            }
+            hardReload();
+            return;
+          }
+          showFallback(detail);
+        }
+
+        window.addEventListener(
+          'error',
+          function (event) {
+            var target = event.target;
+            if (target && target.tagName === 'SCRIPT') {
+              tryRecover('script failed: ' + (target.src || 'inline'));
+            }
+          },
+          true
+        );
+
+        window.addEventListener('load', function () {
+          window.setTimeout(function () {
+            if (!rootIsEmpty()) return;
+            tryRecover('app did not mount');
+          }, 6000);
+        });
+      })();
     </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div class="boot-fallback">
+        <div class="boot-fallback__box">
+          <p class="boot-fallback__title">需要启用 JavaScript</p>
+          <p class="boot-fallback__text">CodeViz 的代码分析与图表全部在浏览器本地运行，请允许本站执行 JavaScript 后刷新。</p>
+        </div>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
