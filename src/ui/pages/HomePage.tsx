@@ -256,6 +256,9 @@ export function HomePage() {
               打开代码实验室
             </ButtonLink>
           </div>
+          <p className="home-hero__path">
+            已经决定用 C++？<a href={hrefFor('/learn?path=cpp')}>走 C++ 直达路线</a>，指针、文件、位运算都可以晚点再看。
+          </p>
           <p className="home-hero__meta">
             <span>{lessons.length} 节课程</span>
             <span aria-hidden="true">·</span>

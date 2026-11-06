@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   quiz: (lessonId: string) => `${PREFIX}quiz.${lessonId}`,
   labDraft: `${PREFIX}lab.draft`,
   theme: `${PREFIX}theme`,
+  path: `${PREFIX}path`,
 } as const;
 
 export const SESSION_KEYS = {

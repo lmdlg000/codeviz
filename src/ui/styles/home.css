@@ -1039,3 +1039,19 @@
     width: 100%;
   }
 }
+
+/* 首页：C++ 直达入口 */
+.home-hero__path {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+
+.home-hero__path a {
+  color: var(--primary);
+  border-bottom: 1px dashed currentColor;
+}
+
+.home-hero__path a:hover {
+  border-bottom-style: solid;
+}
