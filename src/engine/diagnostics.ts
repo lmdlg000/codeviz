@@ -82,6 +82,21 @@ const STD_FUNCTION_NAMES: ReadonlySet<string> = new Set([
   'at',
 ]);
 
+/** 可以出现在「函数式转换」位置的类型名：char(x) / int(x) / size_t(x) 等 */
+const CAST_LIKE_NAMES: ReadonlySet<string> = new Set([
+  'char',
+  'short',
+  'int',
+  'long',
+  'float',
+  'double',
+  'bool',
+  'unsigned',
+  'signed',
+  'size_t',
+  'void',
+]);
+
 const TARGET_CAP = 40;
 
 export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
@@ -353,6 +368,8 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
       const name = call.callee;
       if (!name || reportedCalls.has(name)) continue;
       if (knownFunctionNames.has(name) || STD_FUNCTION_NAMES.has(name)) continue;
+      // 函数式类型转换：char('0' + x)、int(f)、double(v) 都是内置类型名，不是函数调用
+      if (CAST_LIKE_NAMES.has(name)) continue;
       reportedCalls.add(name);
       add(
         'info',
@@ -366,7 +383,11 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
 
   // 12. 重复定义
   const seenDefinitions = new Map<string, number>();
+  const visitedNodes = new Set<FuncDeclNode>();
   const visitFunction = (fn: FuncDeclNode): void => {
+    // 成员函数会同时出现在 program.functions 与 class.methods 里，按节点去重
+    if (visitedNodes.has(fn)) return;
+    visitedNodes.add(fn);
     if (!fn.body) return;
     const key = `${fn.className ?? ''}|${fn.name}|${fn.params.map((p) => p.typeText).join(',')}`;
     const first = seenDefinitions.get(key);

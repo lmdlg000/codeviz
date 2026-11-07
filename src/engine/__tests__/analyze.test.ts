@@ -750,3 +750,46 @@ int main() { return 0; }
     expect(result.diagnostics.filter((d) => d.severity === 'error')).toHaveLength(0);
   });
 });
+
+describe('analyzeCode：C++ 类与运算符重载（BigInt 示例）', () => {
+  // 用示例库里真实上线的那份代码做回归：类外定义、运算符重载、深拷贝、new/delete[]
+  const BIGINT = samples.find((sample) => sample.id === 'cpp-bigint')?.code ?? '';
+
+  it('示例存在且能被完整解析', () => {
+    expect(BIGINT.length).toBeGreaterThan(1000);
+    const result = analyzeCode(BIGINT, { filename: 'bigint.cpp' });
+    expect(result.parseErrors).toBe(0);
+    expect(result.functions.some((fn) => fn.name === 'main')).toBe(true);
+  });
+
+  it('类结构完整：4 个字段 + 构造/析构/运算符重载', () => {
+    const result = analyzeCode(BIGINT, { filename: 'bigint.cpp' });
+    expect(result.classes).toHaveLength(1);
+    const cls = result.classes[0];
+    expect(cls.name).toBe('BigInt');
+    expect(cls.fields).toHaveLength(4);
+    expect(cls.methods.length).toBeGreaterThanOrEqual(15);
+    const names = cls.methods.map((method) => method.name);
+    expect(names).toContain('~BigInt');
+    expect(names.some((name) => name.includes('operator'))).toBe(true);
+  });
+
+  it('成员函数不被误报重复定义，char(x) 不被当成未定义函数', () => {
+    const result = analyzeCode(BIGINT, { filename: 'bigint.cpp' });
+    const rules = new Set(result.diagnostics.map((d) => d.rule));
+    expect(rules.has('duplicate-definition')).toBe(false);
+    expect(rules.has('undefined-function')).toBe(false);
+  });
+
+  it('整份代码没有 error 级诊断', () => {
+    const result = analyzeCode(BIGINT, { filename: 'bigint.cpp' });
+    expect(result.diagnostics.filter((d) => d.severity === 'error')).toHaveLength(0);
+  });
+
+  it('调用图包含成员函数与运算符重载', () => {
+    const result = analyzeCode(BIGINT, { filename: 'bigint.cpp' });
+    expect(result.callGraph.nodes.length).toBeGreaterThanOrEqual(15);
+    const labels = result.callGraph.nodes.map((node) => node.name).join(' ');
+    expect(labels).toContain('operator');
+  });
+});

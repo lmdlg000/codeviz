@@ -170,3 +170,87 @@ int main() {
     expect(result.output).toBe('7\n');
   });
 });
+
+describe('simulate：malloc / calloc / free', () => {
+  it('malloc(n * sizeof(int)) 还原成 int 数组，free 后标记释放', () => {
+    const result = simulate(`
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+  int n = 3;
+  int *a = (int*)malloc(n * sizeof(int));
+  for (int i = 0; i < n; i++) a[i] = i + 1;
+  printf("%d\\n", a[0] + a[2]);
+  free(a);
+  return 0;
+}
+`);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('4\n');
+    const last = result.steps[result.steps.length - 1].heap![0];
+    expect(last.elemType).toBe('int');
+    expect(last.length).toBe(3);
+    expect(last.freed).toBe(true);
+    expect((result.heapIssues ?? []).filter((issue) => issue.kind === 'leak')).toHaveLength(0);
+  });
+
+  it('calloc(n, sizeof(double)) 按元素类型申请', () => {
+    const result = simulate(`
+#include <stdlib.h>
+int main() {
+  double *p = (double*)calloc(2, sizeof(double));
+  p[1] = 1.5;
+  free(p);
+  return 0;
+}
+`);
+    expect(result.ok).toBe(true);
+    const block = result.steps[result.steps.length - 1].heap![0];
+    expect(block.elemType).toBe('double');
+    expect(block.length).toBe(2);
+    expect(block.values[1]).toBe('1.5');
+  });
+
+  it('忘记 free 会报告泄漏', () => {
+    const result = simulate(`
+#include <stdlib.h>
+int main() {
+  int *p = (int*)malloc(4 * sizeof(int));
+  p[0] = 1;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(true);
+    const leaks = (result.heapIssues ?? []).filter((issue) => issue.kind === 'leak');
+    expect(leaks).toHaveLength(1);
+  });
+
+  it('重复 free 被拦住', () => {
+    const result = simulate(`
+#include <stdlib.h>
+int main() {
+  int *p = (int*)malloc(2 * sizeof(int));
+  free(p);
+  free(p);
+  return 0;
+}
+`);
+    expect(result.ok).toBe(false);
+    expect(result.error?.message).toContain('重复释放');
+  });
+
+  it('free 之后按元素读写会被拦住', () => {
+    const result = simulate(`
+#include <stdlib.h>
+int main() {
+  int *p = (int*)malloc(2 * sizeof(int));
+  p[0] = 1;
+  free(p);
+  p[1] = 2;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(false);
+    expect(result.error?.message).toContain('释放后使用');
+  });
+});

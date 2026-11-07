@@ -836,6 +836,20 @@ function toFunctionInfo(record: FunctionRecord): FunctionInfo {
 
 /* ============================== 调用图 ============================== */
 
+const TYPE_CAST_NAMES: ReadonlySet<string> = new Set([
+  'char',
+  'short',
+  'int',
+  'long',
+  'float',
+  'double',
+  'bool',
+  'unsigned',
+  'signed',
+  'size_t',
+  'void',
+]);
+
 function buildCallGraph(model: AnalysisModel): CallGraph {
   const withBody = model.records.filter((r) => r.hasBody);
   const byName = new Map<string, FunctionRecord[]>();
@@ -874,8 +888,10 @@ function buildCallGraph(model: AnalysisModel): CallGraph {
     for (const call of caller.calls) {
       const target = resolve(call.callee, caller);
       if (!target) {
-        // 类名调用（隐式构造函数）不算"外部函数"
-        if (!model.classByName.has(call.callee)) external.add(call.callee);
+        // 类名调用（隐式构造函数）与函数式类型转换（char(x) / int(x)）都不算"外部函数"
+        if (!model.classByName.has(call.callee) && !TYPE_CAST_NAMES.has(call.callee)) {
+          external.add(call.callee);
+        }
         continue;
       }
       const key = `${caller.id}->${target.id}`;

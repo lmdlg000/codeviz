@@ -1084,6 +1084,14 @@ export class Parser {
         this.advance();
         const id = this.expectName();
         name = `~${id.text}`;
+      } else if (this.check('operator')) {
+        // 类外定义：BigInt& BigInt::operator=(const BigInt& o) —— 这里也要吃掉运算符符号
+        this.advance();
+        let opName = 'operator ';
+        while (!this.atEnd() && !this.check('(') && !this.check(';') && !this.check('{')) {
+          opName += this.advance().text;
+        }
+        name = opName.trim();
       } else if (this.peek().kind === 'ident' || this.peek().kind === 'keyword') {
         name = this.advance().text;
       } else {
@@ -1929,7 +1937,10 @@ export class Parser {
         this.pos = saved;
         return null;
       }
-      while (this.check('*') || this.check('&')) this.advance();
+      // 指针 / 引用的星号必须留在类型文本里，否则 (int*) 会退化成 (int)，
+      // 强转后的指针被当成整数转换，堆指针就丢了
+      let castText = spec.text;
+      while (this.check('*') || this.check('&')) castText += this.advance().text;
       if (!this.check(')')) {
         this.pos = saved;
         return null;
@@ -1939,7 +1950,7 @@ export class Parser {
         this.pos = saved;
         return null;
       }
-      return spec.text;
+      return castText;
     } catch {
       this.pos = saved;
       return null;

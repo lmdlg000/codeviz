@@ -145,7 +145,10 @@ function scanStatement(
       return { line: stmt.line, message: `${stmt.decl.typeSpec.text} 暂不支持单步执行。` };
     }
     if (registry.classes.has(base)) {
-      return { line: stmt.line, message: 'class 对象（含成员函数）暂不支持单步执行，可改用 struct 演示。' };
+      return {
+        line: stmt.line,
+        message: `这段代码声明了 class ${base} 的对象。类对象（含构造/析构、成员函数、运算符重载）暂不支持单步执行——可以切到「类图」看结构与「调用图」看函数关系；想逐步观察运算过程，把这一步改写成过程式代码再运行。`,
+      };
     }
     for (const declarator of stmt.decl.declarators) {
       if (declarator.isFunctionPointer) {
@@ -171,7 +174,10 @@ function scanFunction(
   if (depth > 24) return null;
   if (!fn.body) return null;
   if (fn.className) {
-    return { line: fn.line, message: '类成员函数暂不支持单步执行。' };
+    return {
+      line: fn.line,
+      message: `成员函数 ${fn.className}::${fn.name} 暂不支持单步执行（类对象模型尚未纳入解释器）。可以看「类图」与「调用图」，或在 main 里用过程式写法复现同一段运算。`,
+    };
   }
   if (fn.isTemplate) {
     return { line: fn.line, message: '模板函数暂不支持单步执行。' };

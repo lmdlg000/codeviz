@@ -1405,6 +1405,11 @@ class Interpreter {
         const text = String.fromCharCode(code);
         return intValue((name === 'toupper' ? text.toUpperCase() : text.toLowerCase()).charCodeAt(0), 'char');
       }
+      case 'malloc':
+      case 'calloc':
+        return this.evalMalloc(expr, name === 'calloc');
+      case 'free':
+        return this.evalFree(expr);
       case 'getchar': {
         const char = this.readRawChar('字符');
         return intValue(char.charCodeAt(0), 'char');
@@ -1524,31 +1529,27 @@ class Interpreter {
 
   /* ============================== 堆内存 ============================== */
 
-  /** new T / new T(初值) / new T[n]：分配一块堆内存并返回指向它的指针 */
-  private evalNew(expr: ExprNode & { kind: 'new' }): RValue {
-    const rawType = (expr.typeText || 'int').replace(/\s+/g, '');
-    const elemType = baseTypeName(rawType);
-    const base = lastSegment(elemType);
-    const isArray = Boolean(expr.arraySize);
-    const alive = this.heapBlocks.filter((block) => !block.freed).length;
+  /** 分配一块堆内存并返回指向它的指针（new 与 malloc 共用） */
+  private allocateBlock(
+    elemType: string,
+    length: number,
+    line: number,
+    isArray: boolean,
+  ): { block: HeapBlock; pointer: PointerValue } {
+    const alive = this.heapBlocks.filter((item) => !item.freed).length;
     if (alive >= MAX_HEAP_BLOCKS) {
-      throw new SimError(`堆上同时存在的内存块超过 ${MAX_HEAP_BLOCKS} 个，教学解释器停止继续分配。`, expr.line);
+      throw new SimError(`堆上同时存在的内存块超过 ${MAX_HEAP_BLOCKS} 个，教学解释器停止继续分配。`, line);
     }
-
-    let length = 1;
-    if (isArray) {
-      length = expr.arraySize ? asInt(this.evalExpr(expr.arraySize)) : 0;
-      if (length <= 0) throw new SimError('new[] 的长度必须大于 0。', expr.line);
-    }
-
+    const safeLength = Math.max(1, length);
+    const base = lastSegment(elemType);
     const cls = this.classMap.get(base);
     const makeDefault = (): RValue =>
       cls ? this.createStructValue(cls.name, undefined) : this.defaultScalar(base, elemType);
     const elems: RValue[] = [];
-    for (let i = 0; i < length; i++) elems.push(makeDefault());
+    for (let i = 0; i < safeLength; i++) elems.push(makeDefault());
 
-    const typeText = isArray ? `${elemType}[${length}]` : elemType;
-    const array: ArrayValue = { t: 'array', elems, dims: [length], elemType, typeText };
+    const typeText = isArray ? `${elemType}[${safeLength}]` : elemType;
+    const array: ArrayValue = { t: 'array', elems, dims: [safeLength], elemType, typeText };
     const id = this.nextHeapId++;
     const label = `heap#${id}`;
     const block: HeapBlock = {
@@ -1559,80 +1560,176 @@ class Interpreter {
       array,
       ref: arrayElementRef(array, 0, `${label}[0]`),
       freed: false,
-      line: expr.line,
+      line,
     };
-
-    // new int(5)：带初值；evaluate 放在登记之后，异常时也能在堆视图里看到这块内存
     this.heapBlocks.push(block);
     this.heapIndex.set(array, block);
-    this.heapPeak = Math.max(this.heapPeak, this.heapBlocks.filter((b) => !b.freed).length);
+    this.heapPeak = Math.max(this.heapPeak, this.heapBlocks.filter((item) => !item.freed).length);
 
+    return {
+      block,
+      pointer: {
+        t: 'pointer',
+        label: `${label}[0]`,
+        target: block.ref,
+        elemType,
+        typeText: `${elemType}*`,
+        array,
+        offset: 0,
+      },
+    };
+  }
+
+  /** new T / new T(初值) / new T[n] */
+  private evalNew(expr: ExprNode & { kind: 'new' }): RValue {
+    const rawType = (expr.typeText || 'int').replace(/\s+/g, '');
+    const elemType = baseTypeName(rawType);
+    const isArray = Boolean(expr.arraySize);
+
+    let length = 1;
+    if (isArray) {
+      length = expr.arraySize ? asInt(this.evalExpr(expr.arraySize)) : 0;
+      if (length <= 0) throw new SimError('new[] 的长度必须大于 0。', expr.line);
+    }
+
+    const { block, pointer } = this.allocateBlock(elemType, length, expr.line, isArray);
     if (!isArray && expr.args.length > 0) {
-      array.elems[0] = coerceValue(this.evalExpr(expr.args[0]), elemType);
+      block.array.elems[0] = coerceValue(this.evalExpr(expr.args[0]), elemType);
     }
 
     this.emit({
       event: 'declare',
-      description: `new ${typeText} → ${label}（${length} 个 ${elemType}${isArray ? '' : '，值 ' + formatValue(array.elems[0])}）`,
+      description: `new ${block.array.typeText} → ${block.label}（${block.array.elems.length} 个 ${elemType}${
+        isArray ? '' : '，值 ' + formatValue(block.array.elems[0])
+      }）`,
       line: expr.line,
     });
-
-    return {
-      t: 'pointer',
-      label: `${label}[0]`,
-      target: block.ref,
-      elemType,
-      typeText: `${elemType}*`,
-      array,
-      offset: 0,
-    };
+    return pointer;
   }
 
-  /** delete p / delete[] p：释放并标记，重复释放或释放后使用都给明确报错 */
-  private evalDelete(expr: ExprNode & { kind: 'delete' }): RValue {
-    const value = this.evalExpr(expr.expr);
+  /**
+   * 解析 malloc / calloc 的字节数，还原成「元素类型 + 个数」。
+   * 只认最常见的两种写法：`malloc(n * sizeof(T))` 与 `calloc(n, sizeof(T))`；
+   * 其它情况按 char 数组处理（1 字节 1 格），并在提示里说明。
+   */
+  private mallocSpec(expr: ExprNode & { kind: 'call' }, isCalloc: boolean): { elemType: string; length: number } {
+    const sizeofTypeOf = (node: ExprNode | undefined): string | null => {
+      if (!node || node.kind !== 'sizeof') return null;
+      if (node.expr) return exprToText(node.expr);
+      return node.typeText ?? null;
+    };
+
+    if (isCalloc) {
+      const count = expr.args[0] ? asInt(this.evalExpr(expr.args[0])) : 0;
+      const type = sizeofTypeOf(expr.args[1]);
+      return { elemType: type ? baseTypeName(type) : 'char', length: count };
+    }
+
+    const arg = expr.args[0];
+    if (arg && arg.kind === 'binary' && arg.op === '*') {
+      const rightType = sizeofTypeOf(arg.right);
+      if (rightType) {
+        return { elemType: baseTypeName(rightType), length: asInt(this.evalExpr(arg.left)) };
+      }
+      const leftType = sizeofTypeOf(arg.left);
+      if (leftType) {
+        return { elemType: baseTypeName(leftType), length: asInt(this.evalExpr(arg.right)) };
+      }
+    }
+    const bytes = arg ? asInt(this.evalExpr(arg)) : 0;
+    return { elemType: 'char', length: bytes };
+  }
+
+  private evalMalloc(expr: ExprNode & { kind: 'call' }, isCalloc: boolean): RValue {
+    const spec = this.mallocSpec(expr, isCalloc);
+    if (spec.length <= 0) throw new SimError(`${isCalloc ? 'calloc' : 'malloc'} 申请的大小必须大于 0。`, expr.line);
+    const { block, pointer } = this.allocateBlock(spec.elemType, spec.length, expr.line, true);
+    this.emit({
+      event: 'declare',
+      description: `${isCalloc ? 'calloc' : 'malloc'} ${block.array.typeText} → ${block.label}（${
+        block.array.elems.length
+      } 个 ${spec.elemType}，需手动 free）`,
+      line: expr.line,
+    });
+    return pointer;
+  }
+
+  /** free(p) 与 delete p 共用的释放逻辑 */
+  private releaseBlock(value: RValue, line: number, viaFree: boolean): void {
     if (value.t === 'null') {
-      this.emit({ event: 'assign', description: 'delete 空指针：什么也不会发生', line: expr.line });
-      return voidValue();
+      this.emit({ event: 'assign', description: `${viaFree ? 'free' : 'delete'} 空指针：什么也不会发生`, line });
+      return;
     }
     if (value.t !== 'pointer') {
-      throw new SimError(`delete 需要指针，${exprToText(expr.expr)} 不是指针。`, expr.line);
+      throw new SimError(`${viaFree ? 'free' : 'delete'} 需要指针，这个表达式不是指针。`, line);
     }
     const block = value.array ? this.heapIndex.get(value.array) : undefined;
     if (!block) {
+      const kind = viaFree ? 'invalid-free' : 'invalid-free';
       this.heapIssues.push({
-        kind: 'invalid-free',
-        message: `第 ${expr.line} 行 delete 的地址不是 new 分配的`,
-        line: expr.line,
+        kind,
+        message: `第 ${line} 行 ${viaFree ? 'free' : 'delete'} 的地址不是堆上申请的`,
+        line,
       });
-      throw new SimError('这个地址不是 new 出来的，不能 delete。', expr.line);
+      throw new SimError(`这个地址不是 ${viaFree ? 'malloc / calloc' : 'new'} 出来的，不能释放。`, line);
     }
     if (block.freed) {
       this.heapIssues.push({
         kind: 'double-free',
-        message: `${block.label} 被重复释放（第 ${expr.line} 行，最初在第 ${block.line} 行 new）`,
-        line: expr.line,
+        message: `${block.label} 被重复释放（第 ${line} 行，最初在第 ${block.line} 行申请）`,
+        line,
         blockId: block.id,
       });
       throw new SimError(
-        `${block.label} 已经在之前的 delete 里释放过了：重复释放是未定义行为，程序可能崩溃。`,
-        expr.line,
-      );
-    }
-    if (expr.isArray !== block.isArray) {
-      throw new SimError(
-        block.isArray
-          ? `${block.label} 是 new[] 申请的数组，必须用 delete[] 释放。`
-          : `${block.label} 是单个对象，应该用 delete 而不是 delete[]。`,
-        expr.line,
+        `${block.label} 已经释放过了：重复释放是未定义行为，程序可能崩溃。`,
+        line,
       );
     }
     block.freed = true;
-    this.emit({
-      event: 'assign',
-      description: `delete${block.isArray ? '[]' : ''} ${block.label}（释放 ${block.array.elems.length} 个 ${block.elemType}）`,
-      line: expr.line,
-    });
+  }
+
+  /** delete p / delete[] p */
+  private evalDelete(expr: ExprNode & { kind: 'delete' }): RValue {
+    const value = this.evalExpr(expr.expr);
+    if (value.t === 'pointer' && value.array) {
+      const block = this.heapIndex.get(value.array);
+      if (block && block.freed) {
+        this.releaseBlock(value, expr.line, false);
+        return voidValue();
+      }
+      if (block && expr.isArray !== block.isArray) {
+        throw new SimError(
+          block.isArray
+            ? `${block.label} 是 new[] 申请的数组，必须用 delete[] 释放。`
+            : `${block.label} 是单个对象，应该用 delete 而不是 delete[]。`,
+          expr.line,
+        );
+      }
+    }
+    this.releaseBlock(value, expr.line, false);
+    const block = value.t === 'pointer' && value.array ? this.heapIndex.get(value.array) : undefined;
+    if (block) {
+      this.emit({
+        event: 'assign',
+        description: `delete${block.isArray ? '[]' : ''} ${block.label}（释放 ${block.array.elems.length} 个 ${block.elemType}）`,
+        line: expr.line,
+      });
+    }
+    return voidValue();
+  }
+
+  /** free(p) */
+  private evalFree(expr: ExprNode & { kind: 'call' }): RValue {
+    const value = expr.args[0] ? this.evalExpr(expr.args[0]) : nullValue();
+    const block = value.t === 'pointer' && value.array ? this.heapIndex.get(value.array) : undefined;
+    this.releaseBlock(value, expr.line, true);
+    if (block) {
+      this.emit({
+        event: 'assign',
+        description: `free ${block.label}（释放 ${block.array.elems.length} 个 ${block.elemType}）`,
+        line: expr.line,
+      });
+    }
     return voidValue();
   }
 
@@ -1643,12 +1740,12 @@ class Interpreter {
     if (!block || !block.freed) return;
     this.heapIssues.push({
       kind: 'use-after-free',
-      message: `第 ${line} 行使用了已释放的 ${block.label}（在第 ${block.line} 行 new，已 delete）`,
+      message: `第 ${line} 行使用了已释放的 ${block.label}（在第 ${block.line} 行申请，已释放）`,
       line,
       blockId: block.id,
     });
     throw new SimError(
-      `${block.label} 已经被 delete 了，再去读写它就是「释放后使用」，结果不可预期。`,
+      `${block.label} 已经释放了，再去读写它就是「释放后使用」，结果不可预期。`,
       line,
     );
   }
@@ -1690,7 +1787,7 @@ class Interpreter {
     });
   }
 
-  /** 结束时统计泄漏：new 了但没有 delete 的块 */
+  /** 结束时统计泄漏：申请了但没有释放的块 */
   private collectLeaks(): void {
     if (this.leaksCollected) return;
     this.leaksCollected = true;
@@ -1698,7 +1795,7 @@ class Interpreter {
       if (block.freed) continue;
       this.heapIssues.push({
         kind: 'leak',
-        message: `${block.label}（${block.isArray ? `${block.elemType}[${block.array.elems.length}]` : block.elemType}）在第 ${block.line} 行 new 出来，程序结束前一直没有 delete`,
+        message: `${block.label}（${block.isArray ? `${block.elemType}[${block.array.elems.length}]` : block.elemType}）在第 ${block.line} 行申请，程序结束前一直没有释放`,
         line: block.line,
         blockId: block.id,
       });
@@ -1782,6 +1879,7 @@ class Interpreter {
       if (index < 0 || index >= object.elems.length) {
         throw new SimError(`数组下标 ${index} 越界（长度 ${object.elems.length}）。`, line);
       }
+      this.assertHeapAlive(object, line);
       return object.elems[index];
     }
     if (object.t === 'pointer') {
@@ -1827,6 +1925,7 @@ class Interpreter {
           if (index < 0 || index >= object.elems.length) {
             throw new SimError(`数组下标 ${index} 越界（长度 ${object.elems.length}）。`, expr.line);
           }
+          this.assertHeapAlive(object, expr.line);
           return arrayElementRef(object, index, this.elementLabel(expr, index));
         }
         if (object.t === 'pointer' && object.array) {
@@ -1834,6 +1933,7 @@ class Interpreter {
           if (absolute < 0 || absolute >= object.array.elems.length) {
             throw new SimError(`指针下标 ${index} 越界。`, expr.line);
           }
+          this.assertHeapAlive(object.array, expr.line);
           return arrayElementRef(object.array, absolute, this.elementLabel(expr, index));
         }
         if (object.t === 'string') {
