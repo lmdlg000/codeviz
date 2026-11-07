@@ -574,19 +574,23 @@ int main() {
     expect(result.error?.line).toBeGreaterThan(0);
   });
 
-  it('类对象 / 成员函数返回 unsupported', () => {
+  it('类对象与成员函数已经可以执行', () => {
     const result = run(`
+#include <iostream>
 class Shape {
+  double k;
 public:
-  double area() { return 1.0; }
+  Shape(double k) : k(k) {}
+  double area() { return k * k; }
 };
 int main() {
-  Shape s;
+  Shape s(3);
+  std::cout << s.area() << std::endl;
   return 0;
 }
 `);
-    expect(result.ok).toBe(false);
-    expect(result.supported).toBe(false);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('9\n');
   });
 
   it('没有 main 返回 unsupported', () => {

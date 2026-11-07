@@ -481,3 +481,13 @@ export interface EngineApi {
 
 /** 行数上限（含空行），与产品需求一致 */
 export const MAX_CODE_LINES = 1000;
+
+/**
+ * 单步执行的默认步数预算。
+ * 纯 C 小程序一般几百步就结束；带类 / 动态内存的完整示例（BigInt 那种）
+ * 约 4000 步，所以留到 6000，同时保持每步都记录完整变量与堆快照的开销可控。
+ */
+export const DEFAULT_MAX_STEPS = 6000;
+
+/** 单步执行的步数硬上限，防止死循环把页面拖垮 */
+export const MAX_TRACE_STEPS = 20000;

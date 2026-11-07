@@ -10,6 +10,7 @@
  */
 import { useMemo } from 'react';
 import { analyzeCode, simulate } from '../../engine';
+import { DEFAULT_MAX_STEPS } from '../../engine/types';
 import type { AnalysisResult, CodeStats, SimulateOptions, TraceResult } from '../../engine/types';
 
 const MAX_ANALYSIS_ENTRIES = 24;
@@ -78,7 +79,7 @@ function traceFailure(): TraceResult {
     steps: [],
     output: '',
     truncated: false,
-    maxSteps: 3000,
+    maxSteps: DEFAULT_MAX_STEPS,
   };
 }
 
@@ -88,7 +89,7 @@ const EMPTY_TRACE: TraceResult = {
   steps: [],
   output: '',
   truncated: false,
-  maxSteps: 3000,
+  maxSteps: DEFAULT_MAX_STEPS,
 };
 
 function remember<T>(map: Map<string, T>, key: string, value: T, limit: number): T {

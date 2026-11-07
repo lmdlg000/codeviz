@@ -5,7 +5,7 @@
  * simulate 用它在执行前做一次静态体检，遇到明确不支持的语法/函数时
  * 直接返回 supported=false，避免执行到一半才报错。
  */
-import type { ExprNode, FuncDeclNode, ProgramNode, StmtNode } from './ast';
+import type { ClassDeclNode, ExprNode, FuncDeclNode, ProgramNode, StmtNode } from './ast';
 import { collectExprs, walkStmt } from './ast';
 import { SUPPORTED_BUILTINS, UNSUPPORTED_FUNCTIONS } from './io';
 
@@ -13,6 +13,20 @@ export interface UnsupportedIssue {
   line: number;
   message: string;
 }
+
+/** 允许写成 f(x) 的内置类型名 */
+const CAST_NAMES: ReadonlySet<string> = new Set([
+  'char',
+  'short',
+  'int',
+  'long',
+  'float',
+  'double',
+  'bool',
+  'unsigned',
+  'signed',
+  'size_t',
+]);
 
 export interface SupportRegistry {
   /** 源码内所有带函数体的函数：裸名 → 第一个定义 */
@@ -88,18 +102,15 @@ function checkExpression(
     case 'unknown':
       return { line: expr.line, message: `表达式 "${expr.text}" 暂不支持单步执行。` };
     case 'ident':
-      if (expr.name === 'this') return { line: expr.line, message: 'this 指针暂不支持单步执行。' };
+      // this 由成员函数调用时注入，这里放行
       return null;
     case 'call': {
       const name = expr.name;
       if (!name) {
         return { line: expr.line, message: '这种函数调用形式暂不支持单步执行。' };
       }
-      // 字符串 / 数组的少量成员函数
-      if (expr.callee.kind === 'member' && expr.callee.op !== '::') {
-        if (['length', 'size', 'c_str', 'at'].includes(name)) return null;
-        return { line: expr.line, message: `成员函数 ${name}() 暂不支持单步执行。` };
-      }
+      // 成员调用：类方法、字符串 / 数组方法都交给解释器判断，找不到时会给出明确报错
+      if (expr.callee.kind === 'member' && expr.callee.op !== '::') return null;
       if (UNSUPPORTED_FUNCTIONS.has(name)) {
         return { line: expr.line, message: `函数 ${name}() 暂不支持单步执行（文件 / 内存 / STL 等高级用法）。` };
       }
@@ -114,9 +125,9 @@ function checkExpression(
         }
         return null;
       }
-      if (registry.methods.has(name)) {
-        return { line: expr.line, message: `类方法 ${name}() 的调用暂不支持单步执行。` };
-      }
+      if (registry.methods.has(name)) return null; // 成员函数按对象分派，交给解释器
+      // char(x) / int(x) 这类函数式类型转换
+      if (CAST_NAMES.has(name) && expr.args.length === 1) return null;
       return { line: expr.line, message: `调用了源码中没有定义的函数 ${name}()，无法执行。` };
     }
     default:
@@ -144,19 +155,12 @@ function scanStatement(
     if (UNSUPPORTED_TYPES.has(base)) {
       return { line: stmt.line, message: `${stmt.decl.typeSpec.text} 暂不支持单步执行。` };
     }
-    if (registry.classes.has(base)) {
-      return {
-        line: stmt.line,
-        message: `这段代码声明了 class ${base} 的对象。类对象（含构造/析构、成员函数、运算符重载）暂不支持单步执行——可以切到「类图」看结构与「调用图」看函数关系；想逐步观察运算过程，把这一步改写成过程式代码再运行。`,
-      };
-    }
+    // 类对象现在支持：构造 / 析构 / 成员函数 / 运算符重载都由解释器处理
     for (const declarator of stmt.decl.declarators) {
       if (declarator.isFunctionPointer) {
         return { line: declarator.line, message: '函数指针暂不支持单步执行。' };
       }
-      if (declarator.isReference) {
-        return { line: declarator.line, message: '引用变量暂不支持单步执行。' };
-      }
+      // 引用变量（int& r = a）由解释器绑定到目标对象
     }
   }
   if (stmt.kind === 'rangeFor') {
@@ -173,25 +177,18 @@ function scanFunction(
 ): UnsupportedIssue | null {
   if (depth > 24) return null;
   if (!fn.body) return null;
-  if (fn.className) {
-    return {
-      line: fn.line,
-      message: `成员函数 ${fn.className}::${fn.name} 暂不支持单步执行（类对象模型尚未纳入解释器）。可以看「类图」与「调用图」，或在 main 里用过程式写法复现同一段运算。`,
-    };
-  }
+  // 成员函数已支持
   if (fn.isTemplate) {
     return { line: fn.line, message: '模板函数暂不支持单步执行。' };
   }
   for (const param of fn.params) {
-    if (param.isReference) {
-      return { line: param.line, message: '引用参数暂不支持单步执行，可以改成指针参数。' };
-    }
+    // 引用参数按引用绑定实参，已支持
     const base = classOfType(param.base);
     if (UNSUPPORTED_TYPES.has(base)) {
       return { line: param.line, message: `${param.typeText} 参数暂不支持单步执行。` };
     }
-    if (registry.classes.has(base)) {
-      return { line: param.line, message: 'class 类型的参数暂不支持单步执行。' };
+    if (registry.classes.has(base) && !param.isReference && !param.isPointer && !param.isArray) {
+      return { line: param.line, message: '按值传类对象暂不支持单步执行（缺少拷贝构造调用）。请改成 `const T&`。' };
     }
   }
 
@@ -221,6 +218,39 @@ export function findUnsupportedFunction(
   return scanFunction(fn, registry, new Set<FuncDeclNode>([fn]), 0);
 }
 
+/** 类层面的子集检查：继承、虚函数、类模板都不在单步执行范围内 */
+function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null {
+  // 继承与类模板的问题是「整段代码的组织方式」，优先报出来；
+  // 否则一个虚析构函数会抢在前面，让人以为只是析构函数的问题。
+  const flattened: ClassDeclNode[] = [];
+  const collect = (list: ClassDeclNode[]): void => {
+    for (const cls of list) {
+      flattened.push(cls);
+      collect(cls.nested);
+    }
+  };
+  collect(classes);
+
+  for (const cls of flattened) {
+    if (cls.isTemplate) {
+      return { line: cls.line, message: `类模板 ${cls.name} 暂不支持单步执行，请展开成具体类型再看。` };
+    }
+    if (cls.bases.length > 0) {
+      return {
+        line: cls.line,
+        message: `${cls.name} 用了继承（: ${cls.bases.map((base) => base.name).join(', ')}），继承与多态暂不支持单步执行。`,
+      };
+    }
+  }
+  for (const cls of flattened) {
+    const virtualMethod = cls.methods.find((method) => method.isVirtual || method.isPureVirtual);
+    if (virtualMethod) {
+      return { line: virtualMethod.line, message: `虚函数 ${virtualMethod.name}() 暂不支持单步执行。` };
+    }
+  }
+  return null;
+}
+
 /** 检查 main 函数（simulate 的入口） */
 export function findUnsupportedProgram(
   program: ProgramNode,
@@ -233,6 +263,12 @@ export function findUnsupportedProgram(
   if (!mainFn.body) {
     return { line: mainFn.line, message: 'main 函数没有函数体，无法执行。' };
   }
+
+  // 继承 / 虚函数 / 类模板超出教学子集：在开跑之前就说清楚，
+  // 不要等跑到一半才抛「没有可匹配的成员函数」这种看不懂的运行时错误。
+  const classIssue = findUnsupportedClass(program.classes);
+  if (classIssue) return classIssue;
+
   const issue = findUnsupportedFunction(mainFn, registry);
   if (issue) return issue;
 

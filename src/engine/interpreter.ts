@@ -18,6 +18,7 @@ import type {
   TraceResult,
   TraceStep,
 } from './types';
+import { DEFAULT_MAX_STEPS, MAX_TRACE_STEPS } from './types';
 import type { ClassDeclNode, ExprNode, FieldDeclNode, FuncDeclNode, ParamNode, ProgramNode, StmtNode } from './ast';
 import type { FormatSpec } from './io';
 import { flattenBinaryChain, parseFormat, rootName } from './io';
@@ -98,6 +99,8 @@ interface Frame {
   name: string;
   line: number;
   scopes: Scope[];
+  /** 成员函数调用时的 this 对象，用于裸字段名回退与 this-> 访问 */
+  thisValue?: StructValue;
 }
 
 type Signal =
@@ -116,6 +119,19 @@ function lastSegment(name: string): string {
 function trimZeros(text: string): string {
   if (!text.includes('.')) return text;
   return text.replace(/0+$/, '').replace(/\.$/, '');
+}
+
+/**
+ * 短文本复用同一个字符串实例。
+ * 轨迹里塞满了 `'0'` `'\0'` `int` 这类重复文本，几千步下来会造出大量
+ * 内容相同但各自独立的字符串；intern 之后内存直接降到可忽略。
+ */
+const textPool = new Map<string, string>();
+function internText(text: string): string {
+  const pooled = textPool.get(text);
+  if (pooled !== undefined) return pooled;
+  if (textPool.size < 4096) textPool.set(text, text);
+  return text;
 }
 
 function flattenClasses(program: ProgramNode): ClassDeclNode[] {
@@ -158,6 +174,20 @@ interface HeapBlock {
 }
 
 const MAX_HEAP_BLOCKS = 64;
+
+/** 可以写成 f(x) 形式的内置类型转换 */
+const BUILTIN_CAST_NAMES: ReadonlySet<string> = new Set([
+  'char',
+  'short',
+  'int',
+  'long',
+  'float',
+  'double',
+  'bool',
+  'unsigned',
+  'signed',
+  'size_t',
+]);
 const HEAP_PREVIEW = 16;
 
 /** 解释器主类 */
@@ -177,6 +207,18 @@ class Interpreter {
   /** 全局变量初始化期间不记录步骤，保证首步是 start */
   private quiet = false;
   private functionMap = new Map<string, FuncDeclNode>();
+  /** 非成员运算符重载：operator+ 等可能有多个，按类型挑 */
+  private freeFunctions = new Map<string, FuncDeclNode[]>();
+  /** 类外定义的成员函数：`类名::方法名` → 实现（class.methods 里往往只有声明） */
+  private methodIndex = new Map<string, FuncDeclNode[]>();
+
+  private indexMethod(fn: FuncDeclNode): void {
+    if (!fn.className || !fn.body) return;
+    const key = `${lastSegment(fn.className)}::${fn.name}`;
+    const list = this.methodIndex.get(key) ?? [];
+    list.push(fn);
+    this.methodIndex.set(key, list);
+  }
   private classMap = new Map<string, ClassDeclNode>();
   private enumValues: Map<string, number>;
   /** new 出来的堆块，按申请顺序排列 */
@@ -187,10 +229,21 @@ class Interpreter {
   private heapPeak = 0;
   private heapIssues: TraceHeapIssue[] = [];
   private leaksCollected = false;
+  /** 上一份堆快照的内容签名，用于连续步复用同一份快照对象 */
+  private heapKey = '';
+  private heapCache: HeapBlockSnapshot[] | undefined;
+  /** 执行 operator<< 时，把 os << x 的文本收集到这里 */
+  private captureSink: string[] | null = null;
+  /**
+   * 表达式产生的临时类对象（函数按值返回 / 类名当构造函数用）。
+   * C++ 里它们的生命周期到「完整表达式」结束，这里用语句边界近似：
+   * 语句执行完统一调用析构，避免临时对象的堆缓冲变成假泄漏。
+   */
+  private temps: StructValue[] = [];
 
   constructor(program: ProgramNode, options: SimulateOptions) {
     this.program = program;
-    this.stepLimit = Math.min(Math.max(options.maxSteps ?? 3000, 10), 20000);
+    this.stepLimit = Math.min(Math.max(options.maxSteps ?? DEFAULT_MAX_STEPS, 10), MAX_TRACE_STEPS);
     this.input = options.stdin ?? '';
     this.enumValues = collectEnums(program);
 
@@ -200,9 +253,19 @@ class Interpreter {
     for (const fn of program.functions) {
       if (!fn.body) continue;
       if (!this.functionMap.has(fn.name)) this.functionMap.set(fn.name, fn);
+      if (fn.className) this.indexMethod(fn);
+      if (!fn.className && fn.name.startsWith('operator')) {
+        const list = this.freeFunctions.get(fn.name) ?? [];
+        list.push(fn);
+        this.freeFunctions.set(fn.name, list);
+      }
     }
     for (const cls of this.classMap.values()) {
       for (const method of cls.methods) {
+        const key = `${lastSegment(cls.name)}::${method.name}`;
+        const list = this.methodIndex.get(key) ?? [];
+        if (method.body) list.push(method);
+        this.methodIndex.set(key, list);
         if (!method.body) continue;
         if (!this.functionMap.has(method.name)) this.functionMap.set(method.name, method);
       }
@@ -406,8 +469,8 @@ class Interpreter {
       nextSnapshot.set(slot.name, valueText);
       const entry: RuntimeVar = {
         name: slot.name,
-        typeText: slot.typeText,
-        valueText,
+        typeText: internText(slot.typeText),
+        valueText: internText(valueText),
         category: slot.category,
         changed: this.lastSnapshot.get(slot.name) !== valueText,
       };
@@ -455,6 +518,26 @@ class Interpreter {
     }
     const globalSlot = this.globalScope.vars.get(name);
     if (globalSlot) return globalSlot;
+    // 成员函数内部可以直接写字段名：回退到 this 对应对象的字段
+    const self = frame?.thisValue;
+    if (self && self.fields.has(name)) {
+      const fieldType = self.fieldTypes.get(name) ?? 'int';
+      return {
+        name,
+        value: self.fields.get(name) ?? intValue(0, fieldType),
+        ref: {
+          get: () => self.fields.get(name) ?? intValue(0, fieldType),
+          set: (next) => {
+            self.fields.set(name, next);
+          },
+          label: `this->${name}`,
+          typeText: fieldType,
+        },
+        typeText: fieldType,
+        category: categoryOfValue(self.fields.get(name) ?? intValue(0, fieldType)),
+        isConst: false,
+      };
+    }
     throw new SimError(`变量 ${name} 在使用前没有声明。`, line);
   }
 
@@ -509,6 +592,17 @@ class Interpreter {
   /* ============================== 语句执行 ============================== */
 
   private execStmt(stmt: StmtNode): Signal {
+    // 每条语句结束都清理本语句产生的临时对象（相当于「完整表达式」边界）。
+    // 嵌套语句用各自的 mark，已清理过的不会被重复析构。
+    const mark = this.temps.length;
+    try {
+      return this.execStmtInner(stmt);
+    } finally {
+      this.releaseTemps(mark);
+    }
+  }
+
+  private execStmtInner(stmt: StmtNode): Signal {
     this.tick();
     this.currentLine = stmt.line;
     const frame = this.currentFrame();
@@ -528,6 +622,7 @@ class Interpreter {
           return NORMAL;
         } finally {
           current.scopes.pop();
+          this.destroyScope(scope);
         }
       }
       case 'decl':
@@ -560,7 +655,17 @@ class Interpreter {
       case 'switch':
         return this.execSwitch(stmt);
       case 'return': {
-        const value = stmt.expr ? this.evalExpr(stmt.expr) : voidValue();
+        let value = stmt.expr ? this.evalExpr(stmt.expr) : voidValue();
+        // 按值返回类对象时必须「当场」拷贝：等到函数帧退出再拷，
+        // 局部对象的析构已经把堆缓冲 delete 掉了（会读到 \0）。
+        const fn = this.currentFrame()?.fn;
+        const byValue = !(fn && fn.returnType.includes('&'));
+        if (value.t === 'struct' && byValue) {
+          // return T(...) / return a + b：返回值本身就是刚构造的临时对象，
+          // 直接移交所有权（等价于 C++17 的拷贝省略），不再多构造一次。
+          if (this.isTemp(value)) this.adoptTemp(value);
+          else value = this.copyObject(value, stmt.line);
+        }
         this.emit({
           event: 'return',
           description: stmt.expr ? `返回 ${formatValue(value)}` : '返回（void）',
@@ -632,7 +737,9 @@ class Interpreter {
       if (!declarator.name) continue;
       const typeText = this.declTypeText(typeSpec.text, declarator);
       const value = this.instantiateDeclarator(declarator, typeSpec.base, typeText);
-      this.declare(declarator.name, value, typeText, typeSpec.isConst);
+      // `const BigInt* p` 的 const 修饰的是指向的内容，指针本身仍可改指
+      const pointerMutable = declarator.pointerDepth > 0 || declarator.isReference;
+      this.declare(declarator.name, value, typeText, typeSpec.isConst && !pointerMutable);
       this.emit({
         event: 'declare',
         description: declarator.init
@@ -844,9 +951,19 @@ class Interpreter {
         return this.createStructValue(cls.name, declarator.init);
       }
       if (declarator.init && declarator.init.kind === 'call') {
-        throw new SimError('class / struct 的构造函数调用暂不支持单步执行。', declarator.init.line, 'unsupported');
+        const args = declarator.init.args.map((arg) => this.evalExpr(arg));
+        return this.constructObject(cls.name, args, declarator.init.line);
       }
-      return this.createStructValue(cls.name, undefined);
+      if (declarator.init) {
+        // Point c = a + b; 采用表达式的值；同类对象优先走拷贝构造，保证深拷贝
+        const evaluated = this.evalExpr(declarator.init);
+        if (evaluated.t === 'struct' && lastSegment(evaluated.typeName) === cls.name) {
+          return this.copyObject(evaluated, declarator.init.line);
+        }
+        return this.constructObject(cls.name, [], declarator.init.line);
+      }
+      // 无初始化器时，如果有默认构造函数也要执行一次
+      return this.constructObject(cls.name, [], 1);
     }
     if (!declarator.init) return this.defaultScalar(base, typeText);
     return coerceValue(this.evalExpr(declarator.init), typeText);
@@ -970,6 +1087,244 @@ class Interpreter {
       elemType,
       typeText: `${base}${resolvedDims.map((d) => `[${d}]`).join('')}`,
     };
+  }
+
+  /** 找非成员运算符重载：优先第二个参数类型匹配 */
+  private findFreeOperator(name: string, rightType: string | null): FuncDeclNode | undefined {
+    const candidates = this.freeFunctions.get(name);
+    if (!candidates || candidates.length === 0) return undefined;
+    if (rightType) {
+      const matched = candidates.find(
+        (fn) => lastSegment(baseTypeName(fn.params[1]?.base ?? '')) === lastSegment(rightType),
+      );
+      if (matched) return matched;
+    }
+    return candidates[0];
+  }
+
+  /**
+   * 运算符重载分派：先试成员方法，再试非成员函数。
+   * 返回 undefined 表示没有重载，调用方继续走内置语义。
+   */
+  private tryOperatorOverload(
+    op: string,
+    left: RValue,
+    right: RValue,
+    line: number,
+  ): RValue | undefined {
+    const methodName = `operator ${op}`;
+    if (left.t === 'struct') {
+      const member = this.findMethod(left.typeName, methodName, [right]);
+      if (member) return this.callFunction(member, [right], line, left);
+    }
+    if (left.t !== 'struct' && right.t !== 'struct') return undefined;
+    const free = this.findFreeOperator(methodName, right.t === 'struct' ? right.typeName : null);
+    if (!free) return undefined;
+    return this.callFunction(free, [left, right], line);
+  }
+
+  /** 调用 operator<<(ostream&, const T&)，把输出「接」回 cout 的缓冲 */
+  private runStreamOperator(value: StructValue, line: number): string | null {
+    const fn = this.findFreeOperator('operator <<', value.typeName);
+    if (!fn) return null;
+    const previous = this.captureSink;
+    this.captureSink = [];
+    try {
+      this.callFunction(fn, [voidValue(), value], line);
+      return this.captureSink.join('');
+    } finally {
+      this.captureSink = previous;
+    }
+  }
+
+  /** 在类里找可调用的方法：参数个数完全匹配优先，其次看默认参数 */
+  /**
+   * 类外定义的成员函数拿不到类内声明里的默认参数（`BigInt(size_t v = 0);`
+   * 只有声明带 `= 0`），这里把默认值补到实现上，否则 `BigInt t;` 会找不到构造函数。
+   */
+  private inheritDefaults(fn: FuncDeclNode, prototypes: FuncDeclNode[]): FuncDeclNode {
+    if (!fn.params.some((param) => !param.defaultValue)) return fn;
+    const proto = prototypes.find(
+      (candidate) =>
+        candidate !== fn &&
+        candidate.params.length === fn.params.length &&
+        candidate.params.some((param) => param.defaultValue),
+    );
+    if (!proto) return fn;
+    const params = fn.params.map((param, index) =>
+      param.defaultValue ? param : { ...param, defaultValue: proto.params[index]?.defaultValue },
+    );
+    return { ...fn, params };
+  }
+
+  /** 默认参数在 AST 里是源码文本，这里把它变成运行期值（只覆盖常见字面量） */
+  private evalDefaultParam(param: ParamNode): RValue {
+    const text = (param.defaultValue ?? '').trim();
+    const typeText = param.typeText;
+    if (!text) return param.isPointer ? nullValue() : this.defaultScalar(baseTypeName(typeText), typeText);
+    if (text === 'nullptr' || text === 'NULL') return nullValue();
+    if (param.isPointer) return nullValue();
+    if (text === 'true' || text === 'false') return boolValue(text === 'true');
+    if (/^-?0x[0-9a-fA-F]+$/.test(text)) return intValue(parseInt(text, 16), typeText);
+    if (/^-?\d+$/.test(text)) return intValue(Number(text), typeText);
+    if (/^-?\d*\.\d+([eE][-+]?\d+)?$/.test(text)) return floatValue(Number(text), typeText);
+    if (text.startsWith("'")) {
+      const inner = text.slice(1, -1);
+      const char = inner === '\\0' ? 0 : inner.replace(/^\\/, '').charCodeAt(0);
+      return intValue(char, typeText);
+    }
+    if (text.startsWith('"')) return stringValue(text.slice(1, -1), typeText);
+    return this.defaultScalar(baseTypeName(typeText), typeText);
+  }
+
+  private scoreParams(method: FuncDeclNode, args: RValue[]): number {
+    let score = 0;
+    for (let i = 0; i < args.length && i < method.params.length; i++) {
+      const param = method.params[i];
+      const arg = args[i];
+      const typeText = param.typeText;
+      if (param.isPointer || typeText.includes('*')) {
+        if (arg.t === 'string') score += 4;
+        else if (arg.t === 'pointer' || arg.t === 'null') score += 4;
+        else score -= 2;
+        continue;
+      }
+      if (param.isReference || typeText.includes('&')) {
+        if (arg.t === 'struct') {
+          score += lastSegment(baseTypeName(typeText)) === lastSegment(arg.typeName) ? 5 : 1;
+        }
+        continue;
+      }
+      if (isStringType(typeText)) {
+        score += arg.t === 'string' ? 5 : -2;
+        continue;
+      }
+      if (isFloatType(typeText)) {
+        score += arg.t === 'float' ? 4 : arg.t === 'int' ? 1 : -2;
+        continue;
+      }
+      if (arg.t === 'int') score += 3;
+      else if (arg.t === 'struct') score -= 3;
+    }
+    return score;
+  }
+
+  private findMethod(
+    className: string,
+    name: string,
+    args: RValue[] | number,
+  ): FuncDeclNode | undefined {
+    const argCount = typeof args === 'number' ? args : args.length;
+    const cls = this.classMap.get(lastSegment(className));
+    if (!cls) return undefined;
+    const key = `${lastSegment(className)}::${name}`;
+    const prototypes = cls.methods.filter((method) => method.name === name);
+    const candidates = [
+      ...cls.methods.filter((method) => method.name === name && method.body),
+      ...(this.methodIndex.get(key) ?? []),
+    ].map((method) => this.inheritDefaults(method, prototypes));
+    if (candidates.length === 0) return undefined;
+    const exact = candidates.filter((method) => method.params.length === argCount);
+    if (exact.length > 0) {
+      if (typeof args === 'number') return exact[0];
+      // 重载解析：按实参类型打分，分高者优先（否则 BigInt("123") 会误选 size_t 构造）
+      let best = exact[0];
+      let bestScore = this.scoreParams(best, args);
+      for (const candidate of exact.slice(1)) {
+        const score = this.scoreParams(candidate, args);
+        if (score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      }
+      return best;
+    }
+    return candidates.find((method) => {
+      const required = method.params.filter((param) => !param.defaultValue).length;
+      return required <= argCount && argCount <= method.params.length;
+    });
+  }
+
+  /** 构造一个类对象：先铺默认字段，再执行匹配的构造函数 */
+  private constructObject(className: string, args: RValue[], line: number): StructValue {
+    const value = this.createStructValue(className, undefined);
+    const name = lastSegment(className);
+    const ctor = this.findMethod(name, name, args);
+    if (ctor) this.callFunction(ctor, args, line, value);
+    return value;
+  }
+
+  /** 找真正的拷贝构造函数：单个参数且是同类对象的引用或指针 */
+  private findCopyCtor(className: string): FuncDeclNode | undefined {
+    const name = lastSegment(className);
+    const key = `${name}::${name}`;
+    const cls = this.classMap.get(name);
+    const candidates = [
+      ...(cls?.methods.filter((method) => method.name === name && method.body) ?? []),
+      ...(this.methodIndex.get(key) ?? []),
+    ];
+    return candidates.find((method) => {
+      if (method.params.length !== 1) return false;
+      const param = method.params[0];
+      const isTargetClass = lastSegment(baseTypeName(param.typeText)) === name;
+      return isTargetClass && (param.isReference || param.isPointer || param.typeText.includes('&'));
+    });
+  }
+
+  /** 拷贝一个类对象：有拷贝构造就调用它（深拷贝），否则共享同一份字段 */
+  private copyObject(source: StructValue, line: number): StructValue {
+    const name = lastSegment(source.typeName);
+    const copyCtor = this.findCopyCtor(name);
+    if (!copyCtor) return source;
+    const copy = this.createStructValue(name, undefined);
+    this.callFunction(copyCtor, [source], line, copy);
+    return copy;
+  }
+
+  /** 作用域结束时销毁其中的类对象（调用析构函数，按声明逆序） */
+  private destroyScope(scope: Scope): void {
+    const slots = [...scope.vars.values()];
+    for (let i = slots.length - 1; i >= 0; i--) {
+      if (slots[i].name === 'this') continue;
+      this.destroyValue(slots[i].value);
+    }
+  }
+
+  private destroyValue(value: RValue): void {
+    if (value.t === 'struct') {
+      const dtor = this.findMethod(value.typeName, `~${lastSegment(value.typeName)}`, 0);
+      if (dtor) this.callFunction(dtor, [], this.currentLine, value);
+      return;
+    }
+    if (value.t === 'array') {
+      for (const element of value.elems) this.destroyValue(element);
+    }
+  }
+
+  /** 把一个由表达式产生的类对象登记为临时对象，语句结束时析构 */
+  private registerTemp(value: StructValue): void {
+    if (!this.findMethod(value.typeName, `~${lastSegment(value.typeName)}`, 0)) return;
+    this.temps.push(value);
+  }
+
+  /** 临时对象被变量 / 字段接管：取消登记，交给作用域管理 */
+  private adoptTemp(value: RValue): RValue {
+    if (value.t !== 'struct') return value;
+    const index = this.temps.lastIndexOf(value);
+    if (index >= 0) this.temps.splice(index, 1);
+    return value;
+  }
+
+  private isTemp(value: RValue): boolean {
+    return value.t === 'struct' && this.temps.includes(value);
+  }
+
+  /** 语句结束：析构本语句产生的临时对象（先登记的先生效，和 C++ 顺序一致） */
+  private releaseTemps(mark: number): void {
+    while (this.temps.length > mark) {
+      const value = this.temps.pop() as StructValue;
+      this.destroyValue(value);
+    }
   }
 
   private createStructValue(typeName: string, init: ExprNode | undefined): StructValue {
@@ -1202,6 +1557,17 @@ class Interpreter {
     if (expr.op === '<<') {
       const { base } = flattenBinaryChain(expr, '<<');
       if (/(^|::)cout$/.test(rootName(base))) return this.execCout(expr);
+      // 正在执行 operator<< 里的 os << x：os 是形参，求值为 void
+      if (this.captureSink) {
+        const leftValue = this.evalExpr(expr.left);
+        if (leftValue.t === 'void') {
+          const rightValue = this.evalExpr(expr.right);
+          this.captureSink.push(this.toText(rightValue));
+          return leftValue;
+        }
+        const rightValue = this.evalExpr(expr.right);
+        return this.binaryOp(expr.op, leftValue, rightValue, expr.line);
+      }
     }
     if (expr.op === '>>') {
       const { base } = flattenBinaryChain(expr, '>>');
@@ -1213,6 +1579,8 @@ class Interpreter {
   }
 
   private binaryOp(op: string, left: RValue, right: RValue, line: number): RValue {
+    const overloaded = this.tryOperatorOverload(op, left, right, line);
+    if (overloaded !== undefined) return overloaded;
     // 字符串拼接 / 比较
     if (op === '+' && (left.t === 'string' || right.t === 'string')) {
       return stringValue(this.toText(left) + this.toText(right));
@@ -1316,12 +1684,31 @@ class Interpreter {
     const ref = this.resolveLValue(expr.target);
     if (expr.op === '=') {
       const raw = this.evalExpr(expr.value);
-      const value = this.coerceForRef(raw, ref);
+      // 类对象赋值优先走 operator=：否则只是把字段别名过去，
+      // 右侧临时对象析构后左侧的堆缓冲就悬空了（BigInt 里必踩）。
+      const current = ref.get();
+      if (current.t === 'struct' && raw.t === 'struct' && raw !== current) {
+        const assign = this.findMethod(current.typeName, 'operator =', [raw]);
+        if (assign) {
+          this.callFunction(assign, [raw], expr.line, current);
+          return current;
+        }
+      }
+      const value = this.coerceForRef(this.adoptTemp(raw), ref);
       ref.set(value);
       return value;
     }
     const current = ref.get();
     const right = this.evalExpr(expr.value);
+    // a += b：优先调用成员 operator+=，避免退化成 operator+ 造成递归
+    if (current.t === 'struct') {
+      const member = this.findMethod(current.typeName, `operator ${expr.op}`, [right]);
+      if (member) {
+        const outcome = this.callFunction(member, [right], expr.line, current);
+        if (outcome.t === 'struct' && outcome !== current) ref.set(outcome);
+        return outcome;
+      }
+    }
     const baseOp = expr.op.slice(0, -1);
     let next: RValue;
     if (baseOp === '+' && (current.t === 'string' || right.t === 'string')) {
@@ -1345,6 +1732,17 @@ class Interpreter {
       return this.evalMemberCall(expr, callee);
     }
     const name = expr.name || (callee.kind === 'ident' ? callee.name : '');
+    // char(x) / int(x) 这种函数式类型转换
+    if (BUILTIN_CAST_NAMES.has(name) && expr.args.length === 1) {
+      return coerceValue(this.evalExpr(expr.args[0]), name);
+    }
+    // Point(1, 2) 这种临时对象：类名当构造函数用
+    if (this.classMap.has(lastSegment(name))) {
+      const args = expr.args.map((arg) => this.evalExpr(arg));
+      const temp = this.constructObject(lastSegment(name), args, expr.line);
+      this.registerTemp(temp);
+      return temp;
+    }
     switch (name) {
       case 'printf':
         return this.builtinPrintf(expr);
@@ -1361,6 +1759,10 @@ class Interpreter {
         this.printOutput(String.fromCharCode(asInt(value)), expr.line);
         return intValue(asInt(value));
       }
+      case 'memcpy':
+      case 'memset':
+      case 'memcmp':
+        return this.builtinMem(name, expr);
       case 'strlen': {
         const value = expr.args[0] ? this.evalExpr(expr.args[0]) : stringValue('');
         const text = charsOf(value) ?? '';
@@ -1524,7 +1926,9 @@ class Interpreter {
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
     const args = expr.args.map((arg) => this.evalExpr(arg));
-    return this.callFunction(fn, args, expr.line);
+    // 成员函数内部直接调用另一个成员函数（如 alloc(...)）：沿用当前 this
+    const implicitThis = fn.className ? this.currentFrame()?.thisValue : undefined;
+    return this.callFunction(fn, args, expr.line, implicitThis);
   }
 
   /* ============================== 堆内存 ============================== */
@@ -1685,6 +2089,8 @@ class Interpreter {
         line,
       );
     }
+    // 释放前先析构里面的类对象（与 C++ 语义一致）
+    for (const element of block.array.elems) this.destroyValue(element);
     block.freed = true;
   }
 
@@ -1752,7 +2158,11 @@ class Interpreter {
 
   /** 当前堆状态快照，供 UI 逐步展示 */
   private heapSnapshot(): HeapBlockSnapshot[] | undefined {
-    if (this.heapBlocks.length === 0) return undefined;
+    if (this.heapBlocks.length === 0) {
+      this.heapKey = '';
+      this.heapCache = undefined;
+      return undefined;
+    }
     const owners = new Map<number, string[]>();
     const note = (name: string, value: RValue): void => {
       if (value.t !== 'pointer' || !value.array) return;
@@ -1769,22 +2179,41 @@ class Interpreter {
       }
     }
 
-    return this.heapBlocks.map((block) => {
+    // 先算内容签名：堆没变化的连续步直接复用上一份快照（引用共享）。
+    // 带类与动态内存的长程序会有几千步、绝大多数步堆是不动的，
+    // 不做这件事单次执行的轨迹能到几十 MB。
+    const previews: string[][] = [];
+    const parts: string[] = [];
+    for (const block of this.heapBlocks) {
       const all = arrayElementTexts(block.array);
-      const values = all.slice(0, HEAP_PREVIEW);
+      const values = all.slice(0, HEAP_PREVIEW).map(internText);
+      previews.push(values);
+      parts.push(
+        `${block.id}|${block.freed ? 1 : 0}|${all.length}|${(owners.get(block.id) ?? []).join(',')}|${values.join('\u0001')}`,
+      );
+    }
+    const key = parts.join('\u0002');
+    if (key === this.heapKey && this.heapCache) return this.heapCache;
+
+    const snapshots = this.heapBlocks.map((block, index) => {
+      const values = previews[index];
+      const length = block.array.elems.length;
       return {
         id: block.id,
-        label: block.label,
-        elemType: block.elemType,
+        label: internText(block.label),
+        elemType: internText(block.elemType),
         isArray: block.isArray,
-        length: block.array.elems.length,
+        length,
         values,
-        hidden: Math.max(0, all.length - values.length),
+        hidden: Math.max(0, length - values.length),
         freed: block.freed,
         line: block.line,
-        owners: owners.get(block.id) ?? [],
+        owners: (owners.get(block.id) ?? []).map(internText),
       };
     });
+    this.heapKey = key;
+    this.heapCache = snapshots;
+    return snapshots;
   }
 
   /** 结束时统计泄漏：申请了但没有释放的块 */
@@ -1817,6 +2246,15 @@ class Interpreter {
     if (method === 'at' && expr.args[0]) {
       const index = asInt(this.evalExpr(expr.args[0]));
       return this.readElement(object, index, expr.line, expr);
+    }
+    // 用户自定义类的成员函数：找到同名同参数个数的方法，把对象当作 this 传进去
+    if (object.t === 'struct') {
+      const args = expr.args.map((arg) => this.evalExpr(arg));
+      const target = this.findMethod(object.typeName, method, args);
+      if (target) {
+        return this.callFunction(target, args, expr.line, object);
+      }
+      throw new SimError(`类 ${object.typeName} 没有可匹配的成员函数 ${method}()。`, expr.line);
     }
     throw new SimError(`成员函数 ${method}() 暂不支持单步执行。`, expr.line, 'unsupported');
   }
@@ -2054,6 +2492,13 @@ class Interpreter {
       }
       const value = this.evalExpr(item);
       if (value.t === 'void') continue;
+      if (value.t === 'struct') {
+        const text = this.runStreamOperator(value, expr.line);
+        if (text !== null) {
+          chunk += text;
+          continue;
+        }
+      }
       chunk += this.toText(value);
     }
     this.printOutput(chunk, expr.line);
@@ -2082,6 +2527,58 @@ class Interpreter {
         description: `从输入读入 ${ref.label} = ${formatValue(ref.get())}`,
         line: expr.line,
       });
+    }
+    return intValue(0);
+  }
+
+  /** memcpy / memset / memcmp：按字节处理，元素宽度大于 1 时按元素个数换算 */
+  private builtinMem(name: string, expr: ExprNode & { kind: 'call' }): RValue {
+    const target = expr.args[0] ? this.evalExpr(expr.args[0]) : nullValue();
+    const second = expr.args[1] ? this.evalExpr(expr.args[1]) : intValue(0);
+    const count = expr.args[2] ? asInt(this.evalExpr(expr.args[2])) : 0;
+
+    const readByte = (value: RValue, index: number): number => {
+      if (value.t === 'string') return index < value.v.length ? value.v.charCodeAt(index) : 0;
+      if (value.t === 'pointer') {
+        if (value.str !== undefined) {
+          const pos = value.offset + index;
+          return pos < value.str.length ? value.str.charCodeAt(pos) : 0;
+        }
+        if (value.array) {
+          const pos = value.offset + index;
+          const element = value.array.elems[pos];
+          return element ? asInt(element) : 0;
+        }
+      }
+      if (value.t === 'array') {
+        const element = value.elems[index];
+        return element ? asInt(element) : 0;
+      }
+      return asInt(value);
+    };
+
+    const writeByte = (value: RValue, index: number, byte: number): void => {
+      const array = value.t === 'array' ? value : value.t === 'pointer' ? value.array : undefined;
+      if (!array) return;
+      const offset = value.t === 'pointer' ? value.offset : 0;
+      const pos = offset + index;
+      if (pos < 0 || pos >= array.elems.length) return;
+      array.elems[pos] = intValue(byte, array.elemType);
+    };
+
+    if (name === 'memcpy') {
+      for (let i = 0; i < count; i++) writeByte(target, i, readByte(second, i));
+      return target;
+    }
+    if (name === 'memset') {
+      const byte = asInt(second);
+      for (let i = 0; i < count; i++) writeByte(target, i, byte);
+      return target;
+    }
+    // memcmp
+    for (let i = 0; i < count; i++) {
+      const diff = readByte(target, i) - readByte(second, i);
+      if (diff !== 0) return intValue(diff < 0 ? -1 : 1);
     }
     return intValue(0);
   }
@@ -2380,7 +2877,12 @@ class Interpreter {
 
   /* ============================== 函数调用 ============================== */
 
-  private callFunction(fn: FuncDeclNode, args: RValue[], callLine: number): RValue {
+  private callFunction(
+    fn: FuncDeclNode,
+    args: RValue[],
+    callLine: number,
+    thisValue?: StructValue,
+  ): RValue {
     if (this.frames.length >= MAX_CALL_DEPTH) {
       throw new SimError(`递归层数超过 ${MAX_CALL_DEPTH} 层，可能是没有终止条件的递归。`, callLine, 'runtime');
     }
@@ -2398,15 +2900,52 @@ class Interpreter {
       line: fn.line,
       scopes: [new Scope(parentScope === this.globalScope ? this.globalScope : parentScope)],
     };
+    if (thisValue) {
+      frame.thisValue = thisValue;
+      const selfRef: Ref = {
+        get: () => thisValue,
+        set: () => undefined,
+        label: 'this',
+        typeText: `${thisValue.typeName}*`,
+      };
+      frame.scopes[0].vars.set('this', {
+        name: 'this',
+        value: {
+          t: 'pointer',
+          label: 'this',
+          target: selfRef,
+          elemType: thisValue.typeName,
+          typeText: `${thisValue.typeName}*`,
+          offset: 0,
+        },
+        ref: selfRef,
+        typeText: `${thisValue.typeName}*`,
+        category: 'pointer',
+        isConst: true,
+      });
+    }
     this.frames.push(frame);
 
     for (let i = 0; i < fn.params.length; i++) {
       const param = fn.params[i];
       if (!param.name || param.name === '...') continue;
-      const arg = args[i] ?? nullValue();
+      const provided = i < args.length ? args[i] : undefined;
+      // 省略实参时要求默认值：`BigInt(size_t v = 0)` 里的 v 必须是 0 而不是 null
+      const arg = provided !== undefined ? provided : this.evalDefaultParam(param);
       const value = this.coerceParam(arg, param);
       const slot = this.makeSlot(param.name, value, param.typeText);
       frame.scopes[0].vars.set(param.name, slot);
+    }
+
+    // 构造初始化列表：x(a), y(b) 在函数体之前执行
+    if (thisValue && fn.ctorInit && fn.ctorInit.length > 0) {
+      for (const entry of fn.ctorInit) {
+        const fieldName = entry.name.replace(/^this->/, '');
+        if (!thisValue.fields.has(fieldName)) continue;
+        const fieldType = thisValue.fieldTypes.get(fieldName) ?? 'int';
+        const arg = entry.args[0] ? this.evalExpr(entry.args[0]) : voidValue();
+        thisValue.fields.set(fieldName, coerceValue(arg, fieldType));
+      }
     }
 
     let result: RValue = voidValue();
@@ -2430,10 +2969,16 @@ class Interpreter {
     } finally {
       this.frames.pop();
     }
+    // 按值返回的类对象是调用方的临时对象，到调用语句结束才析构
+    if (result.t === 'struct' && !fn.returnType.includes('&')) {
+      this.registerTemp(result);
+    }
     return result;
   }
 
   private coerceParam(arg: RValue, param: ParamNode): RValue {
+    // 引用参数不做拷贝，直接绑定到实参对象（写入会反映到调用方）
+    if (param.isReference || (param.typeText.includes('&') && !param.isPointer)) return arg;
     if (param.isPointer || param.isArray) {
       if (arg.t === 'array') return arrayToPointer(arg, param.name);
       if (arg.t === 'pointer' || arg.t === 'null') return arg;
@@ -2467,7 +3012,7 @@ class Interpreter {
 
 /** 对已解析的 ProgramNode 执行教学解释器，返回执行轨迹 */
 export function simulateProgram(program: ProgramNode, options: SimulateOptions = {}): TraceResult {
-  const maxSteps = Math.min(Math.max(options.maxSteps ?? 3000, 10), 20000);
+  const maxSteps = Math.min(Math.max(options.maxSteps ?? DEFAULT_MAX_STEPS, 10), MAX_TRACE_STEPS);
   try {
     const classes = flattenClasses(program);
     const registry = buildSupportRegistry(program, classes);

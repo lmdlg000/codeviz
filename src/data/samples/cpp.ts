@@ -10,7 +10,7 @@ const samples: CodeSample[] = [
   {
     id: 'cpp-bigint',
     title: 'BigInt：自己实现大整数',
-    description: '一个完整的 C++ 类：私有缓冲区、深拷贝、运算符重载与动态内存管理。适合看类图、调用图与内存布局。',
+    description: '一个完整的 C++ 类：私有缓冲区、深拷贝、运算符重载与动态内存管理。类图、调用图、堆内存都能看，也能单步跑完 —— 每次 new/delete 都对应到具体行。',
     language: 'cpp',
     code: `#include <iostream>
 #include <cstddef>

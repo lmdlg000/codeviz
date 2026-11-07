@@ -1315,6 +1315,7 @@ export class Parser {
     let isExplicit = options.quals.isExplicit;
     let trailingReturn: string | null = null;
     let ctorInitText: string | undefined;
+    let ctorInit: { name: string; args: ExprNode[] }[] | undefined;
 
     let guard = 0;
     while (guard++ < 40) {
@@ -1357,12 +1358,39 @@ export class Parser {
       if (this.check(':')) {
         this.advance();
         const initStart = this.pos;
+        const entries: { name: string; args: ExprNode[] }[] = [];
         while (!this.atEnd() && !this.check('{') && !this.check(';')) {
-          if (this.check('(')) this.skipBalanced('(', ')');
-          else if (this.check('{')) break;
-          else this.advance();
+          let entryName = '';
+          while (
+            !this.atEnd() &&
+            !this.check('(') &&
+            !this.check('{') &&
+            !this.check(',') &&
+            !this.check(';')
+          ) {
+            entryName += this.advance().text;
+          }
+          const args: ExprNode[] = [];
+          if (this.check('(')) {
+            this.advance();
+            while (!this.atEnd() && !this.check(')')) {
+              args.push(this.parseAssignment());
+              if (!this.match(',')) break;
+            }
+            this.expect(')');
+          } else if (this.check('{')) {
+            this.advance();
+            while (!this.atEnd() && !this.check('}')) {
+              args.push(this.parseAssignment());
+              if (!this.match(',')) break;
+            }
+            this.expect('}');
+          }
+          entries.push({ name: entryName.trim(), args });
+          if (!this.match(',')) break;
         }
         ctorInitText = this.tokensText(initStart, this.pos);
+        ctorInit = entries;
         continue;
       }
       break;
@@ -1447,6 +1475,7 @@ export class Parser {
       isDestructor,
       specifiers: options.quals.specifiers,
       ctorInitText,
+      ctorInit,
       access: options.access,
       signature,
       ...this.span(options.startTok),

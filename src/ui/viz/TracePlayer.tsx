@@ -66,6 +66,9 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
+/** 超过这个步数就不自动播放，交给用户手动「单步 / 跳到末尾」 */
+const AUTOPLAY_MAX_STEPS = 600;
+
 function safeSteps(trace: TraceResult | null | undefined): TraceStep[] {
   if (!trace || !Array.isArray(trace.steps)) return [];
   return trace.steps.filter((step) => step && typeof step === 'object');
@@ -83,6 +86,8 @@ export function TracePlayer({
   const highlighted = useMemo(() => highlightCode(code ?? '', detected), [code, detected]);
   const steps = useMemo(() => safeSteps(trace), [trace]);
   const reduced = useReducedMotion();
+  // 几千步的长轨迹不自动播放：否则页面会自己闪好几分钟
+  const canAutoplay = Boolean(autoplay) && steps.length > 1 && steps.length <= AUTOPLAY_MAX_STEPS && !reduced;
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -101,9 +106,9 @@ export function TracePlayer({
   // 代码 / 追踪结果变化时回到第一步
   useEffect(() => {
     setIndex(0);
-    setPlaying(Boolean(autoplay) && steps.length > 1 && !reduced);
+    setPlaying(canAutoplay);
     lastLineRef.current = undefined;
-  }, [stepsKey, autoplay, reduced, steps.length]);
+  }, [stepsKey, canAutoplay, steps.length]);
 
   const current = steps.length > 0 ? steps[Math.min(index, steps.length - 1)] : undefined;
   const currentLine = current?.line;

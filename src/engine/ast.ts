@@ -361,6 +361,8 @@ export interface FuncDeclNode extends NodePos {
   isDestructor: boolean;
   specifiers: string[];
   ctorInitText?: string;
+  /** 构造初始化列表：x(a), y(b) */
+  ctorInit?: { name: string; args: ExprNode[] }[];
   access?: AccessKind;
   signature: string;
 }

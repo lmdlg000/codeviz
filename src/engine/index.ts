@@ -13,7 +13,7 @@ import type {
   SourceLanguage,
   TraceResult,
 } from './types';
-import { MAX_CODE_LINES } from './types';
+import { DEFAULT_MAX_STEPS, MAX_CODE_LINES, MAX_TRACE_STEPS } from './types';
 import { tokenize } from './tokenizer';
 import { parseTokens } from './parser';
 import { analyzeProgram } from './analyzer';
@@ -81,7 +81,7 @@ export function analyzeCode(code: string, options: AnalyzeOptions = {}): Analysi
 
 /** 单步执行教学子集代码；不支持时返回 supported=false 的友好结果 */
 export function simulate(code: string, options: SimulateOptions = {}): TraceResult {
-  const maxSteps = Math.min(Math.max(options.maxSteps ?? 3000, 10), 20000);
+  const maxSteps = Math.min(Math.max(options.maxSteps ?? DEFAULT_MAX_STEPS, 10), MAX_TRACE_STEPS);
   try {
     const tokenizerResult = tokenize(code);
     const parseResult = parseTokens(tokenizerResult.tokens);
