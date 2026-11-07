@@ -64,15 +64,12 @@ export function buildSupportRegistry(program: ProgramNode, classDecls: ProgramNo
 }
 
 const UNSUPPORTED_TYPES = new Set([
-  'map',
-  'set',
   'unordered_map',
   'unordered_set',
+  'multimap',
+  'multiset',
   'list',
   'deque',
-  'queue',
-  'stack',
-  'pair',
   'tuple',
   'ofstream',
   'ifstream',
@@ -216,28 +213,11 @@ export function findUnsupportedFunction(
 
 /**
  * 类层面的子集检查。
- * 单继承 + 虚函数 + 类模板都已支持（模板在看到 `Stack<int>` 时就地展开成具体类），
- * 这里只拦真正做不到的：多继承。
+ * 单继承 / 多继承 / 虚函数 / 类模板都已支持，没有需要提前拦下的类特性了；
+ * 兄弟基类同名字段的二义性在访问时单独报错（见解释器的 ambiguousField）。
  */
 function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null {
-  const flattened: ClassDeclNode[] = [];
-  const collect = (list: ClassDeclNode[]): void => {
-    for (const cls of list) {
-      flattened.push(cls);
-      collect(cls.nested);
-    }
-  };
-  collect(classes);
-
-  for (const cls of flattened) {
-    if (cls.bases.length > 1) {
-      // 多继承要处理基类指针偏移与二义性，教学子集先不做
-      return {
-        line: cls.line,
-        message: `${cls.name} 用了多继承（: ${cls.bases.map((base) => base.name).join(', ')}），多继承暂不支持单步执行。`,
-      };
-    }
-  }
+  void classes;
   return null;
 }
 

@@ -49,7 +49,7 @@ import {
   truthy,
   voidValue,
 } from './values';
-import type { ArrayValue, PointerValue, Ref, RValue, StructValue } from './values';
+import type { ArrayValue, MapEntryValue, MapValue, PointerValue, Ref, RValue, StructValue } from './values';
 import { exprToText, formatNumber, scalarSize, truncateText } from './utils';
 
 const MAX_CALL_DEPTH = 64;
@@ -105,7 +105,7 @@ interface Frame {
 
 type Signal =
   | { kind: 'normal' }
-  | { kind: 'return'; value: RValue }
+  | { kind: 'return'; value: RValue; ref?: Ref }
   | { kind: 'break' }
   | { kind: 'continue' };
 
@@ -114,6 +114,22 @@ const NORMAL: Signal = { kind: 'normal' };
 function lastSegment(name: string): string {
   const index = name.lastIndexOf('::');
   return index >= 0 ? name.slice(index + 2) : name;
+}
+
+/** 纯取值不会产生副作用的左值：a、a.b、a[i]、*p */
+function isSimpleLvalue(node: ExprNode): boolean {
+  switch (node.kind) {
+    case 'ident':
+      return true;
+    case 'member':
+      return node.op !== '::' && isSimpleLvalue(node.object);
+    case 'index':
+      return isSimpleLvalue(node.object) && isSimpleLvalue(node.index);
+    case 'unary':
+      return node.op === '*' && isSimpleLvalue(node.operand);
+    default:
+      return false;
+  }
 }
 
 function trimZeros(text: string): string {
@@ -148,6 +164,59 @@ function flattenClasses(program: ProgramNode): ClassDeclNode[] {
 function vectorElemType(typeText: string): string | undefined {
   const match = /(?:^|::)\s*vector\s*<(.+)>\s*$/.exec(typeText.trim());
   return match ? match[1].trim() : undefined;
+}
+
+/** `std::map<string, int>` → ['string', 'int']；名字不匹配就返回 undefined */
+function templateArgsOf(typeText: string, name: string): string[] | undefined {
+  const match = new RegExp(`(?:^|::)\\s*${name}\\s*<(.+)>\\s*$`).exec(typeText.trim());
+  if (!match) return undefined;
+  return splitTemplateArgs(match[1])
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+/** 去掉 `const` / 引用，容器里存的都是值 */
+function plainType(text: string): string {
+  return text
+    .replace(/\b(const|constexpr|volatile|typename)\b/g, '')
+    .replace(/[*&]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+interface AssocInfo {
+  kind: 'map' | 'set';
+  keyType: string;
+  valueType: string;
+}
+
+/** `std::map<K, V>` / `std::set<K>` */
+function assocTypeOf(typeText: string): AssocInfo | undefined {
+  const mapArgs = templateArgsOf(typeText, 'map');
+  if (mapArgs && mapArgs.length >= 2) {
+    return { kind: 'map', keyType: plainType(mapArgs[0]), valueType: plainType(mapArgs[1]) };
+  }
+  const setArgs = templateArgsOf(typeText, 'set');
+  if (setArgs && setArgs.length >= 1) {
+    return { kind: 'set', keyType: plainType(setArgs[0]), valueType: 'void' };
+  }
+  return undefined;
+}
+
+/** `std::stack<int>` / `std::queue<int>` / `std::priority_queue<int>` */
+function adapterTypeOf(typeText: string): { adapter: 'stack' | 'queue' | 'priority_queue'; elemType: string } | undefined {
+  for (const adapter of ['stack', 'queue', 'priority_queue'] as const) {
+    const args = templateArgsOf(typeText, adapter);
+    if (args && args.length >= 1) return { adapter, elemType: plainType(args[0]) };
+  }
+  return undefined;
+}
+
+/** `std::pair<A, B>` */
+function pairTypeOf(typeText: string): { first: string; second: string } | undefined {
+  const args = templateArgsOf(typeText, 'pair');
+  if (!args || args.length < 2) return undefined;
+  return { first: plainType(args[0]), second: plainType(args[1]) };
 }
 
 /** 展开模板时要跟着替换的字段：只动类型文本，不碰标识符 */
@@ -284,6 +353,8 @@ class Interpreter {
   private staticConsts = new Map<string, Map<string, number>>();
   /** 类名 → 直接基类列表（单继承为主，多继承按声明顺序平铺） */
   private parents = new Map<string, string[]>();
+  /** 最近一次「返回引用」的调用交出来的左值，供 `at(v,1) = 9` 这类写法使用 */
+  private refReturnSlot: Ref | undefined;
 
   /** 从自己到最顶层基类的顺序：Dog → Animal */
   private classChain(className: string): string[] {
@@ -300,6 +371,48 @@ class Interpreter {
   /** base 是 derived 的基类（或同一个类）吗 */
   private isAncestorOf(base: string, derived: string): boolean {
     return this.classChain(derived).includes(lastSegment(base));
+  }
+
+  /**
+   * 基类子对象的布局顺序：按声明顺序，每个基类自己的基类排在它前面
+   * （`class C : public A, public B` → A、B；菱形时祖先只出现一次）。
+   */
+  private baseLayout(className: string): string[] {
+    const result: string[] = [];
+    const visit = (name: string, depth: number): void => {
+      if (depth > 16) return;
+      for (const base of this.parents.get(name) ?? []) {
+        visit(base, depth + 1);
+        if (!result.includes(base)) result.push(base);
+      }
+    };
+    visit(lastSegment(className), 0);
+    return result;
+  }
+
+  /**
+   * 兄弟基类里同名的字段：C++ 里写 `c.x` 会有二义性，必须写成 `c.A::x`。
+   * 返回真正冲突的那几个基类名，没有冲突就返回 undefined。
+   */
+  private ambiguousField(className: string, field: string): string[] | undefined {
+    const base = lastSegment(className);
+    const owners = this.baseLayout(base).filter((name) =>
+      (this.classMap.get(name)?.fields ?? []).some((item) => !item.isStatic && item.name === field),
+    );
+    if (owners.length < 2) return undefined;
+    // 有继承关系的两个基类不算冲突（更派生的那份隐藏基类的同名字段）
+    const distinct = owners.filter((owner) => !owners.some((other) => owner !== other && this.isAncestorOf(owner, other)));
+    return distinct.length > 1 ? distinct : undefined;
+  }
+
+  /** 兄弟基类同名字段：给一句和 C++ 编译器同义的提示，而不是悄悄只用其中一份 */
+  private assertFieldNotAmbiguous(typeName: string, field: string, line: number): void {
+    const owners = this.ambiguousField(typeName, field);
+    if (!owners) return;
+    throw new SimError(
+      `${field} 在 ${owners.join(' 和 ')} 里都有定义，直接写 ${field} 会有二义性；请写成 ${owners[0]}::${field} 指明是哪一份（或给字段改个名字）。`,
+      line,
+    );
   }
 
   /** 一个类是否抽象：链上有纯虚函数、且更派生的类没有实现它 */
@@ -768,6 +881,11 @@ class Interpreter {
       };
       if (slot.value.t === 'array') {
         entry.arrayValues = arrayElementTexts(slot.value);
+      } else if (slot.value.t === 'map') {
+        // map / set 在内存视图里也按「一格一个条目」画，键值一目了然
+        entry.arrayValues = slot.value.entries.map((item) =>
+          item.value === null ? formatValue(item.key, 1) : `${formatValue(item.key, 1)}: ${formatValue(item.value, 1)}`,
+        );
       } else if (slot.value.t === 'pointer') {
         entry.pointerTarget = slot.value.target ? slot.value.label : slot.value.str !== undefined ? '(字符串常量)' : '空指针';
       }
@@ -812,7 +930,8 @@ class Interpreter {
     if (globalSlot) return globalSlot;
     // 成员函数内部可以直接写字段名：回退到 this 对应对象的字段
     const self = frame?.thisValue;
-    if (self && self.fields.has(name)) {
+    if (self && (self.fields.has(name) || this.ambiguousField(self.typeName, name))) {
+      this.assertFieldNotAmbiguous(self.typeName, name, line);
       const fieldType = self.fieldTypes.get(name) ?? 'int';
       return {
         name,
@@ -988,12 +1107,21 @@ class Interpreter {
           if (this.isTemp(value)) this.adoptTemp(value);
           else value = this.copyObject(value, stmt.line);
         }
+        // `int& at(...)`：把「返回的那个左值」也带出去，`at(v,1) = 9` 才写得进去
+        let ref: Ref | undefined;
+        if (!byValue && stmt.expr && isSimpleLvalue(stmt.expr)) {
+          try {
+            ref = this.resolveLValue(stmt.expr);
+          } catch {
+            ref = undefined;
+          }
+        }
         this.emit({
           event: 'return',
           description: stmt.expr ? `返回 ${formatValue(value)}` : '返回（void）',
           line: stmt.line,
         });
-        return { kind: 'return', value };
+        return { kind: 'return', value, ref };
       }
       case 'break':
         this.emit({ event: 'break', description: '跳出当前循环 / switch', line: stmt.line });
@@ -1190,6 +1318,7 @@ class Interpreter {
 
   private execRangeFor(stmt: StmtNode & { kind: 'rangeFor' }): Signal {
     const iterable = this.evalExpr(stmt.iterable);
+    if (iterable.t === 'map') return this.execMapRangeFor(stmt, iterable);
     let items: RValue[];
     if (iterable.t === 'array') items = iterable.elems;
     else if (iterable.t === 'string') {
@@ -1218,6 +1347,36 @@ class Interpreter {
           line: stmt.line,
         });
         const signal = this.execStmt(stmt.body);
+        if (signal.kind === 'break') return NORMAL;
+        if (signal.kind === 'return') return signal;
+      } finally {
+        frame.scopes.pop();
+      }
+    }
+    return NORMAL;
+  }
+
+  /** `for (const auto& p : m)`：map 每次给一个 pair，set 每次给一个键 */
+  private execMapRangeFor(stmt: StmtNode & { kind: 'rangeFor' }, map: MapValue): Signal {
+    const entryType = map.kind === 'set' ? map.keyType : `pair<${map.keyType}, ${map.valueType}>`;
+    // 复制一份条目名单：循环体里 erase 不至于打乱遍历
+    const entries = map.entries.slice();
+    for (const entry of entries) {
+      const item = this.mapIterationItem(map, entry);
+      const frame = this.currentFrame();
+      if (!frame) return NORMAL;
+      const scope = new Scope(this.currentScope());
+      frame.scopes.push(scope);
+      try {
+        if (stmt.byReference) this.declareBound(stmt.varName, { get: () => item, set: () => undefined, label: stmt.varName, typeText: entryType }, entryType);
+        else this.declare(stmt.varName, item, entryType);
+        this.emit({
+          event: 'declare',
+          description: `遍历元素 ${stmt.varName} = ${formatValue(item)}`,
+          line: stmt.line,
+        });
+        const signal = this.execStmt(stmt.body);
+        if (stmt.byReference) this.syncMapItem(map, entry, item);
         if (signal.kind === 'break') return NORMAL;
         if (signal.kind === 'return') return signal;
       } finally {
@@ -1297,6 +1456,15 @@ class Interpreter {
     // std::vector<T> 用动态数组承载：push_back / size / begin / end 都能逐步看到
     const vectorElem = vectorElemType(typeText);
     if (vectorElem) return this.createVectorValue(vectorElem, declarator.init, typeText);
+    // 关联容器 / 容器适配器 / pair
+    const assoc = assocTypeOf(typeText);
+    if (assoc) return this.createMapValue(assoc, declarator.init, typeText);
+    const adapter = adapterTypeOf(typeText);
+    if (adapter) {
+      return this.createAdapterValue(adapter.adapter, adapter.elemType, declarator.init, typeText);
+    }
+    const pairTypes = pairTypeOf(typeText);
+    if (pairTypes) return this.createPairValue(pairTypes.first, pairTypes.second, declarator.init, typeText);
     if (isStringType(base) && !isPointerType(typeText)) {
       if (!declarator.init) return stringValue('', base);
       return coerceValue(this.evalExpr(declarator.init), typeText);
@@ -1340,6 +1508,214 @@ class Interpreter {
     const value = this.evalExpr(expr);
     if (isStringType(elemType)) return stringValue(this.toText(value), elemType);
     return coerceValue(value, elemType);
+  }
+
+  /* ---------- std::map / std::set / std::pair / 容器适配器 ---------- */
+
+  /** `std::map<K, V> m = {{"a", 1}};` */
+  private createMapValue(
+    info: AssocInfo,
+    init: ExprNode | undefined,
+    typeText: string,
+  ): MapValue {
+    const value: MapValue = {
+      t: 'map',
+      kind: info.kind,
+      keyType: info.keyType,
+      valueType: info.valueType,
+      typeText,
+      entries: [],
+    };
+    const items = init && init.kind === 'initlist' ? init.items : [];
+    for (const item of items) {
+      if (info.kind === 'set') {
+        this.mapInsertEntry(value, this.coerceKey(item, info.keyType), null);
+        continue;
+      }
+      if (item.kind !== 'initlist' || item.items.length < 2) continue;
+      const key = this.coerceKey(item.items[0], info.keyType);
+      const entryValue = coerceValue(this.evalExpr(item.items[1]), info.valueType);
+      this.mapInsertEntry(value, key, entryValue);
+    }
+    return value;
+  }
+
+  /** `std::stack<int> s;` / `queue` / `priority_queue`：底层还是数组，只是进出口不同 */
+  private createAdapterValue(
+    adapter: 'stack' | 'queue' | 'priority_queue',
+    elemType: string,
+    init: ExprNode | undefined,
+    typeText: string,
+  ): ArrayValue {
+    const items = init && init.kind === 'initlist' ? init.items : [];
+    const elems = items.map((item) => this.coerceVectorElement(item, elemType));
+    const value: ArrayValue = { t: 'array', elems, dims: [elems.length], elemType, typeText, adapter };
+    if (adapter === 'priority_queue') this.sortAdapter(value);
+    return value;
+  }
+
+  /** 优先队列：按「最大堆」语义保持有序，top() 取末尾（最大）的那个 */
+  private sortAdapter(array: ArrayValue): void {
+    array.elems.sort((left, right) => this.compareForSort(left, right));
+  }
+
+  private createPairValue(
+    first: string,
+    second: string,
+    init: ExprNode | undefined,
+    typeText: string,
+  ): StructValue {
+    const pair = this.createStructValue('pair', undefined);
+    pair.typeText = typeText;
+    pair.fields.set('first', this.defaultScalar(first, first));
+    pair.fieldTypes.set('first', first);
+    pair.fields.set('second', this.defaultScalar(second, second));
+    pair.fieldTypes.set('second', second);
+    if (!init) return pair;
+    const items = init.kind === 'initlist' ? init.items : init.kind === 'call' ? init.args : [];
+    if (items[0]) pair.fields.set('first', coerceValue(this.evalExpr(items[0]), first));
+    if (items[1]) pair.fields.set('second', coerceValue(this.evalExpr(items[1]), second));
+    return pair;
+  }
+
+  private coerceKey(expr: ExprNode, keyType: string): RValue {
+    const value = this.evalExpr(expr);
+    if (isStringType(keyType)) return stringValue(this.toText(value), keyType);
+    return coerceValue(value, keyType);
+  }
+
+  /** 有序表里找键：找不到返回 -1（map / set 都按 key 升序排着） */
+  private mapKeyIndex(map: MapValue, key: RValue): number {
+    return map.entries.findIndex((entry) => this.valuesEqual(entry.key, key));
+  }
+
+  /** 插入 / 覆盖一个条目，保持按 key 升序 */
+  private mapInsertEntry(map: MapValue, key: RValue, value: RValue | null): boolean {
+    const index = this.mapKeyIndex(map, key);
+    if (index >= 0) {
+      if (value !== null) map.entries[index].value = value;
+      return false;
+    }
+    const entry: MapEntryValue = { key, value };
+    const at = map.entries.findIndex((item) => this.compareForSort(key, item.key) < 0);
+    if (at < 0) map.entries.push(entry);
+    else map.entries.splice(at, 0, entry);
+    return true;
+  }
+
+  /** 读取 m[k]：map 里没有这个键就按 C++ 语义插入一个默认值 */
+  private mapIndexRead(map: MapValue, keyExpr: ExprNode, line: number): RValue {
+    if (map.kind === 'set') throw new SimError('std::set 不能用下标访问，请用 count() / insert()。', line, 'unsupported');
+    const key = this.coerceKey(keyExpr, map.keyType);
+    const index = this.mapKeyIndex(map, key);
+    if (index >= 0) return map.entries[index].value ?? this.defaultScalar(map.valueType, map.valueType);
+    const empty = this.defaultScalar(map.valueType, map.valueType);
+    this.mapInsertEntry(map, key, empty);
+    return empty;
+  }
+
+  /** `m[k] = v`：拿到条目 value 的引用，缺键时先插入 */
+  private mapIndexRef(map: MapValue, keyExpr: ExprNode, label: string, line: number): Ref {
+    if (map.kind === 'set') throw new SimError('std::set 不能用下标访问，请用 insert() / count()。', line, 'unsupported');
+    const key = this.coerceKey(keyExpr, map.keyType);
+    if (this.mapKeyIndex(map, key) < 0) {
+      this.mapInsertEntry(map, key, this.defaultScalar(map.valueType, map.valueType));
+    }
+    const entry = map.entries[this.mapKeyIndex(map, key)];
+    return {
+      get: () => entry.value ?? this.defaultScalar(map.valueType, map.valueType),
+      set: (value) => {
+        entry.value = value;
+      },
+      label,
+      typeText: map.valueType,
+    };
+  }
+
+  /** map / set 的成员函数 */
+  private evalMapCall(map: MapValue, method: string, expr: ExprNode & { kind: 'call' }): RValue | undefined {
+    const keyArg = (): RValue => this.coerceKey(expr.args[0], map.keyType);
+    switch (method) {
+      case 'size':
+        return intValue(map.entries.length);
+      case 'empty':
+        return boolValue(map.entries.length === 0);
+      case 'clear':
+        map.entries.length = 0;
+        return voidValue();
+      case 'count':
+        if (!expr.args[0]) return intValue(0);
+        return intValue(this.mapKeyIndex(map, keyArg()) >= 0 ? 1 : 0);
+      case 'contains':
+        if (!expr.args[0]) return boolValue(false);
+        return boolValue(this.mapKeyIndex(map, keyArg()) >= 0);
+      case 'at': {
+        if (!expr.args[0]) throw new SimError('at() 需要一个键。', expr.line);
+        const index = this.mapKeyIndex(map, keyArg());
+        if (index < 0) {
+          throw new SimError(`map::at 找不到这个键（运行时会抛 out_of_range）。`, expr.line, 'runtime');
+        }
+        return map.entries[index].value ?? intValue(0, map.valueType);
+      }
+      case 'erase':
+        if (!expr.args[0]) return intValue(0);
+        {
+          const index = this.mapKeyIndex(map, keyArg());
+          if (index < 0) return intValue(0);
+          map.entries.splice(index, 1);
+          return intValue(1);
+        }
+      case 'insert':
+        if (map.kind === 'set') {
+          const key = keyArg();
+          return boolValue(this.mapInsertEntry(map, key, null));
+        }
+        {
+          const arg = expr.args[0];
+          if (!arg) return boolValue(false);
+          const pair = this.evalExpr(arg);
+          if (pair.t !== 'struct' || !pair.fields.has('first')) {
+            throw new SimError('insert() 需要一个键值对，例如 m.insert({"a", 1})。', expr.line, 'unsupported');
+          }
+          const key = coerceValue(pair.fields.get('first') as RValue, map.keyType);
+          const value = coerceValue(pair.fields.get('second') as RValue, map.valueType);
+          return boolValue(this.mapInsertEntry(map, key, value));
+        }
+      case 'begin':
+      case 'end':
+      case 'find':
+        throw new SimError(
+          `map / set 的迭代器（${method}()）暂不支持单步执行，请用 count() / contains() / at() 或范围 for。`,
+          expr.line,
+          'unsupported',
+        );
+      default:
+        return undefined;
+    }
+  }
+
+  /** 范围 for 遍历 map / set 时的元素：map 给出 pair，set 给出键 */
+  private mapIterationItem(map: MapValue, entry: MapEntryValue): RValue {
+    if (map.kind === 'set') return entry.key;
+    const pair = this.createStructValue('pair', undefined);
+    pair.typeText = `pair<${map.keyType}, ${map.valueType}>`;
+    pair.fields.set('first', entry.key);
+    pair.fieldTypes.set('first', map.keyType);
+    pair.fields.set('second', entry.value ?? this.defaultScalar(map.valueType, map.valueType));
+    pair.fieldTypes.set('second', map.valueType);
+    return pair;
+  }
+
+  /** 按引用遍历时，循环体改过的 pair 要写回表里 */
+  private syncMapItem(map: MapValue, entry: MapEntryValue, item: RValue): void {
+    if (map.kind === 'set' || item.t !== 'struct') return;
+    const nextKey = item.fields.get('first');
+    const nextValue = item.fields.get('second');
+    if (nextValue !== undefined) entry.value = nextValue;
+    if (nextKey && !this.valuesEqual(nextKey, entry.key)) {
+      map.entries.sort((left, right) => this.compareForSort(left.key, right.key));
+      entry.key = nextKey;
+    }
   }
 
   /** begin() / end()：指向同一个数组的偏移指针，std::sort 靠它确定区间 */
@@ -1769,8 +2145,9 @@ class Interpreter {
 
   private destroyValue(value: RValue): void {
     if (value.t === 'struct') {
-      // 析构顺序和构造相反：先自己的，再一层层往上
-      for (const className of this.classChain(value.typeName)) {
+      // 析构顺序和构造相反：先自己，再按基类声明顺序倒着析构各个基类
+      const order = [lastSegment(value.typeName), ...this.baseLayout(value.typeName).reverse()];
+      for (const className of order) {
         const dtor = this.findMethodIn(className, `~${className}`, 0);
         if (dtor) this.callFunction(dtor, [], this.currentLine, value);
       }
@@ -1818,25 +2195,56 @@ class Interpreter {
     };
     const cls = this.classMap.get(name);
     if (!cls) return value;
-    // 对象布局和 C++ 一致：基类子对象在前，自己的字段在后。
+    // 对象布局和 C++ 一致：基类子对象在前（按声明顺序），自己的字段在后。
     // 平铺成一张字段表之后，派生类里直接写基类字段名就能取到。
-    const bases = this.classChain(name).slice(1).reverse();
-    for (const base of bases) {
+    // 兄弟基类里同名的那几个字段不能互相覆盖，用 `Base::name` 做存储键区分开。
+    const duplicated = new Set(this.duplicatedFields(name));
+    for (const base of this.baseLayout(name)) {
       const baseCls = this.classMap.get(base);
-      if (baseCls) this.layoutFields(value, baseCls, undefined);
+      if (baseCls) this.layoutFields(value, baseCls, undefined, duplicated);
     }
-    this.layoutFields(value, cls, init);
+    this.layoutFields(value, cls, init, duplicated);
     return value;
   }
 
-  private layoutFields(value: StructValue, cls: ClassDeclNode, init: ExprNode | undefined): void {
+  /** 兄弟基类里撞名的字段（需要 `Base::name` 才能访问的那些） */
+  private duplicatedFields(className: string): string[] {
+    const owners = new Map<string, string[]>();
+    const collect = (cls: ClassDeclNode | undefined): void => {
+      for (const field of cls?.fields ?? []) {
+        if (field.isStatic) continue;
+        const list = owners.get(field.name) ?? [];
+        if (!list.includes(cls!.name)) list.push(cls!.name);
+        owners.set(field.name, list);
+      }
+    };
+    const name = lastSegment(className);
+    for (const base of this.baseLayout(name)) collect(this.classMap.get(base));
+    collect(this.classMap.get(name));
+    const result: string[] = [];
+    for (const [field, list] of owners) {
+      if (list.length < 2) continue;
+      // 有继承关系的两份不算撞名：更派生的那份直接隐藏基类的同名字段
+      const visible = list.filter((owner) => !list.some((other) => owner !== other && this.isAncestorOf(owner, other)));
+      if (visible.length > 1) result.push(field);
+    }
+    return result;
+  }
+
+  private layoutFields(
+    value: StructValue,
+    cls: ClassDeclNode,
+    init: ExprNode | undefined,
+    duplicated: Set<string>,
+  ): void {
     const fields = cls.fields.filter((field) => !field.isStatic);
     const initItems = init && init.kind === 'initlist' ? init.items : [];
     for (let i = 0; i < fields.length; i++) {
       const field = fields[i];
       const fieldType = this.fieldTypeText(field);
-      value.fieldTypes.set(field.name, fieldType);
-      value.fields.set(field.name, this.defaultFieldValue(field, initItems[i]));
+      const key = duplicated.has(field.name) ? `${cls.name}::${field.name}` : field.name;
+      value.fieldTypes.set(key, fieldType);
+      value.fields.set(key, this.defaultFieldValue(field, initItems[i]));
     }
   }
 
@@ -1904,6 +2312,7 @@ class Interpreter {
         return this.evalCall(expr);
       case 'index': {
         const object = this.evalExpr(expr.object);
+        if (object.t === 'map') return this.mapIndexRead(object, expr.index, expr.line);
         const index = asInt(this.evalExpr(expr.index));
         return this.readElement(object, index, expr.line, expr);
       }
@@ -2263,6 +2672,19 @@ class Interpreter {
         const count = Math.max(0, asInt(this.evalExpr(expr.args[0])));
         const char = String.fromCharCode(asInt(this.evalExpr(expr.args[1])));
         return stringValue(char.repeat(count));
+      }
+      case 'make_pair': {
+        const first = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
+        const second = expr.args[1] ? this.evalExpr(expr.args[1]) : intValue(0);
+        const firstType = this.valueTypeText(first) || 'int';
+        const secondType = this.valueTypeText(second) || 'int';
+        const pair = this.createStructValue('pair', undefined);
+        pair.typeText = `pair<${firstType}, ${secondType}>`;
+        pair.fields.set('first', first);
+        pair.fieldTypes.set('first', firstType);
+        pair.fields.set('second', second);
+        pair.fieldTypes.set('second', secondType);
+        return pair;
       }
       case 'printf':
         return this.builtinPrintf(expr);
@@ -2822,25 +3244,50 @@ class Interpreter {
 
   /** 实参是简单左值时给出它的引用，供引用参数直接绑定 */
   private argRef(expr: ExprNode): Ref | undefined {
-    const simple = (node: ExprNode): boolean => {
-      switch (node.kind) {
-        case 'ident':
-          return true;
-        case 'member':
-          return node.op !== '::' && simple(node.object);
-        case 'index':
-          return simple(node.object) && simple(node.index);
-        case 'unary':
-          return node.op === '*' && simple(node.operand);
-        default:
-          return false;
-      }
-    };
-    if (!simple(expr)) return undefined;
+    if (!isSimpleLvalue(expr) && !(expr.kind === 'call' && this.returnsReference(expr))) return undefined;
     try {
       return this.resolveLValue(expr);
     } catch {
       return undefined;
+    }
+  }
+
+  /** 这个调用绑定的是不是「返回引用」的函数（只有它们能出现在赋值号左边） */
+  private returnsReference(expr: ExprNode & { kind: 'call' }): boolean {
+    const anyRef = (list: FuncDeclNode[] | undefined): boolean =>
+      (list ?? []).some((fn) => fn.returnType.includes('&'));
+    const callee = expr.callee;
+    if (callee.kind === 'ident') {
+      const single = this.functionMap.get(callee.name);
+      if (single) return single.returnType.includes('&');
+      return anyRef(this.freeFunctions.get(callee.name));
+    }
+    if (callee.kind === 'member') {
+      for (const cls of this.classMap.values()) {
+        if (cls.methods.some((method) => method.name === callee.name && method.returnType.includes('&'))) {
+          return true;
+        }
+      }
+      for (const [key, list] of this.methodIndex) {
+        if (key.endsWith(`::${callee.name}`) && anyRef(list)) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 调用一个返回引用的函数，把「它返回的那个左值」取出来。
+   * `at(v, 1) = 9`、`int& r = at(v, 1)`、`swap(at(v,0), at(v,1))` 都靠它。
+   */
+  private callRef(expr: ExprNode & { kind: 'call' }): Ref | undefined {
+    if (!this.returnsReference(expr)) return undefined;
+    const saved = this.refReturnSlot;
+    this.refReturnSlot = undefined;
+    try {
+      this.evalExpr(expr);
+      return this.refReturnSlot;
+    } finally {
+      this.refReturnSlot = saved;
     }
   }
 
@@ -2856,6 +3303,10 @@ class Interpreter {
     // p->f() 先解引用，拿到实际对象再做分派
     if (callee.op === '->') object = this.derefValue(object, expr.line, callee);
     const method = callee.name;
+    if (object.t === 'map') {
+      const handled = this.evalMapCall(object, method, expr);
+      if (handled !== undefined) return handled;
+    }
     if (method === 'length' || method === 'size') {
       if (object.t === 'string') return intValue(Array.from(object.v).length);
       if (object.t === 'array') return intValue(object.elems.length);
@@ -2865,6 +3316,22 @@ class Interpreter {
       const resized = (): void => {
         object.dims = [object.elems.length];
       };
+      // 容器适配器（stack / queue / priority_queue）只从两端进出
+      const adapter = object.adapter;
+      if (adapter && (method === 'push' || method === 'pop')) {
+        if (method === 'push') {
+          const value = expr.args[0] ? this.coerceVectorElement(expr.args[0], object.elemType) : voidValue();
+          object.elems.push(value);
+          if (adapter === 'priority_queue') this.sortAdapter(object);
+          resized();
+          return voidValue();
+        }
+        // stack / priority_queue 从尾部出，queue 从头部出
+        if (adapter === 'queue') object.elems.shift();
+        else object.elems.pop();
+        resized();
+        return voidValue();
+      }
       if (method === 'push_back') {
         const value = expr.args[0] ? this.coerceVectorElement(expr.args[0], object.elemType) : voidValue();
         object.elems.push(value);
@@ -2878,6 +3345,10 @@ class Interpreter {
       }
       if (method === 'front') return object.elems[0] ?? intValue(0, object.elemType);
       if (method === 'back') return object.elems[object.elems.length - 1] ?? intValue(0, object.elemType);
+      // stack::top / priority_queue::top 都在「出口」那一端
+      if (method === 'top' && adapter) {
+        return object.elems[object.elems.length - 1] ?? intValue(0, object.elemType);
+      }
       if (method === 'clear') {
         object.elems.length = 0;
         resized();
@@ -2888,7 +3359,8 @@ class Interpreter {
       if (method === 'end') return this.vectorIterator(object, object.elems.length, expr.line);
     }
     if (method === 'c_str' && object.t === 'string') return object;
-    if (method === 'at' && expr.args[0]) {
+    // `at` 是容器 / 字符串的下标访问；用户类里自己写的 at() 走下面的方法分派
+    if (method === 'at' && expr.args[0] && object.t !== 'struct') {
       const index = asInt(this.evalExpr(expr.args[0]));
       return this.readElement(object, index, expr.line, expr);
     }
@@ -2954,11 +3426,18 @@ class Interpreter {
   private evalMember(expr: ExprNode & { kind: 'member' }): RValue {
     if (expr.op === '::') {
       if (expr.name === 'endl') return stringValue('\n');
+      // 兄弟基类同名字段的限定写法：`c.A::x`（成员函数里直接写 `A::x`）
+      const qualified = this.qualifiedFieldTarget(expr);
+      if (qualified) {
+        const fieldType = qualified.object.fieldTypes.get(qualified.key) ?? 'int';
+        return qualified.object.fields.get(qualified.key) ?? intValue(0, fieldType);
+      }
       throw new SimError(`命名空间成员 ${exprToText(expr)} 暂不支持单步执行。`, expr.line, 'unsupported');
     }
     let object = this.evalExpr(expr.object);
     if (expr.op === '->') object = this.derefValue(object, expr.line, expr);
     if (object.t === 'struct') {
+      this.assertFieldNotAmbiguous(object.typeName, expr.name, expr.line);
       const value = object.fields.get(expr.name);
       if (value === undefined) {
         throw new SimError(`结构体 ${object.typeName} 没有成员 ${expr.name}。`, expr.line);
@@ -2966,6 +3445,30 @@ class Interpreter {
       return value;
     }
     throw new SimError(`${exprToText(expr)} 暂不支持读取。`, expr.line, 'unsupported');
+  }
+
+  /**
+   * `c.A::x` / 成员函数里的 `A::x`：定位到具体是哪一份基类字段。
+   * 返回 undefined 表示这不是字段限定（例如 `std::vector`），交给上层报错。
+   */
+  private qualifiedFieldTarget(
+    expr: ExprNode & { kind: 'member' },
+  ): { object: StructValue; key: string } | undefined {
+    let object: StructValue | undefined;
+    let baseName = '';
+    if (expr.object.kind === 'member' && expr.object.op === '.') {
+      const target = this.evalExpr(expr.object.object);
+      if (target.t !== 'struct') return undefined;
+      object = target;
+      baseName = expr.object.name;
+    } else if (expr.object.kind === 'ident') {
+      object = this.currentFrame()?.thisValue;
+      baseName = expr.object.name;
+    }
+    if (!object) return undefined;
+    const key = `${lastSegment(baseName)}::${expr.name}`;
+    if (!object.fields.has(key)) return undefined;
+    return { object, key };
   }
 
   private sizeOfExpr(expr: ExprNode & { kind: 'sizeof' }): number {
@@ -3044,6 +3547,12 @@ class Interpreter {
 
   private resolveLValue(expr: ExprNode): Ref {
     switch (expr.kind) {
+      case 'call': {
+        // `at(v, 1) = 9` / `++at(v, 0)`：函数返回的是引用，写进去就是改原对象
+        const ref = this.callRef(expr);
+        if (ref) return ref;
+        break;
+      }
       case 'ident': {
         if (this.enumValues.has(expr.name)) {
           throw new SimError(`${expr.name} 是枚举常量，不能被赋值。`, expr.line);
@@ -3054,6 +3563,9 @@ class Interpreter {
       }
       case 'index': {
         const object = this.evalExpr(expr.object);
+        if (object.t === 'map') {
+          return this.mapIndexRef(object, expr.index, exprToText(expr), expr.line);
+        }
         const index = asInt(this.evalExpr(expr.index));
         if (object.t === 'array') {
           if (index < 0 || index >= object.elems.length) {
@@ -3083,10 +3595,24 @@ class Interpreter {
         break;
       }
       case 'member': {
-        if (expr.op === '::') throw new SimError('这个成员不能被赋值。', expr.line);
+        if (expr.op === '::') {
+          const qualified = this.qualifiedFieldTarget(expr);
+          if (!qualified) throw new SimError('这个成员不能被赋值。', expr.line);
+          const { object, key } = qualified;
+          const fieldType = object.fieldTypes.get(key) ?? 'int';
+          return {
+            get: () => object.fields.get(key) ?? intValue(0, fieldType),
+            set: (value) => {
+              object.fields.set(key, value);
+            },
+            label: exprToText(expr),
+            typeText: fieldType,
+          };
+        }
         let object = this.evalExpr(expr.object);
         if (expr.op === '->') object = this.derefValue(object, expr.line, expr);
         if (object.t === 'struct') {
+          this.assertFieldNotAmbiguous(object.typeName, expr.name, expr.line);
           const fieldType = object.fieldTypes.get(expr.name) ?? 'int';
           return {
             get: () => object.fields.get(expr.name) ?? intValue(0, fieldType),
@@ -3679,11 +4205,13 @@ class Interpreter {
 
     let result: RValue = voidValue();
     let explicit = false;
+    let returnedRef: Ref | undefined;
     try {
       if (fn.body) {
         const signal = this.execStmt(fn.body);
         if (signal.kind === 'return') {
           result = signal.value;
+          returnedRef = signal.ref;
           explicit = true;
         }
       }
@@ -3698,6 +4226,8 @@ class Interpreter {
     } finally {
       this.frames.pop();
     }
+    // 返回引用的函数：把「返回的那个左值」留在槽里，调用方可以往里写
+    if (fn.returnType.includes('&')) this.refReturnSlot = returnedRef;
     // 按值返回的类对象是调用方的临时对象，到调用语句结束才析构
     if (result.t === 'struct' && !fn.returnType.includes('&')) {
       this.registerTemp(result);

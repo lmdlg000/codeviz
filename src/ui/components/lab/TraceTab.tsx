@@ -69,8 +69,8 @@ export function TraceTab({ code, language, analysis, trace, loading, onRun }: Tr
         <h3 className="lab-trace-intro__title">单步执行，看清每一行</h3>
         <p className="lab-trace-intro__text">
           教学子集解释器会逐句运行代码，同时展示变量、调用栈与输出。支持声明、运算、循环、分支、函数调用、数组、
-          printf / cout、单继承的类（含虚函数与多态调用）、函数模板与类模板、std::vector 与 std::sort，
-          以及 new / delete 的堆视图。
+          printf / cout、类（单继承与多继承、虚函数与多态调用）、函数模板与类模板、std::vector、std::map / std::set /
+          std::pair、stack / queue / priority_queue，以及 new / delete 的堆视图。
         </p>
 
         <div

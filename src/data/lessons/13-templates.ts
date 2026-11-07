@@ -7,14 +7,15 @@ const lesson: Lesson = {
   title: '模板与 STL：写出通用的代码',
   subtitle: '让类型成为参数，让标准库替你干活',
   description:
-    '从函数模板、类模板到 STL 容器与算法：用 template 写出与类型无关的代码，再用 vector、string、sort 和范围 for 完成真实的数据处理。',
+    '从函数模板、类模板到 STL 容器与算法：用 template 写出与类型无关的代码，再用 vector、map、set、栈与队列解决真实的数据处理问题。',
   difficulty: 3,
-  minutes: 45,
+  minutes: 55,
   objectives: [
     '写出函数模板与类模板，说明模板在编译期如何按类型实例化。',
     '用 vector 保存一组数据，完成遍历、求和、排序等常见操作。',
+    '用 map 按键查找、用 set 去重排序，并说清 m[key] 与 at(key) 的区别。',
     '正确使用 auto、范围 for 与 sort，并理解它们背后的迭代器。',
-    '说出 vector 下标访问与 at 的区别，以及迭代器失效的常见场景。',
+    '按语义选择容器适配器：括号匹配用栈、排队用队列、取最值用优先队列。',
   ],
   blocks: [
     {
@@ -330,7 +331,85 @@ int main() {
     },
     {
       type: 'heading',
-      text: '四、一次遍历的两种视图',
+      text: '四、关联容器与容器适配器：按键找值、只从两端进出',
+    },
+    {
+      type: 'text',
+      body:
+        'vector 用“第几个”找元素，map 用“键”找值。`std::map<K, V>` 是一张有序的键值表：每个键只出现一次，插入后自动按 key 升序排好，因此“按学号查成绩”“统计每个单词出现几次”这类问题一行下标就能写。`m[key]` 在键不存在时会**插入**一个默认值再返回引用，所以读之前最好确认键存在；`m.at(key)` 不插入，找不到会抛 `out_of_range`。`count` 返回 0 或 1（map 的键唯一），`erase(key)` 删除，范围 for 遍历出来的每个元素是一个 `pair`，用 `p.first` 取键、`p.second` 取值。',
+    },
+    {
+      type: 'code',
+      language: 'cpp',
+      title: 'wordcount.cpp',
+      code: `#include <iostream>
+#include <map>
+#include <string>
+
+int main() {
+  std::string words[5] = {"red", "blue", "red", "green", "red"};
+
+  std::map<std::string, int> count;
+  for (int i = 0; i < 5; i++) {
+    count[words[i]] = count[words[i]] + 1;
+  }
+
+  for (const auto& entry : count) {
+    std::cout << entry.first << ": " << entry.second << std::endl;
+  }
+  return 0;
+}`,
+      caption:
+        '插入顺序是 red、blue、green，输出却是按 key 升序：map 自己维护顺序，这就是“有序键值表”。',
+    },
+    {
+      type: 'text',
+      body:
+        '`std::set<K>` 只存键、不留值，重复插入会被忽略，因此它天生就是“去重 + 排序”的工具：把一组成绩全部 `insert` 进去，再遍历出来就是升序且没有重复。`std::pair<A, B>` 则把两个值捆在一起，`first` / `second` 分别访问，`make_pair(a, b)` 会按实参类型自动推导，常用来把两个相关的数据当一个整体传参或放进容器。',
+    },
+    {
+      type: 'text',
+      body:
+        '容器适配器（container adaptor）不是新容器，而是给已有容器套上一层“只暴露必要接口”的壳：`stack` 只能从一端进出（后进先出），`queue` 一头进另一头出（先进先出），`priority_queue` 每次弹出的都是当前最大值。它们的接口都只有 `push` / `pop` / 取顶 / `size` / `empty`——限制接口正是为了表达语义：括号匹配天然是栈，叫号系统天然是队列，取最紧急的任务天然是优先队列。用栈做括号匹配，就是“遇到左括号压栈、遇到右括号弹一个出来配对”，最后栈为空才算匹配成功。',
+    },
+    {
+      type: 'code',
+      language: 'cpp',
+      title: 'brackets.cpp',
+      code: `#include <iostream>
+#include <stack>
+#include <string>
+
+int main() {
+  std::string text = "((a+b)*c)";
+  std::stack<char> open;
+
+  for (char ch : text) {
+    if (ch == '(') {
+      open.push(ch);
+    } else if (ch == ')') {
+      if (open.empty()) {
+        std::cout << "右括号多余" << std::endl;
+        return 1;
+      }
+      open.pop();
+    }
+  }
+
+  std::cout << (open.empty() ? "括号匹配" : "左括号多余") << std::endl;
+  return 0;
+}`,
+      caption:
+        'push 压栈、pop 弹栈、empty 判空：栈的三个动作就把“后遇到的先配对”表达完了。',
+    },
+    {
+      type: 'text',
+      body:
+        '为什么不用 vector 硬写？因为 vector 允许你从中间插入、按下标乱跳，而这些操作在括号匹配里毫无意义，写错了也没人拦你。适配器把不该出现的操作直接删掉，让类型本身就说明“这里只能后进先出”。这也是 C++ 的一条通用思路：用更窄的接口表达更强的约束。',
+    },
+    {
+      type: 'heading',
+      text: '五、一次遍历的两种视图',
     },
     {
       type: 'text',
@@ -397,15 +476,17 @@ int main() {
     },
     {
       type: 'heading',
-      text: '五、易错点',
+      text: '六、易错点',
     },
     {
       type: 'list',
       items: [
-        '忘记 `#include <vector>`、`#include <algorithm>` 或 `#include <string>`，编译会报类型或函数找不到。',
+        '忘记 `#include <vector>`、`#include <algorithm>`、`#include <map>` 或 `#include <string>`，编译会报类型或函数找不到。',
         '`sort` 的第二个参数写成 `v.end() - 1`，最后一个元素没参加排序；尾后迭代器才是正确终点。',
         '用 `for (int score : scores)` 修改 score，容器里的值不会变；要修改请用引用。',
-        '对空 vector 调用 `front()`、`back()` 是未定义行为，调用前先判断 `empty()`。',
+        '对空 vector 调用 `front()`、`back()`、对空 stack 调用 `top()` 都是未定义行为，调用前先判断 `empty()`。',
+        '用 `m[key]` 只是“查一下”时，键不存在会**插入**一个默认值，表的大小悄悄变大；只查不改请用 `count` 或 `at`。',
+        '`map` 的迭代器指向的是 `pair<const K, V>`，`it->first` 不能改；想按键排序就得让 key 保持有序。',
         '模板的声明和实现被拆到不同文件，编译能过但链接失败。',
         '`vector::size()` 返回无符号类型，直接和 int 比较可能产生警告；统一用 `std::size_t` 更稳妥。',
       ],
@@ -419,12 +500,12 @@ int main() {
     },
     {
       type: 'heading',
-      text: '六、小结',
+      text: '七、小结',
     },
     {
       type: 'text',
       body:
-        '模板把类型抽象成参数，STL 把常用数据结构和算法做成现成工具。学会 vector 的增、查、改、排，再配合范围 for、auto 与 sort，已经能解决大部分入门数据处理任务。模板的语法细节很多，先掌握“定义模板、使用时提供类型、编译期实例化”这条主线，遇到复杂报错时从第一条错误看起。',
+        '模板把类型抽象成参数，STL 把常用数据结构和算法做成现成工具。选容器其实是在选“用什么方式找数据”：按位置找用 vector，按键找用 map，只关心“在不在、排好没”用 set，只允许从两端动作用适配器。学会 vector 的增、查、改、排，再配合 map 的按键查找与范围 for、auto、sort，已经能解决大部分入门数据处理任务。模板的语法细节很多，先掌握“定义模板、使用时提供类型、编译期实例化”这条主线，遇到复杂报错时从第一条错误看起。',
     },
     {
       type: 'try',
@@ -479,6 +560,9 @@ int main() {
     '`template <typename T>` 声明类型参数，编译器在编译期按实参类型实例化出具体函数或类。',
     '函数模板与类模板都只是“图纸”，只有被使用时才实例化；模板定义通常放在头文件。',
     'vector 是自动扩容的动态数组，size() 是元素个数，capacity() 是当前容量。',
+    'map 按键有序、键唯一，`m[key]` 缺键会插入默认值，只查不改请用 `count` 或 `at`。',
+    'set 等于“自动去重 + 自动排序”，插入重复元素会被忽略。',
+    'stack / queue / priority_queue 是容器适配器，用更窄的接口表达后进先出、先进先出、取最大值。',
     '范围 for 按值遍历会复制元素；修改元素必须写 `for (int& x : v)`。',
     'sort 接收迭代器区间，默认升序，直接原地修改容器；使用前要包含 `<algorithm>`。',
   ],
@@ -522,8 +606,34 @@ int main() {
       explanation:
         'sort 接收一对迭代器，对半开区间 `[begin, end)` 内的元素原地排序，默认使用 `<` 比较、结果升序。它返回 void，排序结果直接体现在原容器里。',
     },
+    {
+      id: 'c13-q4',
+      question: '`std::map<std::string,int> m;` 之后只执行 `if (m["abc"] > 0) { }`，`m.size()` 会怎样？',
+      options: [
+        '仍然是 0，没赋过值就不算元素',
+        '变成 1，因为 `m["abc"]` 已经插入了一个值为 0 的条目',
+        '编译不通过，map 不能用 if 判断',
+        '程序崩溃，键不存在不能访问',
+      ],
+      answer: 1,
+      explanation:
+        '`operator[]` 在键不存在时会插入一个「值初始化」的条目并返回它的引用，所以只是“看一眼”也会让 map 变大。只想判断存在性应该用 `m.count("abc")` 或 `m.contains("abc")`，非插入式取值用 `m.at("abc")`（找不到会抛异常）。',
+    },
+    {
+      id: 'c13-q5',
+      question: '用 `std::stack<char>` 判断括号匹配，最重要的理由是？',
+      options: [
+        '栈比数组省内存',
+        '栈只能从一端进出，正好对应「后遇到的左括号先配对」',
+        '栈会自动排序',
+        '栈的查找速度比 vector 快',
+      ],
+      answer: 1,
+      explanation:
+        '括号匹配的本质是“后进先出”：最后压入的左括号必须最先被右括号配对。stack 只暴露 push / pop / top，把这些操作之外的可能性都删掉了，语义即约束，代码也更难写错。',
+    },
   ],
-  labSampleId: 'stl-vector',
+  labSampleId: 'stl-map-count',
 };
 
 export default lesson;

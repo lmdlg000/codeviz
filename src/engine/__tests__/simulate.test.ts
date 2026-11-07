@@ -742,4 +742,59 @@ int main() {
     expect(r.ok, r.error?.message).toBe(true);
     expect(r.output.trim()).toBe('2 4 6');
   });
+
+  it('返回引用的函数可以写在赋值号左边', () => {
+    const r = runRef(`
+#include <iostream>
+int& at(int* a, int i) { return a[i]; }
+int main() {
+  int v[3] = {1, 2, 3};
+  at(v, 1) = 9;
+  std::cout << v[1] << std::endl;
+  int& r = at(v, 2);
+  r = 7;
+  std::cout << v[2] << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('9\n7\n');
+  });
+
+  it('返回引用的成员函数也能被赋值', () => {
+    const r = runRef(`
+#include <iostream>
+class Grid {
+public:
+  Grid() { for (int i = 0; i < 3; i++) data_[i] = i; }
+  int& at(int i) { return data_[i]; }
+private:
+  int data_[3];
+};
+int main() {
+  Grid g;
+  g.at(1) = 42;
+  std::cout << g.at(1) << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('42\n');
+  });
+
+  it('返回引用的调用可以直接传给引用参数', () => {
+    const r = runRef(`
+#include <iostream>
+int& at(int* a, int i) { return a[i]; }
+void bump(int& x) { x = x + 100; }
+int main() {
+  int v[3] = {1, 2, 3};
+  bump(at(v, 0));
+  std::cout << v[0] << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('101\n');
+  });
 });

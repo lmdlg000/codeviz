@@ -86,6 +86,13 @@ const STD_FUNCTION_NAMES: ReadonlySet<string> = new Set([
   'resize',
   'reverse',
   'stable_sort',
+  'make_pair',
+  'count',
+  'contains',
+  'top',
+  'push',
+  'pop',
+  'swap',
 ]);
 
 /** 可以出现在「函数式转换」位置的类型名：char(x) / int(x) / size_t(x) 等 */

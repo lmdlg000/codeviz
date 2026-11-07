@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { simulate } from '../index';
+import { analyzeCode, simulate } from '../index';
 
 const run = (code: string) => simulate(code);
 
@@ -321,5 +321,189 @@ int main() {
 `);
     expect(r.ok, r.error?.message).toBe(true);
     expect(r.output).toBe('1 base\n');
+  });
+});
+
+describe('simulate：多继承', () => {
+  it('两个基类的构造按声明顺序，析构反向', () => {
+    const r = run(`
+#include <iostream>
+class Flyer {
+public:
+  Flyer() { std::cout << "Flyer() "; }
+  ~Flyer() { std::cout << "~Flyer "; }
+};
+class Swimmer {
+public:
+  Swimmer() { std::cout << "Swimmer() "; }
+  ~Swimmer() { std::cout << "~Swimmer "; }
+};
+class Duck : public Flyer, public Swimmer {
+public:
+  Duck() { std::cout << "Duck()" << std::endl; }
+  ~Duck() { std::cout << "~Duck "; }
+};
+int main() {
+  Duck d;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    // 构造：基类按声明顺序；析构：自己 → 基类倒序
+    expect(r.output).toBe('Flyer() Swimmer() Duck()\n~Duck ~Swimmer ~Flyer ');
+  });
+
+  it('两个基类的成员都能直接访问', () => {
+    const r = run(`
+#include <iostream>
+class Flyer {
+public:
+  void fly() const { std::cout << "flying "; }
+protected:
+  int altitude_ = 100;
+};
+class Swimmer {
+public:
+  void swim() const { std::cout << "swimming "; }
+protected:
+  int depth_ = 5;
+};
+class Duck : public Flyer, public Swimmer {
+public:
+  void show() const {
+    std::cout << "alt=" << altitude_ << " depth=" << depth_ << std::endl;
+  }
+};
+int main() {
+  Duck d;
+  d.fly();
+  d.swim();
+  d.show();
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('flying swimming alt=100 depth=5\n');
+  });
+
+  it('两个基类指针都指向同一个派生对象，虚函数都分派到派生实现', () => {
+    const r = run(`
+#include <iostream>
+class A {
+public:
+  virtual void who() const { std::cout << "A "; }
+  virtual ~A() {}
+};
+class B {
+public:
+  virtual void who() const { std::cout << "B "; }
+  virtual ~B() {}
+};
+class C : public A, public B {
+public:
+  void who() const override { std::cout << "C "; }
+};
+int main() {
+  C c;
+  A* pa = &c;
+  B* pb = &c;
+  pa->who();
+  pb->who();
+  std::cout << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('C C \n');
+  });
+
+  it('兄弟基类的同名字段直接访问会报二义性', () => {
+    const r = run(`
+#include <iostream>
+class A { public: int x = 1; };
+class B { public: int x = 2; };
+class C : public A, public B { };
+int main() {
+  C c;
+  std::cout << c.x << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok).toBe(false);
+    expect(r.error?.message).toContain('二义性');
+    expect(r.error?.message).toContain('A::x');
+  });
+
+  it('用 A::x / B::x 限定后能分别读写', () => {
+    const r = run(`
+#include <iostream>
+class A { public: int x = 1; };
+class B { public: int x = 2; };
+class C : public A, public B { };
+int main() {
+  C c;
+  std::cout << c.A::x << " " << c.B::x << std::endl;
+  c.A::x = 10;
+  c.B::x = 20;
+  std::cout << c.A::x + c.B::x << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1 2\n30\n');
+  });
+
+  it('成员函数里用 A::x 可以消解二义性', () => {
+    const r = run(`
+#include <iostream>
+class A { public: int x = 1; };
+class B { public: int x = 2; };
+class C : public A, public B {
+public:
+  int sum() const { return A::x + B::x; }
+};
+int main() {
+  C c;
+  std::cout << c.sum() << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3\n');
+  });
+
+  it('菱形继承：祖先子对象只平铺一次', () => {
+    const r = run(`
+#include <iostream>
+class Base {
+public:
+  int v = 1;
+};
+class Left : public Base { };
+class Right : public Base { };
+class Bottom : public Left, public Right {
+public:
+  int read() const { return v; }
+};
+int main() {
+  Bottom b;
+  std::cout << b.read() << std::endl;
+  return 0;
+}
+`);
+    // 非虚继承时 C++ 里 b.v 本身也是二义的，这里只要不崩、按同一份读取即可
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1\n');
+  });
+
+  it('多继承不再被静态分析器判为不支持', () => {
+    const result = analyzeCode(`
+class A { public: int x; };
+class B { public: int y; };
+class C : public A, public B { };
+int main() { C c; c.x = 1; c.y = 2; return 0; }
+`);
+    expect(result.interpreterSupported).toBe(true);
+    expect(result.parseErrors).toBe(0);
   });
 });

@@ -801,6 +801,113 @@ int main() {
     level: 3,
     focus: 'flow',
   },
+  {
+    id: 'stl-map-count',
+    title: 'map：统计每个单词出现的次数',
+    description: '用 map<string,int> 做词频统计：m[word] 缺键时插入 0 再加一，最后按 key 升序遍历输出 —— 每一步都能看到表里多了哪一条。',
+    language: 'cpp',
+    code: `#include <iostream>
+#include <map>
+#include <string>
+
+int main() {
+  std::string words[6] = {"red", "blue", "red", "green", "blue", "red"};
+
+  std::map<std::string, int> count;
+  for (int i = 0; i < 6; i++) {
+    count[words[i]] = count[words[i]] + 1;
+  }
+
+  std::cout << "different words: " << count.size() << std::endl;
+  for (const auto& entry : count) {
+    std::cout << entry.first << " -> " << entry.second << std::endl;
+  }
+
+  std::cout << "red count = " << count.at("red") << std::endl;
+  std::cout << "yellow? " << count.count("yellow") << std::endl;
+  return 0;
+}`,
+    tags: ['关联容器', '键值对', '统计'],
+    level: 3,
+    focus: 'flow',
+  },
+  {
+    id: 'stl-set-unique',
+    title: 'set：去重 + 排序一次完成',
+    description: '把一组成绩塞进 set，重复的自动丢弃、顺序自动排好；再用 pair 记录「最高分」—— 一次遍历就能看出 set 与 pair 配合的写法。',
+    language: 'cpp',
+    code: `#include <iostream>
+#include <set>
+#include <string>
+
+int main() {
+  int scores[8] = {88, 72, 88, 95, 72, 60, 95, 88};
+
+  std::set<int> unique;
+  for (int i = 0; i < 8; i++) {
+    unique.insert(scores[i]);
+  }
+
+  std::cout << "unique scores: " << unique.size() << std::endl;
+  for (int score : unique) {
+    std::cout << score << " ";
+  }
+  std::cout << std::endl;
+
+  std::pair<std::string, int> best = std::make_pair("nobody", 0);
+  for (int score : unique) {
+    if (score > best.second) {
+      best.second = score;
+    }
+  }
+  std::cout << "top score = " << best.second << std::endl;
+  std::cout << "has 72? " << unique.count(72) << std::endl;
+  return 0;
+}`,
+    tags: ['集合', '去重', 'pair'],
+    level: 3,
+    focus: 'flow',
+  },
+  {
+    id: 'stl-stack-match',
+    title: 'stack 与 queue：只从两端进出的容器',
+    description: '用 stack 做括号匹配（左括号压栈、右括号弹栈），再用 queue 模拟叫号 —— push/pop 只在两端发生，语义一眼看清。',
+    language: 'cpp',
+    code: `#include <iostream>
+#include <queue>
+#include <stack>
+#include <string>
+
+bool matchBrackets(const std::string& text) {
+  std::stack<char> open;
+  for (char ch : text) {
+    if (ch == '(') {
+      open.push(ch);
+    } else if (ch == ')') {
+      if (open.empty()) return false;
+      open.pop();
+    }
+  }
+  return open.empty();
+}
+
+int main() {
+  std::cout << matchBrackets("((a+b)*c)") << std::endl;
+  std::cout << matchBrackets("(a+b))") << std::endl;
+
+  std::queue<int> line;
+  line.push(101);
+  line.push(102);
+  line.push(103);
+  std::cout << "serving " << line.front() << std::endl;
+  line.pop();
+  std::cout << "next " << line.front() << ", waiting " << line.size() << std::endl;
+  return 0;
+}`,
+    tags: ['容器适配器', '栈', '队列'],
+    level: 3,
+    focus: 'flow',
+  },
 ];
 
 export default samples;

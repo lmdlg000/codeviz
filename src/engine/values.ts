@@ -39,6 +39,25 @@ export interface ArrayValue {
   dims: number[];
   elemType: string;
   typeText: string;
+  /** 容器适配器：stack 从尾部进出、queue 从头出、priority_queue 按优先级出 */
+  adapter?: 'stack' | 'queue' | 'priority_queue';
+}
+
+/** std::map / std::set 的一个条目；set 只有 key（value 为 null） */
+export interface MapEntryValue {
+  key: RValue;
+  value: RValue | null;
+}
+
+/** std::map / std::set：按 key 有序的键值对表 */
+export interface MapValue {
+  t: 'map';
+  kind: 'map' | 'set';
+  keyType: string;
+  /** set 没有 value，这里记 'void' */
+  valueType: string;
+  typeText: string;
+  entries: MapEntryValue[];
 }
 
 export interface PointerValue {
@@ -77,6 +96,7 @@ export type RValue =
   | ArrayValue
   | PointerValue
   | StructValue
+  | MapValue
   | NullValue
   | VoidValue;
 
@@ -86,20 +106,27 @@ export function isPointerType(typeText: string): boolean {
   return typeText.includes('*');
 }
 
+/** 砍掉模板实参，只看最外层的类型名：`map<string, int>` → `map` */
+function outerTypeText(typeText: string): string {
+  const index = typeText.indexOf('<');
+  return index < 0 ? typeText : typeText.slice(0, index);
+}
+
 export function isStringType(typeText: string): boolean {
-  return /string/i.test(typeText);
+  const base = baseTypeName(outerTypeText(typeText)).toLowerCase();
+  return base === 'string' || base === 'basic_string' || base === 'wstring';
 }
 
 export function isFloatType(typeText: string): boolean {
-  return /\b(float|double)\b/i.test(typeText);
+  return /\b(float|double)\b/i.test(outerTypeText(typeText));
 }
 
 export function isCharType(typeText: string): boolean {
-  return /\bchar\b/i.test(typeText) && !isPointerType(typeText);
+  return /\bchar\b/i.test(outerTypeText(typeText)) && !isPointerType(typeText);
 }
 
 export function isBoolType(typeText: string): boolean {
-  return /\bbool\b/i.test(typeText);
+  return /\bbool\b/i.test(outerTypeText(typeText));
 }
 
 export function typeBase(typeText: string): string {
@@ -133,6 +160,8 @@ export function categoryOfValue(value: RValue): DataCategory {
       return 'pointer';
     case 'struct':
       return 'struct';
+    case 'map':
+      return 'array';
     case 'null':
       return 'pointer';
     case 'void':
@@ -291,6 +320,15 @@ export function formatValue(value: RValue, depth = 0): string {
       return `"${escapeText(value.v, 40)}"`;
     case 'array':
       return formatArray(value, depth);
+    case 'map': {
+      if (depth > 2) return '{ ... }';
+      if (value.entries.length === 0) return value.kind === 'set' ? '{ }' : '{ }';
+      const items = value.entries.map((entry) => {
+        const key = formatValue(entry.key, depth + 1);
+        return entry.value === null ? key : `${key}: ${formatValue(entry.value, depth + 1)}`;
+      });
+      return `{ ${items.join(', ')} }`;
+    }
     case 'pointer':
       if (value.str !== undefined) return `-> "${escapeText(value.str, 20)}"`;
       if (value.target === null && value.array === undefined) return 'nullptr';

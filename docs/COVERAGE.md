@@ -49,7 +49,7 @@
 | 继承与派生 | 已覆盖 | 继承与多态 | public 继承、构造析构顺序 |
 | 多态与虚函数 | 已覆盖 | 继承与多态 | 虚函数、虚析构、抽象类 |
 | 函数模板与类模板 | 已覆盖 | 模板与 STL | 类型参数、实例化、定义放头文件；两种模板都能单步观察实例化结果 |
-| STL 容器与算法 | 部分覆盖 | 模板与 STL | `vector` / `string` / `sort` / `reverse` 有示例且可单步，`map` / `set` 与容器适配器未展开 |
+| STL 容器与算法 | 已覆盖 | 模板与 STL | `vector` / `string` / `sort` / `reverse`、`map` / `set` / `pair` 与容器适配器 `stack` / `queue` / `priority_queue` 都有示例且可单步 |
 | 引用 | 已覆盖 | 引用 | 别名语义、const T& 传参、返回引用与陷阱 |
 | 动态内存 new / delete | 已覆盖 | 动态内存 | new/delete、new[]/delete[]、三类事故，单步可观察堆块 |
 | 运算符重载 | 已覆盖 | 运算符重载 | 成员/非成员、operator<<、前置后置 ++、不该重载的运算符 |
@@ -58,10 +58,10 @@
 
 ## 已知不支持（解释器）
 
-- **多继承**：`class C : public A, public B` 需要基类指针偏移与二义性处理，整段按「不支持」提前拦下。
-- **STL 关联容器**：`map` / `set` / `unordered_*`、容器适配器 `stack` / `queue`、`pair` / `tuple` 仍只做静态分析。
+- **STL 关联容器的迭代器**：`map` / `set` 的 `begin()` / `end()` / `find()`（以及 `it->first` 这类迭代器访问）按「不支持」提示，请改用 `count` / `contains` / `at` 或范围 for；`unordered_*` / `multimap` / `multiset` / `list` / `deque` / `tuple` 仍只做静态分析。
 - **多维 `new`**、`new T[n](初值)`、`realloc`、智能指针（`unique_ptr` / `shared_ptr`）。
 - **lambda、`goto`**、文件流 `fstream` / `FILE*` 的读写。
+- 结构化绑定 `for (auto [k, v] : m)`、`priority_queue` 的自定义比较器。
 
 已支持但容易踩坑的边界（都有回归测试）：
 
@@ -71,18 +71,23 @@
 | 函数模板 | 按实参类型推导 `T` 后展开一份具体函数；同一模板的 int / double / string 版本各自独立；推导冲突（`pick(1, 2.5)`）给明确报错 |
 | 类模板 | 看到 `Stack<int>` 就地实例化成具体类：字段 / 形参 / 返回类型里的 `T` 全部替换，`static const` 成员参与数组维度计算，构造 / 析构函数名跟着类型走；类图显示 `Stack<T>` |
 | `std::vector` | 用可增长数组承载：`push_back` / `pop_back` / `size` / `empty` / `front` / `back` / `at` / `clear` / `begin` / `end`，配合 `std::sort`、`std::reverse` 真实重排指定区间 |
+| `std::map` / `std::set` | 按 key 有序的条目表：`m[k]`（缺键插入默认值）、`at`（找不到报错）、`count` / `contains` / `insert` / `erase` / `clear` / `size` / `empty`，范围 for 按 key 升序遍历；`for (auto& p : m) p.second = ...` 会写回表里 |
+| `std::pair` | `first` / `second` 可读写，`make_pair(a, b)` 按实参类型推导；`map` 遍历出来的元素就是 pair |
+| 容器适配器 | `stack` / `queue` / `priority_queue` 用同一块数组承载，只暴露 `push` / `pop` / `top`（queue 是 `front` / `back`）/ `size` / `empty`；优先队列每次 `top()` 都是当前最大值 |
+| 返回引用 | `int& at(int* a, int i)` 交出的左值可以写：`at(v, 1) = 9`、`int& r = at(v, 1)`、`bump(at(v, 0))` 都改到原对象 |
 | 拷贝语义 | 有拷贝构造 → 深拷贝；`a = b` 走 `operator=`；`return 局部对象` 先拷贝再析构 |
 | 临时对象 | 按「完整表达式」边界析构（语句结束），`return T(...)` 等价拷贝省略 |
 | 运算符重载 | 成员优先、其次非成员；`operator<<` / `>>`、`+=`、`==` 等按实参类型做重载解析 |
-| 继承 | 单继承；基类子对象按「基类字段在前」平铺，派生类里可直接写基类字段名；构造从基类到派生、析构反过来 |
-| 虚函数 | 虚函数 / `override` / 纯虚函数：按实际对象类型分派；非虚函数按指针的静态类型绑定（多态那一节的关键区别） |
+| 继承 | 单继承与多继承；基类子对象按声明顺序平铺（菱形时公共祖先只平铺一次），派生类里可直接写基类字段名；构造从基类到派生、析构反过来 |
+| 多继承的二义性 | 兄弟基类同名字段直接写 `c.x` 会报二义性，必须写成 `c.A::x`（成员函数里写 `A::x`），两份值分开存 |
+| 虚函数 | 虚函数 / `override` / 纯虚函数：按实际对象类型分派，多继承时通过任一基类指针都分派到派生实现；非虚函数按指针的静态类型绑定 |
 | 抽象类 | 含未实现纯虚函数的类不能实例化，报「抽象类」而不是静默构造 |
 | 动态内存 | `new` / `new[]` / `delete` / `delete[]` / `malloc` / `calloc` / `free`，堆块视图 + 泄漏 / 重复释放 / 释放后使用检测 |
 
 ## 下一版优先补的三块
 
-1. **STL 关联容器**：`map` / `set` / `pair` 与容器适配器（`stack` / `queue` / `priority_queue`）目前只有静态分析；`vector` 与 `sort` / `reverse` 已能单步。
-2. **多继承**：单继承 + 虚函数 + 类模板都已支持；多继承的基类指针偏移与二义性仍未做。
+1. **STL 迭代器**：`map` / `set` 的 `begin` / `end` / `find` 与 `it->first`，以及结构化绑定 `for (auto [k, v] : m)`。
+2. **`priority_queue` 自定义比较器**与 `sort(v.begin(), v.end(), cmp)`（目前只支持默认升序）。
 3. **多线程与 lambda 的静态图示**：目前 lambda 只在语法层面被识别，没有专门的视图。
 
 ## 与实验室能力的对应
@@ -90,6 +95,6 @@
 | 实验室能力 | 覆盖范围 |
 | --- | --- |
 | 静态分析（流程 / 调用 / 类图 / 内存 / 诊断） | C 与常见 C++ 教学代码，≤ 1000 行 |
-| 单步执行 | 教学子集：基本类型、数组、控制流、函数与递归、指针与引用、结构体、`class`（构造 / 析构 / 成员函数 / 运算符重载 / 拷贝语义 / 单继承 / 虚函数 / 抽象类 / 类模板实例化）、函数模板、`new`/`delete` 与 `malloc`/`calloc`/`free`（含堆块视图与泄漏/重复释放/释放后使用检测）、`std::vector` 与 `std::sort`、`printf`/`scanf`/`cout`/`cin`，以及 52 个可单步执行的标准库函数 / 对象（见实验室的「标准库覆盖」页） |
-| 标准库覆盖 | `<stdio.h>` `<string.h>` `<ctype.h>` `<math.h>` `<stdlib.h>`（含 `malloc`/`calloc`/`free`）`<iostream>` `<string>` `<vector>` `<algorithm>` 与 STL 常用名，共 71 条，逐项标注「可执行 / 仅静态」 |
+| 单步执行 | 教学子集：基本类型、数组、控制流、函数与递归、指针与引用（含返回引用）、结构体、`class`（构造 / 析构 / 成员函数 / 运算符重载 / 拷贝语义 / 单继承与多继承 / 虚函数 / 抽象类 / 类模板实例化）、函数模板、`new`/`delete` 与 `malloc`/`calloc`/`free`（含堆块视图与泄漏/重复释放/释放后使用检测）、`std::vector`、`std::map`/`std::set`/`std::pair`、容器适配器 `stack`/`queue`/`priority_queue`、`std::sort`/`std::reverse`、`printf`/`scanf`/`cout`/`cin`，以及 59 个可单步执行的标准库函数 / 对象（见实验室的「标准库覆盖」页） |
+| 标准库覆盖 | `<stdio.h>` `<string.h>` `<ctype.h>` `<math.h>` `<stdlib.h>`（含 `malloc`/`calloc`/`free`）`<iostream>` `<string>` `<vector>` `<map>` `<set>` `<queue>` `<stack>` `<algorithm>` 与 STL 常用名，共 75 条，逐项标注「可执行 / 仅静态」 |
 | 自查清单 | 15 条初学者高频错误，能自动判定的由诊断规则驱动，其余标为「需人工确认」 |
