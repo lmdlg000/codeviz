@@ -80,6 +80,12 @@ const STD_FUNCTION_NAMES: ReadonlySet<string> = new Set([
   'erase',
   'empty',
   'at',
+  'front',
+  'back',
+  'clear',
+  'resize',
+  'reverse',
+  'stable_sort',
 ]);
 
 /** 可以出现在「函数式转换」位置的类型名：char(x) / int(x) / size_t(x) 等 */
@@ -95,6 +101,9 @@ const CAST_LIKE_NAMES: ReadonlySet<string> = new Set([
   'signed',
   'size_t',
   'void',
+  // std::string("abc") 这种函数式构造也不是"未定义的函数"
+  'string',
+  'basic_string',
 ]);
 
 const TARGET_CAP = 40;

@@ -144,6 +144,60 @@ function flattenClasses(program: ProgramNode): ClassDeclNode[] {
   return result;
 }
 
+/** `std::vector<int>` → 'int'；不是 vector 就返回 undefined */
+function vectorElemType(typeText: string): string | undefined {
+  const match = /(?:^|::)\s*vector\s*<(.+)>\s*$/.exec(typeText.trim());
+  return match ? match[1].trim() : undefined;
+}
+
+/** 展开模板时要跟着替换的字段：只动类型文本，不碰标识符 */
+const TEMPLATE_TYPE_KEYS: ReadonlySet<string> = new Set([
+  'typeText',
+  'base',
+  'baseType',
+  'returnType',
+  'signature',
+  'elemType',
+]);
+
+/** 把类型文本里的模板参数换成具体类型（`T&` → `int&`） */
+function applyBindings(text: string, bindings: Map<string, string>): string {
+  if (bindings.size === 0 || !text) return text;
+  let out = text;
+  for (const [param, value] of bindings) {
+    out = out.replace(new RegExp(`\\b${param}\\b`, 'g'), () => value);
+  }
+  return out;
+}
+
+/** `std::map<int, std::string>, 8` → ['std::map<int, std::string>', ' 8'] */
+function splitTemplateArgs(text: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = '';
+  for (const char of text) {
+    if (char === '<' || char === '(' || char === '[') depth++;
+    else if (char === '>' || char === ')' || char === ']') depth--;
+    if (char === ',' && depth === 0) {
+      parts.push(current);
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
+/** 解析编译期常量（`static const int kCapacity = 8`）的字面量 */
+function parseConstIntText(text: string): number | undefined {
+  const trimmed = text.trim();
+  if (!trimmed) return undefined;
+  if (/^-?\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+  if (/^0x[0-9a-fA-F]+$/.test(trimmed)) return Number.parseInt(trimmed, 16);
+  return undefined;
+}
+
 function collectEnums(program: ProgramNode): Map<string, number> {
   const values = new Map<string, number>();
   for (const enumDecl of program.enums) {
@@ -220,6 +274,14 @@ class Interpreter {
     this.methodIndex.set(key, list);
   }
   private classMap = new Map<string, ClassDeclNode>();
+  /** 类模板：`template <typename T> class Stack` 的原型，按模板参数现场展开 */
+  private classTemplates = new Map<string, ClassDeclNode>();
+  /** 函数模板：`template <typename T> T maxValue(...)`，按实参类型推导 */
+  private fnTemplates = new Map<string, FuncDeclNode[]>();
+  /** 已展开出来的具体类型缓存（键就是 `Stack<int>` 这样的名字） */
+  private typeCache = new Map<string, string>();
+  /** 静态常量成员：类名 → 名字 → 值（`static const int kCapacity = 8`） */
+  private staticConsts = new Map<string, Map<string, number>>();
   /** 类名 → 直接基类列表（单继承为主，多继承按声明顺序平铺） */
   private parents = new Map<string, string[]>();
 
@@ -261,7 +323,180 @@ class Interpreter {
     }
     return undefined;
   }
+  /* ============================== 模板展开 ============================== */
+
+  /**
+   * 把 `Stack<int>` 展开成一个真正的类（就像编译器做的实例化），
+   * 之后再走普通类的构造 / 成员调用 / 析构流程，不必到处特判模板。
+   * 不是类模板的类型原样返回。
+   */
+  private concretizeType(base: string, typeText?: string): string {
+    const text = (typeText ?? '').trim();
+    const lt = text.indexOf('<');
+    if (lt < 0) return base;
+    const close = text.lastIndexOf('>');
+    if (close <= lt) return base;
+    const rawName = text
+      .slice(0, lt)
+      .replace(/\b(const|volatile|static|typename|struct|class)\s+/g, '')
+      .trim();
+    const name = lastSegment(rawName);
+    if (!this.classTemplates.has(name)) return base;
+    return this.instantiateClass(name, text.slice(lt + 1, close));
+  }
+
+  /** 类模板实例化：绑定模板参数 → 换掉所有类型文本 → 注册成一个普通类 */
+  private instantiateClass(templateName: string, argText: string): string {
+    const key = `${templateName}<${argText}>`;
+    if (this.typeCache.has(key)) return key;
+    const tpl = this.classTemplates.get(templateName);
+    if (!tpl) return templateName;
+    // 先占位，避免 `Stack<Stack<int>>` 这类自引用把递归撑开
+    this.typeCache.set(key, key);
+
+    const bindings = this.bindTemplateArgs(tpl.templateParams ?? [], argText);
+    const instance = this.substituteTypes(tpl, bindings);
+    instance.name = key;
+    instance.isTemplate = false;
+    instance.templateParams = undefined;
+    // 构造 / 析构函数的名字跟着类型走：`Stack<int>` 的构造函数就叫 `Stack<int>`
+    for (const method of instance.methods) {
+      if (lastSegment(method.className ?? '') === templateName) method.className = key;
+      if (method.name === templateName) method.name = key;
+      if (method.name === `~${templateName}`) method.name = `~${key}`;
+    }
+
+    // `T items_[kCapacity]`：维度是静态常量，展开时就能算出真实长度
+    this.registerStatics(key, instance.fields);
+    const consts = this.staticConsts.get(key) ?? new Map<string, number>();
+    for (const field of instance.fields) {
+      if (!field.arrayDimTexts || field.arrayDimTexts.length === 0) continue;
+      field.arrayDims = field.arrayDims.map((dim, index) => {
+        if (dim !== null) return dim;
+        const text = field.arrayDimTexts?.[index] ?? '';
+        return consts.get(text) ?? parseConstIntText(text) ?? null;
+      });
+    }
+
+    this.classMap.set(key, instance);
+    for (const method of instance.methods) {
+      if (!method.body) continue;
+      const mkey = `${key}::${method.name}`;
+      const list = this.methodIndex.get(mkey) ?? [];
+      list.push(method);
+      this.methodIndex.set(mkey, list);
+    }
+    const bases = instance.bases.map((base) => lastSegment(base.name)).filter(Boolean);
+    if (bases.length > 0) this.parents.set(key, bases);
+    return key;
+  }
+
+  private registerStatics(className: string, fields: FieldDeclNode[]): void {
+    const consts = new Map<string, number>();
+    for (const field of fields) {
+      if (!field.isStatic) continue;
+      const value = parseConstIntText(field.initText ?? '');
+      if (value !== undefined) consts.set(field.name, value);
+    }
+    if (consts.size > 0) this.staticConsts.set(className, consts);
+  }
+
+  private bindTemplateArgs(params: string[], argText: string): Map<string, string> {
+    const bindings = new Map<string, string>();
+    if (params.length === 0) return bindings;
+    const args = splitTemplateArgs(argText);
+    for (let i = 0; i < params.length; i++) {
+      const value = args[i]?.trim();
+      if (value) bindings.set(params[i], value);
+    }
+    return bindings;
+  }
+
+  /** 深拷贝一份声明，并把类型文本里的模板参数换成具体类型 */
+  private substituteTypes<T>(node: T, bindings: Map<string, string>): T {
+    const walk = (value: unknown): unknown => {
+      if (Array.isArray(value)) return value.map(walk);
+      if (!value || typeof value !== 'object') return value;
+      const source = value as Record<string, unknown>;
+      const out: Record<string, unknown> = {};
+      for (const key of Object.keys(source)) {
+        const item = source[key];
+        if (typeof item === 'string' && TEMPLATE_TYPE_KEYS.has(key)) {
+          out[key] = applyBindings(item, bindings);
+        } else if (key === 'arrayDimTexts' && Array.isArray(item)) {
+          out[key] = item.map((text) => (typeof text === 'string' ? applyBindings(text, bindings) : text));
+        } else {
+          out[key] = walk(item);
+        }
+      }
+      return out;
+    };
+    return walk(node) as T;
+  }
+
+  /** 函数模板：拿实参类型推导出 `T`，再展开成普通函数 */
+  private instantiateFunction(templates: FuncDeclNode[], args: RValue[]): FuncDeclNode | undefined {
+    for (const tpl of templates) {
+      const bindings = this.deduceTemplateArgs(tpl, args);
+      if (!bindings) continue;
+      const key = `${tpl.name}<${[...bindings.values()].join(',')}>`;
+      const cached = this.fnInstances.get(key);
+      if (cached) return cached;
+      const instance = this.substituteTypes(tpl, bindings);
+      instance.isTemplate = false;
+      instance.templateParams = undefined;
+      this.fnInstances.set(key, instance);
+      return instance;
+    }
+    return undefined;
+  }
+
+  private deduceTemplateArgs(tpl: FuncDeclNode, args: RValue[]): Map<string, string> | undefined {
+    const params = tpl.templateParams ?? [];
+    if (params.length === 0) return undefined;
+    const bindings = new Map<string, string>();
+    for (let i = 0; i < tpl.params.length; i++) {
+      const arg = args[i];
+      if (!arg) continue;
+      const stripped = tpl.params[i].typeText
+        .replace(/\b(const|volatile|typename|class|static)\b/g, '')
+        .replace(/[*&\s]/g, '');
+      if (!params.includes(stripped)) continue;
+      const value = this.valueTypeText(arg);
+      if (!value) continue;
+      const existing = bindings.get(stripped);
+      // 同一个 T 推出两个不同类型（maxValue(1, 2.5)）在 C++ 里就是调用失败
+      if (existing && existing !== value) return undefined;
+      bindings.set(stripped, value);
+    }
+    return bindings.size > 0 ? bindings : undefined;
+  }
+
+  /** 值的类型文本，用于函数模板的类型推导 */
+  private valueTypeText(value: RValue): string {
+    switch (value.t) {
+      case 'struct':
+        return value.typeName;
+      case 'string':
+        return value.typeText || 'std::string';
+      case 'pointer':
+        return `${value.elemType}*`;
+      case 'array':
+        return value.elemType;
+      case 'int':
+        return value.typeText || 'int';
+      case 'float':
+        return value.typeText || 'double';
+      case 'null':
+        return '';
+      default:
+        return '';
+    }
+  }
+
   private enumValues: Map<string, number>;
+  /** 已展开的函数模板实例：`maxValue<int>` → 具体函数 */
+  private fnInstances = new Map<string, FuncDeclNode>();
   /** new 出来的堆块，按申请顺序排列 */
   private heapBlocks: HeapBlock[] = [];
   /** 数组对象 → 所属堆块，用于判断指针是否指向已释放内存 */
@@ -289,12 +524,26 @@ class Interpreter {
     this.enumValues = collectEnums(program);
 
     for (const cls of flattenClasses(program)) {
+      if (cls.isTemplate) {
+        // 模板本身不参与运行：等看到 `Stack<int>` 再按参数展开出一个真正的类
+        if (!this.classTemplates.has(cls.name)) this.classTemplates.set(cls.name, cls);
+        continue;
+      }
       if (!this.classMap.has(cls.name)) this.classMap.set(cls.name, cls);
+      this.registerStatics(cls.name, cls.fields);
       const bases = cls.bases.map((base) => lastSegment(base.name)).filter(Boolean);
       if (bases.length > 0) this.parents.set(lastSegment(cls.name), bases);
     }
     for (const fn of program.functions) {
       if (!fn.body) continue;
+      if (fn.isTemplate) {
+        if (fn.templateParams && fn.templateParams.length > 0) {
+          const list = this.fnTemplates.get(fn.name) ?? [];
+          list.push(fn);
+          this.fnTemplates.set(fn.name, list);
+          continue;
+        }
+      }
       if (!this.functionMap.has(fn.name)) this.functionMap.set(fn.name, fn);
       if (fn.className) this.indexMethod(fn);
       if (!fn.className && fn.name.startsWith('operator')) {
@@ -581,6 +830,12 @@ class Interpreter {
         isConst: false,
       };
     }
+    // 静态常量成员（`static const int kCapacity = 8`）在成员函数里可以直接写名字
+    if (self) {
+      const consts = this.staticConsts.get(lastSegment(self.typeName));
+      const constant = consts?.get(name);
+      if (constant !== undefined) return this.makeSlot(name, intValue(constant, 'int'), 'int', true);
+    }
     throw new SimError(`变量 ${name} 在使用前没有声明。`, line);
   }
 
@@ -615,16 +870,40 @@ class Interpreter {
     return slot;
   }
 
+  /**
+   * 声明一个引用变量（`int& r = a;`）：不拷贝，直接绑到目标对象的 ref 上。
+   * 之后 `r = 5` 改的就是 `a`，和 C++ 的别名语义一致。
+   */
+  private declareBound(name: string, target: Ref, typeText: string, isConst = false): Slot {
+    const value = target.get();
+    const slot: Slot = {
+      name,
+      value,
+      ref: {
+        get: () => target.get(),
+        set: (next) => target.set(next),
+        label: name,
+        typeText,
+      },
+      typeText,
+      category: categoryOfValue(value),
+      isConst,
+    };
+    this.currentScope().vars.set(name, slot);
+    return slot;
+  }
+
   /* ============================== 全局变量初始化 ============================== */
 
   private initGlobals(): void {
     for (const decl of this.program.globals) {
+      const base = this.concretizeType(decl.typeSpec.base, decl.typeSpec.text);
       for (const declarator of decl.declarators) {
         if (!declarator.name) continue;
         const typeText = this.declTypeText(decl.typeSpec.text, declarator);
         const value = this.instantiateDeclarator(
           declarator,
-          decl.typeSpec.base,
+          base,
           typeText,
         );
         this.declareGlobal(declarator.name, value, typeText);
@@ -756,10 +1035,19 @@ class Interpreter {
       return;
     }
     if (expr.kind === 'postfix') {
-      const value = this.evalExpr(expr);
+      this.evalExpr(expr);
+      // 后缀自增表达式的值是自增前的那个，所以这里重新读一次变量的当前值再报
+      let after: RValue | undefined;
+      try {
+        after = this.resolveLValue(expr.operand).get();
+      } catch {
+        after = undefined;
+      }
       this.emit({
         event: 'assign',
-        description: `执行 ${exprToText(expr)}，${exprToText(expr.operand)} 变为 ${formatValue(value)}`,
+        description: after
+          ? `执行 ${exprToText(expr)}，${exprToText(expr.operand)} 变为 ${formatValue(after)}`
+          : `执行 ${exprToText(expr)}`,
         line: expr.line,
       });
       return;
@@ -776,10 +1064,25 @@ class Interpreter {
 
   private execDecl(stmt: StmtNode & { kind: 'decl' }): void {
     const typeSpec = stmt.decl.typeSpec;
+    // `Stack<int> stack;` 先把类模板展开成具体类，后面全按普通类处理
+    const base = this.concretizeType(typeSpec.base, typeSpec.text);
     for (const declarator of stmt.decl.declarators) {
       if (!declarator.name) continue;
       const typeText = this.declTypeText(typeSpec.text, declarator);
-      const value = this.instantiateDeclarator(declarator, typeSpec.base, typeText);
+      // 引用变量（`int& r = a`）不拷贝，直接绑定到初始化式指向的那个对象
+      if (declarator.isReference && declarator.init) {
+        const target = this.argRef(declarator.init);
+        if (target) {
+          this.declareBound(declarator.name, target, typeText, typeSpec.isConst);
+          this.emit({
+            event: 'declare',
+            description: `声明 ${declarator.name}，引用 ${exprToText(declarator.init)} = ${formatValue(target.get())}`,
+            line: declarator.line,
+          });
+          continue;
+        }
+      }
+      const value = this.instantiateDeclarator(declarator, base, typeText);
       // `const BigInt* p` 的 const 修饰的是指向的内容，指针本身仍可改指
       const pointerMutable = declarator.pointerDepth > 0 || declarator.isReference;
       this.declare(declarator.name, value, typeText, typeSpec.isConst && !pointerMutable);
@@ -894,13 +1197,21 @@ class Interpreter {
     } else {
       throw new SimError('范围 for 只能遍历数组或字符串。', stmt.line, 'unsupported');
     }
-    for (const item of items) {
+    const elemTypeText = iterable.t === 'array' ? iterable.elemType : 'int';
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
       const scope = new Scope(this.currentScope());
       const frame = this.currentFrame();
       if (!frame) return NORMAL;
       frame.scopes.push(scope);
       try {
-        this.declare(stmt.varName, item, 'int');
+        // `for (int& x : v)` 绑到元素本身，改 x 就是改容器里的元素
+        if (stmt.byReference && iterable.t === 'array') {
+          const elementRef = arrayElementRef(iterable, index, `${stmt.varName}`);
+          this.declareBound(stmt.varName, elementRef, elemTypeText || 'int');
+        } else {
+          this.declare(stmt.varName, item, elemTypeText || 'int');
+        }
         this.emit({
           event: 'declare',
           description: `遍历元素 ${stmt.varName} = ${formatValue(item)}`,
@@ -983,6 +1294,9 @@ class Interpreter {
       const value = this.evalExpr(declarator.init);
       return this.coercePointer(value, base);
     }
+    // std::vector<T> 用动态数组承载：push_back / size / begin / end 都能逐步看到
+    const vectorElem = vectorElemType(typeText);
+    if (vectorElem) return this.createVectorValue(vectorElem, declarator.init, typeText);
     if (isStringType(base) && !isPointerType(typeText)) {
       if (!declarator.init) return stringValue('', base);
       return coerceValue(this.evalExpr(declarator.init), typeText);
@@ -1011,6 +1325,34 @@ class Interpreter {
     }
     if (!declarator.init) return this.defaultScalar(base, typeText);
     return coerceValue(this.evalExpr(declarator.init), typeText);
+  }
+
+  /** `std::vector<T>` 的运行时表示：一个可增长的数组 */
+  private createVectorValue(elemType: string, init: ExprNode | undefined, typeText: string): ArrayValue {
+    const items = init && init.kind === 'initlist' ? init.items : [];
+    const elems = items.map((item) =>
+      item.kind === 'initlist' ? this.createVectorValue(elemType, item, typeText) : this.coerceVectorElement(item, elemType),
+    );
+    return { t: 'array', elems, dims: [elems.length], elemType, typeText };
+  }
+
+  private coerceVectorElement(expr: ExprNode, elemType: string): RValue {
+    const value = this.evalExpr(expr);
+    if (isStringType(elemType)) return stringValue(this.toText(value), elemType);
+    return coerceValue(value, elemType);
+  }
+
+  /** begin() / end()：指向同一个数组的偏移指针，std::sort 靠它确定区间 */
+  private vectorIterator(array: ArrayValue, offset: number, line: number): PointerValue {
+    return {
+      t: 'pointer',
+      label: `${array.elemType} 迭代器`,
+      target: null,
+      elemType: array.elemType,
+      typeText: `${array.elemType}*`,
+      array,
+      offset,
+    };
   }
 
   private coercePointer(value: RValue, base: string): RValue {
@@ -1612,7 +1954,7 @@ class Interpreter {
     if (enumValue !== undefined) return intValue(enumValue, 'int');
     if (expr.name === 'std') throw new SimError('std 命名空间不能直接当作值使用。', expr.line, 'unsupported');
     const slot = this.lookupSlot(expr.name, expr.line);
-    return slot.value;
+    return slot.ref.get();
   }
 
   private evalUnary(expr: ExprNode & { kind: 'unary' }): RValue {
@@ -1741,6 +2083,19 @@ class Interpreter {
     if ((op === '==' || op === '!=') && (left.t === 'string' || right.t === 'string')) {
       const equal = this.toText(left) === this.toText(right);
       return boolValue(op === '==' ? equal : !equal);
+    }
+    // std::string 的大小比较：按字典序（`maxValue` 这类模板要在 string 上比较）
+    if ((op === '<' || op === '<=' || op === '>' || op === '>=') && (left.t === 'string' || right.t === 'string')) {
+      const a = this.toText(left);
+      const b = this.toText(right);
+      const result = op === '<' ? a < b : op === '<=' ? a <= b : op === '>' ? a > b : a >= b;
+      return boolValue(result);
+    }
+    // 数组名在指针运算里退化成指向首元素的指针（`a + 3`）
+    if (left.t === 'array' && (op === '+' || op === '-') && right.t !== 'pointer' && right.t !== 'array') {
+      const base = arrayToPointer(left, 'arr');
+      const delta = asInt(right) * (op === '+' ? 1 : -1);
+      return { ...base, offset: delta, label: `${base.label}${op}${Math.abs(delta)}` };
     }
     // 指针运算
     if (left.t === 'pointer' && (op === '+' || op === '-') && right.t !== 'pointer') {
@@ -1901,6 +2256,14 @@ class Interpreter {
       return temp;
     }
     switch (name) {
+      case 'string': {
+        // std::string("apple") / std::string(3, 'a')：函数式构造
+        if (expr.args.length === 0) return stringValue('');
+        if (expr.args.length === 1) return stringValue(this.toText(this.evalExpr(expr.args[0])));
+        const count = Math.max(0, asInt(this.evalExpr(expr.args[0])));
+        const char = String.fromCharCode(asInt(this.evalExpr(expr.args[1])));
+        return stringValue(char.repeat(count));
+      }
       case 'printf':
         return this.builtinPrintf(expr);
       case 'scanf':
@@ -1964,6 +2327,10 @@ class Interpreter {
         const text = String.fromCharCode(code);
         return intValue((name === 'toupper' ? text.toUpperCase() : text.toLowerCase()).charCodeAt(0), 'char');
       }
+      case 'sort':
+      case 'stable_sort':
+      case 'reverse':
+        return this.builtinRangeSort(name, expr);
       case 'malloc':
       case 'calloc':
         return this.evalMalloc(expr, name === 'calloc');
@@ -2080,20 +2447,31 @@ class Interpreter {
     // 成员函数内部直接写 sound()：先按当前对象的实际类型找，
     // 这样 introduce() 里那句 sound() 才会分派到 Dog::sound（多态）
     const self = this.currentFrame()?.thisValue;
-    const args = expr.args.map((arg) => this.evalExpr(arg));
+    const { values: args, refs: argRefs } = this.evalArgs(expr.args);
     if (self) {
       const method = this.findMethod(self.typeName, name, args);
-      if (method) return this.callFunction(method, args, expr.line, self);
+      if (method) return this.callFunction(method, args, expr.line, self, argRefs);
     }
 
     const fn = this.functionMap.get(name);
     if (!fn) {
+      // 函数模板：按实参类型推导 T 之后现场展开一份具体函数
+      const templates = this.fnTemplates.get(name);
+      if (templates && templates.length > 0) {
+        const instance = this.instantiateFunction(templates, args);
+        if (instance) return this.callFunction(instance, args, expr.line);
+        throw new SimError(
+          `无法把函数模板 ${name}() 的模板参数推导出来（实参类型不一致？），暂不支持单步执行。`,
+          expr.line,
+          'unsupported',
+        );
+      }
       if (name === 'exit' || name === 'abort') throw new SimError(`函数 ${name}() 暂不支持单步执行。`, expr.line, 'unsupported');
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
     // 类外定义的成员函数（BigInt::alloc 这种）沿用当前 this
     const implicitThis = fn.className ? self : undefined;
-    return this.callFunction(fn, args, expr.line, implicitThis);
+    return this.callFunction(fn, args, expr.line, implicitThis, argRefs);
   }
 
   /* ============================== 堆内存 ============================== */
@@ -2152,7 +2530,7 @@ class Interpreter {
   /** new T / new T(初值) / new T[n] */
   private evalNew(expr: ExprNode & { kind: 'new' }): RValue {
     const rawType = (expr.typeText || 'int').replace(/\s+/g, '');
-    const elemType = baseTypeName(rawType);
+    const elemType = this.concretizeType(baseTypeName(rawType), rawType);
     const isArray = Boolean(expr.arraySize);
 
     let length = 1;
@@ -2180,6 +2558,42 @@ class Interpreter {
       line: expr.line,
     });
     return pointer;
+  }
+
+  /**
+   * std::sort / std::reverse：参数是同一个容器的 begin / end 迭代器。
+   * 只改这段区间，和真实算法一致（不会动区间外的元素）。
+   */
+  private builtinRangeSort(name: string, expr: ExprNode & { kind: 'call' }): RValue {
+    const first = expr.args[0] ? this.evalExpr(expr.args[0]) : undefined;
+    const last = expr.args[1] ? this.evalExpr(expr.args[1]) : undefined;
+    const array = first && first.t === 'array' ? first : first && first.t === 'pointer' ? first.array : undefined;
+    const lastArray = last && last.t === 'array' ? last : last && last.t === 'pointer' ? last.array : undefined;
+    if (!first || !last || !array || lastArray !== array) {
+      throw new SimError(
+        `${name}() 目前只支持「同一个容器的 begin(), end()」这种区间写法。`,
+        expr.line,
+        'unsupported',
+      );
+    }
+    const from = first.t === 'pointer' ? Math.max(0, first.offset) : 0;
+    const to = last.t === 'pointer' ? Math.min(array.elems.length, last.offset) : array.elems.length;
+    const slice = array.elems.slice(from, to);
+    if (name === 'reverse') slice.reverse();
+    else slice.sort((a, b) => this.compareForSort(a, b));
+    array.elems.splice(from, slice.length, ...slice);
+    return voidValue();
+  }
+
+  private compareForSort(left: RValue, right: RValue): number {
+    if (left.t === 'string' || right.t === 'string') {
+      const a = this.toText(left);
+      const b = this.toText(right);
+      return a < b ? -1 : a > b ? 1 : 0;
+    }
+    const a = asNumber(left);
+    const b = asNumber(right);
+    return a < b ? -1 : a > b ? 1 : 0;
   }
 
   /**
@@ -2406,6 +2820,37 @@ class Interpreter {
     return /^(int|long|short|char|float|double|bool|unsigned|signed|size_t)$/.test(name);
   }
 
+  /** 实参是简单左值时给出它的引用，供引用参数直接绑定 */
+  private argRef(expr: ExprNode): Ref | undefined {
+    const simple = (node: ExprNode): boolean => {
+      switch (node.kind) {
+        case 'ident':
+          return true;
+        case 'member':
+          return node.op !== '::' && simple(node.object);
+        case 'index':
+          return simple(node.object) && simple(node.index);
+        case 'unary':
+          return node.op === '*' && simple(node.operand);
+        default:
+          return false;
+      }
+    };
+    if (!simple(expr)) return undefined;
+    try {
+      return this.resolveLValue(expr);
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** 一次求出所有实参的值，同时留下左值实参的引用 */
+  private evalArgs(args: ExprNode[]): { values: RValue[]; refs: (Ref | undefined)[] } {
+    const refs = args.map((arg) => this.argRef(arg));
+    const values = args.map((arg, index) => refs[index]?.get() ?? this.evalExpr(arg));
+    return { values, refs };
+  }
+
   private evalMemberCall(expr: ExprNode & { kind: 'call' }, callee: ExprNode & { kind: 'member' }): RValue {
     let object = this.evalExpr(callee.object);
     // p->f() 先解引用，拿到实际对象再做分派
@@ -2415,6 +2860,33 @@ class Interpreter {
       if (object.t === 'string') return intValue(Array.from(object.v).length);
       if (object.t === 'array') return intValue(object.elems.length);
     }
+    if (object.t === 'array') {
+      // std::vector 的成员：因为用数组承载，这里就是改数组本身
+      const resized = (): void => {
+        object.dims = [object.elems.length];
+      };
+      if (method === 'push_back') {
+        const value = expr.args[0] ? this.coerceVectorElement(expr.args[0], object.elemType) : voidValue();
+        object.elems.push(value);
+        resized();
+        return voidValue();
+      }
+      if (method === 'pop_back') {
+        object.elems.pop();
+        resized();
+        return voidValue();
+      }
+      if (method === 'front') return object.elems[0] ?? intValue(0, object.elemType);
+      if (method === 'back') return object.elems[object.elems.length - 1] ?? intValue(0, object.elemType);
+      if (method === 'clear') {
+        object.elems.length = 0;
+        resized();
+        return voidValue();
+      }
+      if (method === 'empty') return boolValue(object.elems.length === 0);
+      if (method === 'begin') return this.vectorIterator(object, 0, expr.line);
+      if (method === 'end') return this.vectorIterator(object, object.elems.length, expr.line);
+    }
     if (method === 'c_str' && object.t === 'string') return object;
     if (method === 'at' && expr.args[0]) {
       const index = asInt(this.evalExpr(expr.args[0]));
@@ -2422,10 +2894,10 @@ class Interpreter {
     }
     // 用户自定义类的成员函数：找到同名同参数个数的方法，把对象当作 this 传进去
     if (object.t === 'struct') {
-      const args = expr.args.map((arg) => this.evalExpr(arg));
+      const { values: args, refs } = this.evalArgs(expr.args);
       const target = this.resolveMethodCall(object, method, args, callee.object);
       if (target) {
-        return this.callFunction(target, args, expr.line, object);
+        return this.callFunction(target, args, expr.line, object, refs);
       }
       throw new SimError(`类 ${object.typeName} 没有可匹配的成员函数 ${method}()。`, expr.line);
     }
@@ -3106,6 +3578,7 @@ class Interpreter {
     args: RValue[],
     callLine: number,
     thisValue?: StructValue,
+    argRefs?: (Ref | undefined)[],
   ): RValue {
     if (this.frames.length >= MAX_CALL_DEPTH) {
       throw new SimError(`递归层数超过 ${MAX_CALL_DEPTH} 层，可能是没有终止条件的递归。`, callLine, 'runtime');
@@ -3138,17 +3611,25 @@ class Interpreter {
         label: 'this',
         typeText: `${thisValue.typeName}*`,
       };
+      const thisPointer: PointerValue = {
+        t: 'pointer',
+        label: 'this',
+        target: selfRef,
+        elemType: thisValue.typeName,
+        typeText: `${thisValue.typeName}*`,
+        offset: 0,
+      };
       frame.scopes[0].vars.set('this', {
         name: 'this',
-        value: {
-          t: 'pointer',
+        value: thisPointer,
+        // 这个 ref 返回的是指针本身（`longer = this` 要拿到指针），
+        // 指针的 target 才指向对象（`*this` 用它）
+        ref: {
+          get: () => thisPointer,
+          set: () => undefined,
           label: 'this',
-          target: selfRef,
-          elemType: thisValue.typeName,
           typeText: `${thisValue.typeName}*`,
-          offset: 0,
         },
-        ref: selfRef,
         typeText: `${thisValue.typeName}*`,
         category: 'pointer',
         isConst: true,
@@ -3160,6 +3641,20 @@ class Interpreter {
       const param = fn.params[i];
       if (!param.name || param.name === '...') continue;
       const provided = i < args.length ? args[i] : undefined;
+      // 引用参数绑定到实参本身：`bool pop(T& value)` 里写 value 要改到调用方的变量
+      const ref = provided !== undefined ? argRefs?.[i] : undefined;
+      if (ref && (param.isReference || (param.typeText.includes('&') && !param.isPointer))) {
+        const value = ref.get();
+        frame.scopes[0].vars.set(param.name, {
+          name: param.name,
+          value,
+          ref,
+          typeText: param.typeText,
+          category: categoryOfValue(value),
+          isConst: false,
+        });
+        continue;
+      }
       // 省略实参时要求默认值：`BigInt(size_t v = 0)` 里的 v 必须是 0 而不是 null
       const arg = provided !== undefined ? provided : this.evalDefaultParam(param);
       const value = this.coerceParam(arg, param);

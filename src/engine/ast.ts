@@ -47,6 +47,8 @@ export interface DeclaratorNode extends NodePos {
   pointerDepth: number;
   isReference: boolean;
   arrayDims: (number | null)[];
+  /** 维度的源码文本（`int a[N]` 里的 N），数字维度为 null */
+  arrayDimTexts?: string[];
   init?: ExprNode;
   /** 初始化表达式原文（截断后） */
   initText?: string;
@@ -285,6 +287,8 @@ export interface RangeForStmt extends NodePos {
   kind: 'rangeFor';
   declText: string;
   varName: string;
+  /** `for (int& x : v)` 里的 & —— 按引用遍历时改的是容器里的元素 */
+  byReference?: boolean;
   iterable: ExprNode;
   body: StmtNode;
 }
@@ -356,6 +360,8 @@ export interface FuncDeclNode extends NodePos {
   isInline: boolean;
   isExplicit: boolean;
   isTemplate: boolean;
+  /** `template <typename T>` 里的参数名；类模板的成员拿不到（它们继承类的绑定） */
+  templateParams?: string[];
   isOperator: boolean;
   isConstructor: boolean;
   isDestructor: boolean;
@@ -382,6 +388,8 @@ export interface FieldDeclNode extends NodePos {
   pointerDepth: number;
   isReference: boolean;
   arrayDims: (number | null)[];
+  /** 维度的源码文本（`T items_[kCapacity]` 里的 kCapacity） */
+  arrayDimTexts?: string[];
   initText?: string;
 }
 
@@ -394,6 +402,8 @@ export interface ClassDeclNode extends NodePos {
   methods: FuncDeclNode[];
   nested: ClassDeclNode[];
   isTemplate: boolean;
+  /** `template <typename T, int N>` 里的参数名：['T', 'N'] */
+  templateParams?: string[];
 }
 
 export interface EnumDeclNode extends NodePos {

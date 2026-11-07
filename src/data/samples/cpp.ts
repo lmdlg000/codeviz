@@ -656,7 +656,7 @@ int main() {
   {
     id: 'template-max',
     title: 'maxValue：一个函数模板',
-    description: '用函数模板 maxValue 让同一份比较逻辑服务 int、double 与 string。',
+    description: '用函数模板 maxValue 让同一份比较逻辑服务 int、double 与 string —— 单步执行时会看到 T 被推导成三种类型、各展开一份函数。',
     language: 'cpp',
     code: `#include <iostream>
 #include <string>
@@ -679,7 +679,7 @@ int main() {
   {
     id: 'template-stack',
     title: 'Stack<T>：类模板',
-    description: '用类模板 Stack<T> 演示带类型参数的栈容器及其 push/pop 行为。',
+    description: '用类模板 Stack<T> 演示带类型参数的栈容器及其 push/pop 行为 —— Stack<int> 会就地展开成具体类，static const 的容量也参与数组布局。',
     language: 'cpp',
     code: `#include <iostream>
 
@@ -735,7 +735,7 @@ int main() {
   {
     id: 'stl-vector',
     title: 'vector：动态数组入门',
-    description: '用 vector 保存成绩、用范围 for 遍历求和，再用 sort 把成绩排序。',
+    description: '用 vector 保存成绩、用范围 for 遍历求和，再用 sort 把成绩排序 —— push_back 与 sort 都能一步步看到元素怎么变。',
     language: 'cpp',
     code: `#include <algorithm>
 #include <iostream>
@@ -767,7 +767,7 @@ int main() {
   {
     id: 'vector-stats',
     title: 'vector + string：成绩统计',
-    description: '用 vector 与 string 统计一组成绩的最小值、最大值与平均值。',
+    description: '用 vector 与 string 统计一组成绩的最小值、最大值与平均值 —— vector<string> 的 push_back、front/back 与 sort 都可单步观察。',
     language: 'cpp',
     code: `#include <algorithm>
 #include <iostream>

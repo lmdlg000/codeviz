@@ -64,7 +64,6 @@ export function buildSupportRegistry(program: ProgramNode, classDecls: ProgramNo
 }
 
 const UNSUPPORTED_TYPES = new Set([
-  'vector',
   'map',
   'set',
   'unordered_map',
@@ -128,6 +127,8 @@ function checkExpression(
       if (registry.methods.has(name)) return null; // 成员函数按对象分派，交给解释器
       // char(x) / int(x) 这类函数式类型转换
       if (CAST_NAMES.has(name) && expr.args.length === 1) return null;
+      // std::string("abc") / string(3, 'a') 这类函数式构造
+      if (/^(string|basic_string)$/.test(name)) return null;
       return { line: expr.line, message: `调用了源码中没有定义的函数 ${name}()，无法执行。` };
     }
     default:
@@ -177,10 +178,7 @@ function scanFunction(
 ): UnsupportedIssue | null {
   if (depth > 24) return null;
   if (!fn.body) return null;
-  // 成员函数已支持
-  if (fn.isTemplate) {
-    return { line: fn.line, message: '模板函数暂不支持单步执行。' };
-  }
+  // 模板函数已支持：解释器按实参类型推导后展开一份具体函数再执行
   for (const param of fn.params) {
     // 引用参数按引用绑定实参，已支持
     const base = classOfType(param.base);
@@ -218,8 +216,8 @@ export function findUnsupportedFunction(
 
 /**
  * 类层面的子集检查。
- * 单继承 + 虚函数已经支持（字段按基类在前平铺、构造/析构成链、虚函数按实际类型分派），
- * 这里只拦真正做不到的：多继承、类模板。
+ * 单继承 + 虚函数 + 类模板都已支持（模板在看到 `Stack<int>` 时就地展开成具体类），
+ * 这里只拦真正做不到的：多继承。
  */
 function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null {
   const flattened: ClassDeclNode[] = [];
@@ -232,9 +230,6 @@ function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null
   collect(classes);
 
   for (const cls of flattened) {
-    if (cls.isTemplate) {
-      return { line: cls.line, message: `类模板 ${cls.name} 暂不支持单步执行，请展开成具体类型再看。` };
-    }
     if (cls.bases.length > 1) {
       // 多继承要处理基类指针偏移与二义性，教学子集先不做
       return {

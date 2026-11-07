@@ -704,3 +704,42 @@ int main() {
     expect(out).toBe('4.00 0.00 3.00\n');
   });
 });
+
+describe('simulate：引用语义', () => {
+  const runRef = (code: string) => simulate(code, { maxSteps: 20000 });
+
+  it('引用变量是别名，改 r 就是改 a', () => {
+    const r = runRef(`
+#include <iostream>
+int main() {
+  int a = 10;
+  int& r = a;
+  r = 20;
+  std::cout << a << " ";
+  a = 30;
+  std::cout << r << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output.trim()).toBe('20 30');
+  });
+
+  it('范围 for 带引用时改的是容器里的元素', () => {
+    const r = runRef(`
+#include <iostream>
+#include <vector>
+int main() {
+  int v[3] = {1, 2, 3};
+  for (int& item : v) {
+    item = item * 2;
+  }
+  for (int item : v) std::cout << item << " ";
+  std::cout << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output.trim()).toBe('2 4 6');
+  });
+});

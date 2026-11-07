@@ -124,6 +124,8 @@ interface DeclaratorHeader {
   pointerDepth: number;
   isReference: boolean;
   arrayDims: (number | null)[];
+  /** 维度的源码文本（`T items_[kCapacity]`），纯数字维度为 null */
+  arrayDimTexts?: string[];
   isFunctionPointer: boolean;
   startTok: Token;
 }
@@ -139,6 +141,8 @@ interface FunctionTailOptions {
   isConstructor?: boolean;
   isDestructor?: boolean;
   isTemplate?: boolean;
+  /** `template <typename T>` 里的参数名 */
+  templateParams?: string[];
   /** 返回类型上的指针层数（如 char *name()） */
   pointerDepth?: number;
   isReference?: boolean;
@@ -154,6 +158,39 @@ interface MemberParseResult {
 function lastSegment(name: string): string {
   const idx = name.lastIndexOf('::');
   return idx >= 0 ? name.slice(idx + 2) : name;
+}
+
+/**
+ * 从 `template <typename T, int N = 8>` 的尖括号内部文本里取参数名。
+ * 规则：按顶层逗号切开，每段取「默认值 = 之前的最后一个标识符」——
+ * `typename T` → T、`int N = 8` → N、`class Compare = std::less<int>` → Compare。
+ */
+function templateParamNames(inner: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = '';
+  for (const char of inner) {
+    if (char === '<' || char === '(' || char === '[') depth++;
+    if (char === '>' || char === ')' || char === ']') depth--;
+    if (char === ',' && depth === 0) {
+      parts.push(current);
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  if (current.trim()) parts.push(current);
+
+  const names: string[] = [];
+  for (const part of parts) {
+    const beforeDefault = part.split('=')[0];
+    const identifiers = beforeDefault.match(/[A-Za-z_]\w*/g) ?? [];
+    if (identifiers.length === 0) continue;
+    const name = identifiers[identifiers.length - 1];
+    if (name === 'typename' || name === 'class') continue;
+    names.push(name);
+  }
+  return names;
 }
 
 function baseNameOfTypeText(text: string): string {
@@ -174,6 +211,8 @@ export class Parser {
   private diagnostics: Diagnostic[] = [];
   private knownTypes = new Set<string>();
   private pendingTemplate = false;
+  /** 刚读过的 `template <...>` 参数名，交给接下来的类 / 函数声明 */
+  private pendingTemplateParams: string[] | null = null;
 
   constructor(tokens: Token[]) {
     this.tokens = tokens;
@@ -327,12 +366,14 @@ export class Parser {
       return;
     }
     if (tok.text === 'template') {
-      this.consumeTemplatePrefix();
+      const params = this.consumeTemplatePrefix();
       this.pendingTemplate = true;
+      this.pendingTemplateParams = params;
       try {
         this.parseTopLevelOne();
       } finally {
         this.pendingTemplate = false;
+        this.pendingTemplateParams = null;
       }
       return;
     }
@@ -673,6 +714,7 @@ export class Parser {
       methods,
       nested: nestedClasses,
       isTemplate: this.pendingTemplate,
+      templateParams: this.pendingTemplateParams ?? undefined,
       ...this.span(kwTok),
     };
     return node;
@@ -691,9 +733,12 @@ export class Parser {
       return { access: tok.text as AccessKind };
     }
     if (tok.text === 'template') {
-      this.consumeTemplatePrefix();
+      const params = this.consumeTemplatePrefix();
       const result = this.parseClassMember(className, access);
-      for (const method of result.methods ?? []) method.isTemplate = true;
+      for (const method of result.methods ?? []) {
+        method.isTemplate = true;
+        if (params.length > 0) method.templateParams = params;
+      }
       return result;
     }
     if (tok.text === 'friend') {
@@ -854,6 +899,7 @@ export class Parser {
       pointerDepth: header.pointerDepth,
       isReference: header.isReference,
       arrayDims: header.arrayDims,
+      arrayDimTexts: header.arrayDimTexts,
       initText,
       ...this.span(header.startTok),
     };
@@ -1101,19 +1147,32 @@ export class Parser {
     }
 
     const arrayDims: (number | null)[] = [];
+    const arrayDimTexts: string[] = [];
     while (this.check('[')) {
       this.advance();
+      const dimStart = this.pos;
       let dim: number | null = null;
       if (!this.check(']')) {
         const expr = this.parseAssignment();
         if (expr.kind === 'number') dim = expr.value;
-        // 常量标识符等无法在解析期求值，保留 null
+        // 常量标识符等无法在解析期求值，保留 null，原文留在 arrayDimTexts 里
       }
+      const dimText = this.tokensText(dimStart, this.pos).trim();
       this.expect(']');
       arrayDims.push(dim);
+      arrayDimTexts.push(dimText);
     }
 
-    return { name, className, pointerDepth, isReference, arrayDims, isFunctionPointer, startTok };
+    return {
+      name,
+      className,
+      pointerDepth,
+      isReference,
+      arrayDims,
+      arrayDimTexts: arrayDimTexts.some((text) => text.length > 0) ? arrayDimTexts : undefined,
+      isFunctionPointer,
+      startTok,
+    };
   }
 
   private finishDeclarator(header: DeclaratorHeader, spec: TypeSpec): DeclaratorNode {
@@ -1161,6 +1220,7 @@ export class Parser {
       pointerDepth: header.pointerDepth,
       isReference: header.isReference,
       arrayDims: header.arrayDims,
+      arrayDimTexts: header.arrayDimTexts,
       init,
       initText,
       isFunctionPointer: header.isFunctionPointer,
@@ -1196,6 +1256,7 @@ export class Parser {
           isTypedef: false,
         },
         isTemplate: this.pendingTemplate,
+        templateParams: this.pendingTemplateParams ?? undefined,
       });
       if (mode === 'top') {
         this.program.functions.push(fn);
@@ -1470,6 +1531,7 @@ export class Parser {
       isInline,
       isExplicit,
       isTemplate: options.isTemplate === true,
+      templateParams: options.templateParams,
       isOperator,
       isConstructor,
       isDestructor,
@@ -1688,12 +1750,14 @@ export class Parser {
     if (this.isRangeForAhead()) {
       let declText = '';
       let varName = '';
+      let byReference = false;
       if (this.looksLikeDeclaration()) {
         const quals = this.parseQualifiers();
         const spec = this.parseTypePart(quals);
         const header = this.parseDeclaratorHeader();
         declText = `${spec ? spec.text : ''} ${header.name}`.trim();
         varName = header.name;
+        byReference = header.isReference;
       } else {
         const id = this.expectName('范围 for 需要一个循环变量。');
         varName = id.text;
@@ -1703,7 +1767,7 @@ export class Parser {
       const iterable = this.parseAssignment();
       this.expect(')');
       const body = this.parseStatement();
-      return { kind: 'rangeFor', declText, varName, iterable, body, ...this.span(startTok) };
+      return { kind: 'rangeFor', declText, varName, byReference, iterable, body, ...this.span(startTok) };
     }
 
     let init: DeclStmt | null = null;
@@ -1935,6 +1999,23 @@ export class Parser {
       }
       const expr = this.parseUnary();
       return { kind: 'delete', expr, isArray, ...this.span(tok) };
+    }
+
+    // static_cast<double>(sum) / reinterpret_cast<T*>(p) 这类 C++ 风格转换
+    if (['static_cast', 'dynamic_cast', 'reinterpret_cast', 'const_cast'].includes(tok.text)) {
+      this.advance();
+      if (this.check('<')) {
+        const open = this.pos;
+        this.consumeTemplateArgText();
+        const typeText = this.tokensText(open + 1, Math.max(open + 1, this.pos - 1)).trim();
+        let expr: ExprNode = { kind: 'ident', name: typeText, ...this.span(tok) };
+        if (this.check('(')) {
+          this.advance();
+          expr = this.parseCommaExpr();
+          this.expect(')');
+        }
+        return { kind: 'cast', typeText: typeText || 'int', expr, ...this.span(tok) };
+      }
     }
 
     if (tok.text === '(') {
@@ -2293,9 +2374,14 @@ export class Parser {
     }
   }
 
-  private consumeTemplatePrefix(): void {
+  /** 读掉 `template <...>`，返回参数名（`typename T, int N` → ['T', 'N']） */
+  private consumeTemplatePrefix(): string[] {
     this.advance(); // template
-    if (this.check('<')) this.consumeTemplateArgText();
+    if (!this.check('<')) return [];
+    const open = this.pos;
+    this.consumeTemplateArgText();
+    const inner = this.tokensText(open + 1, Math.max(open + 1, this.pos - 1));
+    return templateParamNames(inner);
   }
 
   private tokensText(start: number, end: number): string {

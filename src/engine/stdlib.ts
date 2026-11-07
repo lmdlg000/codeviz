@@ -168,12 +168,12 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
     header: '<vector> <map> <algorithm>',
     lessonId: 'c13-templates',
     entries: [
-      stat('vector', 'std::vector<int> v;', '动态数组，push_back / size / 下标访问。'),
+      trace('vector', 'std::vector<int> v;', '动态数组：push_back / size / 下标 / 范围 for 都可单步观察。'),
       stat('map', 'std::map<string,int> m;', '有序键值对，按 key 自动排序。'),
       stat('set', 'std::set<int> s;', '自动去重的有序集合。'),
       stat('pair', 'std::pair<int,int> p;', '两个值的组合，first / second。'),
-      stat('sort', 'std::sort(v.begin(), v.end());', '需 <algorithm>，默认升序。'),
-      stat('reverse', 'std::reverse(v.begin(), v.end());', '原地反转区间。'),
+      trace('sort', 'std::sort(v.begin(), v.end());', '需 <algorithm>，默认升序；单步执行会真实重排区间。'),
+      trace('reverse', 'std::reverse(v.begin(), v.end());', '原地反转区间，与 sort 同一套迭代器区间。'),
     ],
   },
 ];

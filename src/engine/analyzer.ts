@@ -1052,9 +1052,14 @@ function buildClassInfos(model: AnalysisModel): ClassInfo[] {
     });
 
     const isAbstract = cls.methods.some((m) => m.isPureVirtual);
+    // 类模板在类图里带上参数名（Stack<T>），别让人以为是普通类
+    const displayName =
+      cls.isTemplate && cls.templateParams && cls.templateParams.length > 0
+        ? `${cls.name}<${cls.templateParams.join(', ')}>`
+        : cls.name;
     result.push({
       id: makeId(cls.name),
-      name: cls.name,
+      name: displayName,
       kind: cls.classKind === 'class' ? 'class' : 'struct',
       bases: cls.bases.map((b) => b.name),
       fields,

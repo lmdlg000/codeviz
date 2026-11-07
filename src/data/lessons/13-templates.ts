@@ -131,6 +131,61 @@ int main() {
         '`Stack<T>` 是模板，`Stack<int>` 才是真正的类型；push 与 pop 共用同一份逻辑，却适用于任何类型。',
     },
     {
+      type: 'diagram',
+      diagram: {
+        kind: 'trace',
+        code: `#include <iostream>
+
+template <typename T>
+class Stack {
+public:
+  Stack() { top_ = -1; }
+  bool empty() const { return top_ == -1; }
+  bool full() const { return top_ == kCapacity - 1; }
+
+  bool push(const T& value) {
+    if (full()) {
+      return false;
+    }
+    top_++;
+    items_[top_] = value;
+    return true;
+  }
+
+  bool pop(T& value) {
+    if (empty()) {
+      return false;
+    }
+    value = items_[top_];
+    top_--;
+    return true;
+  }
+
+private:
+  static const int kCapacity = 4;
+  T items_[kCapacity];
+  int top_ = -1;
+};
+
+int main() {
+  Stack<int> stack;
+  stack.push(10);
+  stack.push(20);
+  stack.push(30);
+
+  int value = 0;
+  while (stack.pop(value)) {
+    std::cout << value << " ";
+  }
+  std::cout << std::endl;
+  return 0;
+}`,
+      },
+      title: '单步执行：Stack<int> 的 push 与 pop',
+      caption:
+        '`Stack<int>` 被就地展开成一个具体类：`items_` 变成 `int[4]`，`kCapacity` 参与数组长度计算。播放一遍，看 `top_` 从 -1 走到 2 再退回去，`pop` 通过引用参数把值带回 `value`。',
+    },
+    {
       type: 'text',
       body:
         '栈的内部用数组和栈顶下标实现：`top_` 为 -1 表示空；push 先检查是否已满，再把元素放到 `++top_` 的位置；pop 先检查是否为空，再把 `top_` 位置的元素交给调用者。`full()` 里用到 `kCapacity`，它是 `static const int`，在类内初始化，编译器会把它当作常量表达式处理。',
@@ -209,6 +264,38 @@ int main() {
 }`,
       caption:
         'push_back 追加、范围 for 求和、sort 原地升序排序：这三招覆盖了 vector 最常用的场景。',
+    },
+    {
+      type: 'diagram',
+      diagram: {
+        kind: 'trace',
+        code: `#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+  std::vector<int> scores = {72, 95, 88, 60};
+  scores.push_back(78);
+  std::cout << "size = " << scores.size() << std::endl;
+
+  int sum = 0;
+  for (int score : scores) {
+    sum += score;
+  }
+  std::cout << "sum = " << sum << std::endl;
+
+  std::sort(scores.begin(), scores.end());
+  std::cout << "sorted: ";
+  for (int score : scores) {
+    std::cout << score << " ";
+  }
+  std::cout << std::endl;
+  return 0;
+}`,
+      },
+      title: '单步执行：push_back 与 sort 到底改了什么',
+      caption:
+        '每次 `push_back` 都会让数组变长一格，`size()` 跟着变；`sort(begin, end)` 只重排这一段区间，播放到那一行时能看到元素被换到正确位置。',
     },
     {
       type: 'text',
