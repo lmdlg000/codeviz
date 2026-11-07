@@ -3,7 +3,7 @@ import type { Lesson } from '../types';
 const lesson: Lesson = {
   id: 'c12-inheritance',
   chapterId: 'cpp-oop',
-  order: 2,
+  order: 3,
   title: '继承与多态：同一种调用，不同的行为',
   subtitle: '从复用代码到面向接口编程',
   description:

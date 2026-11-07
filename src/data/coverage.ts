@@ -41,11 +41,11 @@ export const COVERAGE_ROWS: CoverageRow[] = [
   { source: 'C++ 自学视频教程', topic: '多态与虚函数', status: 'covered', lessonIds: ['c12-inheritance'], note: '虚函数、虚析构、纯虚函数与抽象类。' },
   { source: 'C++ 自学视频教程', topic: '函数模板与类模板', status: 'covered', lessonIds: ['c13-templates'], note: '类型参数、实例化、模板定义放头文件。' },
   { source: 'C++ 自学视频教程', topic: 'STL 容器与算法', status: 'partial', lessonIds: ['c13-templates'], note: '讲了 vector / string / sort 的用法，容器适配器与迭代器体系未展开。' },
-  { source: 'C++ 自学视频教程', topic: '引用', status: 'partial', lessonIds: ['c08-pointers'], note: '在指针课末尾对比过，未单独成节；单步执行暂不支持引用参数。' },
+  { source: 'C++ 自学视频教程', topic: '引用', status: 'covered', lessonIds: ['cpp-refs'], note: '独立一课：别名语义、const T& 传参、返回引用与陷阱；解释器仍不支持引用参数。' },
   { source: 'C++ 自学视频教程', topic: '动态内存 new / delete', status: 'covered', lessonIds: ['cpp-memory'], note: '独立一课：new/delete、new[]/delete[]、泄漏/重复释放/释放后使用，单步执行可观察堆块。' },
-  { source: 'C++ 自学视频教程', topic: '运算符重载', status: 'gap', lessonIds: [], note: '本版未覆盖。' },
-  { source: 'C++ 自学视频教程', topic: '异常处理 try / catch', status: 'gap', lessonIds: [], note: '本版未覆盖。' },
-  { source: 'C++ 自学视频教程', topic: '文件流 fstream', status: 'gap', lessonIds: [], note: '文件课讲的是 C 的 FILE*，C++ 流式文件未覆盖。' }
+  { source: 'C++ 自学视频教程', topic: '运算符重载', status: 'covered', lessonIds: ['cpp-operators'], note: '成员/非成员两种写法、<< 为什么用 friend、前置后置 ++、不该重载的运算符。' },
+  { source: 'C++ 自学视频教程', topic: '异常处理 try / catch', status: 'covered', lessonIds: ['cpp-exceptions'], note: 'try/throw/catch、栈展开与 RAII、析构不抛异常、异常 vs 错误码。' },
+  { source: 'C++ 自学视频教程', topic: '文件流 fstream', status: 'covered', lessonIds: ['cpp-files'], note: 'ifstream/ofstream、打开模式、逐行与逐词读取、与 FILE* 的对照表。' }
 ];
 
 export const COVERAGE_SUMMARY = {

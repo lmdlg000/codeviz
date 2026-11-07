@@ -45,9 +45,13 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c14-bits',
       'cpp-first',
       'cpp-memory',
+      'cpp-refs',
       'c11-classes',
+      'cpp-operators',
       'c12-inheritance',
-      'c13-templates'
+      'c13-templates',
+      'cpp-exceptions',
+      'cpp-files'
     ],
     optional: [],
     notes: {}
@@ -68,9 +72,13 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c06-arrays',
       'c07-functions',
       'cpp-memory',
+      'cpp-refs',
       'c11-classes',
+      'cpp-operators',
       'c12-inheritance',
-      'c13-templates'
+      'c13-templates',
+      'cpp-exceptions',
+      'cpp-files'
     ],
     optional: ['c01-hello', 'c08-pointers', 'c09-structs', 'c10-files', 'c14-bits'],
     notes: {
@@ -80,6 +88,10 @@ export const LEARNING_PATHS: LearningPath[] = [
       'c06-arrays': '先用 `std::vector<int>` 完成同样的遍历与排序，数组留作理解内存布局的底层视角。',
       'c07-functions': 'C++ 还支持函数重载与默认参数：函数名可以相同，参数表不同即可。',
       'cpp-memory': '堆内存必须先学：`new` / `delete`、泄漏与重复释放，单步执行里能直接看到堆块。',
+      'cpp-refs': '引用是 C++ 参数与返回值的默认写法，`const T&` 会从这节课开始一直用到最后。',
+      'cpp-operators': '`operator<<` 让你自己的类型也能用 `cout`，写类和容器时天天要用。',
+      'cpp-exceptions': '异常与 RAII 一起讲：资源交给析构函数，出错路径也不会漏。',
+      'cpp-files': '文件流与 `cout` 语法一致，读完这节就能写简单的读写小工具。',
       'c11-classes': 'C++ 的真正主场：从这里开始，`struct` 与 `class` 只差默认访问权限。',
       'c12-inheritance': '多态必须靠虚函数，记得把基类析构函数写成 `virtual`。',
       'c13-templates': '模板 + STL 是 C++ 生产力的来源，`vector` / `map` / `sort` 要能熟练用。'

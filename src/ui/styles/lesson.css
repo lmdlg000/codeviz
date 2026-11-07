@@ -1396,3 +1396,9 @@
     overflow-y: auto;
   }
 }
+
+/* 表格里的行内代码不再折行：容器本身可横向滚动，折行反而更难读 */
+.lesson-table td code,
+.lesson-table th code {
+  white-space: nowrap;
+}

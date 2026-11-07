@@ -43,7 +43,7 @@ export const chapters: Chapter[] = [
     order: 5,
     title: 'C++ 面向对象',
     shortTitle: '进阶',
-    subtitle: '类、继承、多态与泛型编程',
+    subtitle: '类、重载、继承、多态、模板与异常处理',
     tone: 'violet',
     icon: 'cube',
   },

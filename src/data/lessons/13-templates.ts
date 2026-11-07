@@ -3,7 +3,7 @@ import type { Lesson } from '../types';
 const lesson: Lesson = {
   id: 'c13-templates',
   chapterId: 'cpp-oop',
-  order: 3,
+  order: 4,
   title: '模板与 STL：写出通用的代码',
   subtitle: '让类型成为参数，让标准库替你干活',
   description:
