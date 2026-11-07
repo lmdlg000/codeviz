@@ -15,9 +15,35 @@ import type { AnalysisResult, CodeStats, SimulateOptions, TraceResult } from '..
 
 const MAX_ANALYSIS_ENTRIES = 24;
 const MAX_TRACE_ENTRIES = 16;
+/**
+ * 轨迹缓存还要按「总步数」设预算：
+ * 一条 4000 步的类对象示例约 18MB，按条数缓存 16 条会直接吃掉几百 MB。
+ * 12000 步大约是两三份长轨迹，短程序则仍按 16 条上限走。
+ */
+const MAX_TRACE_STEPS = 12000;
 
 const analysisCache = new Map<string, AnalysisResult>();
 const traceCache = new Map<string, TraceResult>();
+let traceStepTotal = 0;
+
+/** 轨迹专用缓存写入：条数 + 总步数双重淘汰 */
+function rememberTrace(key: string, result: TraceResult): TraceResult {
+  const existing = traceCache.get(key);
+  if (existing) {
+    traceStepTotal -= existing.steps?.length ?? 0;
+    traceCache.delete(key);
+  }
+  traceCache.set(key, result);
+  traceStepTotal += result.steps?.length ?? 0;
+  while (traceCache.size > MAX_TRACE_ENTRIES || (traceStepTotal > MAX_TRACE_STEPS && traceCache.size > 1)) {
+    const oldest = traceCache.keys().next();
+    if (oldest.done) break;
+    const dropped = traceCache.get(oldest.value);
+    traceStepTotal -= dropped?.steps?.length ?? 0;
+    traceCache.delete(oldest.value);
+  }
+  return result;
+}
 
 const EMPTY_STATS: CodeStats = {
   totalLines: 0,
@@ -145,7 +171,7 @@ export function simulateCached(code: string, options?: SimulateOptions): TraceRe
   } catch {
     result = traceFailure();
   }
-  return remember(traceCache, key, result, MAX_TRACE_ENTRIES);
+  return rememberTrace(key, result);
 }
 
 /** React hook：同一段代码在一次渲染内只查一次缓存。 */
