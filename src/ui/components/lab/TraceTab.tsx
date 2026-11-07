@@ -68,8 +68,8 @@ export function TraceTab({ code, language, analysis, trace, loading, onRun }: Tr
         </span>
         <h3 className="lab-trace-intro__title">单步执行，看清每一行</h3>
         <p className="lab-trace-intro__text">
-          教学子集解释器会逐句运行代码，同时展示变量、调用栈与输出。支持声明、运算、循环、分支、函数调用、数组与
-          printf / cout 等常见写法。
+          教学子集解释器会逐句运行代码，同时展示变量、调用栈与输出。支持声明、运算、循环、分支、函数调用、数组、
+          printf / cout、无多继承的类（含虚函数与多态调用）以及 new / delete 的堆视图。
         </p>
 
         <div

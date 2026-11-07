@@ -539,7 +539,7 @@ int main() {
   {
     id: 'inheritance-animal',
     title: 'Animal 家族：继承与重写',
-    description: '让 Dog 和 Cat 继承 Animal 并重写 sound，通过基类指针观察虚函数调用。',
+    description: '让 Dog 和 Cat 继承 Animal 并重写 sound，通过基类指针观察虚函数调用 —— 单步看 introduce() 里那句 sound() 是怎么分派到 Dog 的。',
     language: 'cpp',
     code: `#include <iostream>
 #include <string>
@@ -590,7 +590,7 @@ int main() {
   {
     id: 'shape-polymorphism',
     title: 'Shape：多态图形计算',
-    description: '用抽象基类 Shape、纯虚函数与虚析构实现一组图形的统一面积计算。',
+    description: '用抽象基类 Shape、纯虚函数与虚析构实现一组图形的统一面积计算，单步能看到 delete 时先 ~Circle 再 ~Shape。',
     language: 'cpp',
     code: `#include <iostream>
 

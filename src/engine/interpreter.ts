@@ -220,6 +220,47 @@ class Interpreter {
     this.methodIndex.set(key, list);
   }
   private classMap = new Map<string, ClassDeclNode>();
+  /** 类名 → 直接基类列表（单继承为主，多继承按声明顺序平铺） */
+  private parents = new Map<string, string[]>();
+
+  /** 从自己到最顶层基类的顺序：Dog → Animal */
+  private classChain(className: string): string[] {
+    const chain: string[] = [];
+    const walk = (name: string, depth: number): void => {
+      if (depth > 16 || chain.includes(name)) return;
+      chain.push(name);
+      for (const base of this.parents.get(name) ?? []) walk(base, depth + 1);
+    };
+    walk(lastSegment(className), 0);
+    return chain;
+  }
+
+  /** base 是 derived 的基类（或同一个类）吗 */
+  private isAncestorOf(base: string, derived: string): boolean {
+    return this.classChain(derived).includes(lastSegment(base));
+  }
+
+  /** 一个类是否抽象：链上有纯虚函数、且更派生的类没有实现它 */
+  private abstractMethodOf(className: string): FuncDeclNode | undefined {
+    const chain = this.classChain(className);
+    for (let i = chain.length - 1; i >= 0; i--) {
+      const cls = this.classMap.get(chain[i]);
+      for (const method of cls?.methods ?? []) {
+        if (!method.isPureVirtual) continue;
+        // chain.slice(0, i) 是比声明处更派生的那几个类
+        const implemented = chain.slice(0, i).some((derived) => {
+          const derivedCls = this.classMap.get(derived);
+          const inline = derivedCls?.methods.some(
+            (item) => item.name === method.name && !item.isPureVirtual,
+          );
+          const outOfLine = (this.methodIndex.get(`${derived}::${method.name}`) ?? []).length > 0;
+          return Boolean(inline) || outOfLine;
+        });
+        if (!implemented) return method;
+      }
+    }
+    return undefined;
+  }
   private enumValues: Map<string, number>;
   /** new 出来的堆块，按申请顺序排列 */
   private heapBlocks: HeapBlock[] = [];
@@ -249,6 +290,8 @@ class Interpreter {
 
     for (const cls of flattenClasses(program)) {
       if (!this.classMap.has(cls.name)) this.classMap.set(cls.name, cls);
+      const bases = cls.bases.map((base) => lastSegment(base.name)).filter(Boolean);
+      if (bases.length > 0) this.parents.set(lastSegment(cls.name), bases);
     }
     for (const fn of program.functions) {
       if (!fn.body) continue;
@@ -957,8 +1000,9 @@ class Interpreter {
       if (declarator.init) {
         // Point c = a + b; 采用表达式的值；同类对象优先走拷贝构造，保证深拷贝
         const evaluated = this.evalExpr(declarator.init);
-        if (evaluated.t === 'struct' && lastSegment(evaluated.typeName) === cls.name) {
-          return this.copyObject(evaluated, declarator.init.line);
+        if (evaluated.t === 'struct') {
+          // 用基类变量接派生类对象 = 对象切片（多态信息在这里丢掉）
+          return this.sliceTo(evaluated, cls.name, declarator.init.line);
         }
         return this.constructObject(cls.name, [], declarator.init.line);
       }
@@ -1032,7 +1076,8 @@ class Interpreter {
     const elems: RValue[] = new Array(total);
 
     const makeDefault = (): RValue => {
-      if (cls) return this.createStructValue(cls.name, undefined);
+      // `Circle* arr[2]` 里的元素是指针，不是类对象
+      if (cls && pointerDepth === 0) return this.createStructValue(cls.name, undefined);
       if (pointerDepth > 0) return nullValue();
       return this.defaultScalar(base, elemType);
     };
@@ -1042,7 +1087,7 @@ class Interpreter {
       if (init.kind === 'string' && isCharType(elemType)) {
         const chars = Array.from(init.value);
         for (let i = 0; i < total; i++) elems[i] = intValue(i < chars.length ? chars[i].charCodeAt(0) : 0, elemType);
-      } else if (cls) {
+      } else if (cls && pointerDepth === 0) {
         if (init.kind === 'initlist') {
           for (let i = 0; i < Math.min(total, init.items.length); i++) {
             const item = init.items[i];
@@ -1160,10 +1205,17 @@ class Interpreter {
   /** 默认参数在 AST 里是源码文本，这里把它变成运行期值（只覆盖常见字面量） */
   private evalDefaultParam(param: ParamNode): RValue {
     const text = (param.defaultValue ?? '').trim();
-    const typeText = param.typeText;
-    if (!text) return param.isPointer ? nullValue() : this.defaultScalar(baseTypeName(typeText), typeText);
+    if (!text) return this.defaultScalar(baseTypeName(param.typeText), param.typeText);
+    return this.evalLiteralText(text, param.typeText);
+  }
+
+  /**
+   * 把源码里的字面量文本变成运行期值。
+   * 默认参数与成员默认值在 AST 里都只留了文本，不走这条路就只能瞎猜。
+   */
+  private evalLiteralText(text: string, typeText: string): RValue {
+    if (!text) return this.defaultScalar(baseTypeName(typeText), typeText);
     if (text === 'nullptr' || text === 'NULL') return nullValue();
-    if (param.isPointer) return nullValue();
     if (text === 'true' || text === 'false') return boolValue(text === 'true');
     if (/^-?0x[0-9a-fA-F]+$/.test(text)) return intValue(parseInt(text, 16), typeText);
     if (/^-?\d+$/.test(text)) return intValue(Number(text), typeText);
@@ -1209,7 +1261,24 @@ class Interpreter {
     return score;
   }
 
+  /**
+   * 找方法：先在本类找，找不到再沿继承链往上（Dog → Animal）。
+   * 从「动态类型」出发调用就是虚函数分派，从「静态类型」出发就是非虚的静态绑定。
+   */
   private findMethod(
+    className: string,
+    name: string,
+    args: RValue[] | number,
+  ): FuncDeclNode | undefined {
+    for (const ancestor of this.classChain(className)) {
+      const found = this.findMethodIn(ancestor, name, args);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  /** 只在指定类里找方法（不看基类），用于析构链、构造链 */
+  private findMethodIn(
     className: string,
     name: string,
     args: RValue[] | number,
@@ -1223,7 +1292,11 @@ class Interpreter {
       ...cls.methods.filter((method) => method.name === name && method.body),
       ...(this.methodIndex.get(key) ?? []),
     ].map((method) => this.inheritDefaults(method, prototypes));
-    if (candidates.length === 0) return undefined;
+    if (candidates.length === 0) {
+      // 只有声明没有实现（纯虚函数就是这种）：仍然认这个签名，
+      // 让调用点报「纯虚函数没有实现」而不是「没有这个成员函数」
+      return cls.methods.find((method) => method.name === name && method.params.length === argCount);
+    }
     const exact = candidates.filter((method) => method.params.length === argCount);
     if (exact.length > 0) {
       if (typeof args === 'number') return exact[0];
@@ -1245,13 +1318,40 @@ class Interpreter {
     });
   }
 
-  /** 构造一个类对象：先铺默认字段，再执行匹配的构造函数 */
+  /** 构造一个类对象：铺好字段后执行构造函数（基类由构造链在 callFunction 里先跑） */
   private constructObject(className: string, args: RValue[], line: number): StructValue {
-    const value = this.createStructValue(className, undefined);
     const name = lastSegment(className);
-    const ctor = this.findMethod(name, name, args);
+    const pure = this.abstractMethodOf(name);
+    if (pure) {
+      throw new SimError(
+        `${name} 里有纯虚函数 ${pure.name}()，它是抽象类，不能直接创建对象。请用派生类或者指针。`,
+        line,
+      );
+    }
+    const value = this.createStructValue(name, undefined);
+    const ctor = this.findMethodIn(name, name, args);
     if (ctor) this.callFunction(ctor, args, line, value);
     return value;
+  }
+
+  /**
+   * 构造链：`Dog(name) : Animal(name)` 先构造基类。
+   * 必须在本函数帧里求值基类实参 —— 那里才看得见 Dog 自己的参数 name。
+   */
+  private runBaseCtors(fn: FuncDeclNode, thisValue: StructValue, line: number): void {
+    const className = lastSegment(fn.className ?? thisValue.typeName);
+    for (const base of this.parents.get(className) ?? []) {
+      const baseName = lastSegment(base);
+      const entry = fn.ctorInit?.find((item) => lastSegment(item.name) === baseName);
+      const args = entry ? entry.args.map((arg) => this.evalExpr(arg)) : [];
+      const baseCtor = this.findMethodIn(baseName, baseName, args);
+      if (baseCtor) this.callFunction(baseCtor, args, line, thisValue);
+    }
+  }
+
+  /** 这一类（含基类）有没有析构函数 */
+  private hasDestructor(className: string): boolean {
+    return this.classChain(className).some((name) => Boolean(this.findMethodIn(name, `~${name}`, 0)));
   }
 
   /** 找真正的拷贝构造函数：单个参数且是同类对象的引用或指针 */
@@ -1271,14 +1371,49 @@ class Interpreter {
     });
   }
 
-  /** 拷贝一个类对象：有拷贝构造就调用它（深拷贝），否则共享同一份字段 */
+  /** 拷贝一个类对象：有拷贝构造就调用它（深拷贝），否则按 C++ 隐式拷贝构造逐字段拷贝 */
   private copyObject(source: StructValue, line: number): StructValue {
     const name = lastSegment(source.typeName);
     const copyCtor = this.findCopyCtor(name);
-    if (!copyCtor) return source;
-    const copy = this.createStructValue(name, undefined);
-    this.callFunction(copyCtor, [source], line, copy);
-    return copy;
+    if (copyCtor) {
+      const copy = this.createStructValue(name, undefined);
+      this.callFunction(copyCtor, [source], line, copy);
+      return copy;
+    }
+    // 隐式拷贝构造：字段逐个复制（指针仍是浅拷贝，这正是初学者踩坑的地方）
+    return this.cloneObject(source);
+  }
+
+  /** 隐式拷贝：新对象 + 逐字段复制（不调用任何构造函数） */
+  private cloneObject(source: StructValue): StructValue {
+    const name = lastSegment(source.typeName);
+    const clone = this.createStructValue(name, undefined);
+    for (const [field, value] of source.fields) clone.fields.set(field, value);
+    clone.fieldTypes = new Map(source.fieldTypes);
+    return clone;
+  }
+
+  /**
+   * 按「目标声明类型」拷贝一个对象。目标是基类时就是**对象切片**：
+   * 只留下基类那一份字段，派生部分连同多态信息一起被切掉。
+   */
+  private sliceTo(source: StructValue, targetType: string, line: number): StructValue {
+    const target = lastSegment(targetType);
+    if (!this.classMap.has(target)) return source;
+    if (lastSegment(source.typeName) === target) return this.copyObject(source, line);
+    const sliced = this.createStructValue(target, undefined);
+    for (const [field, value] of source.fields) {
+      if (sliced.fields.has(field)) sliced.fields.set(field, value);
+    }
+    return sliced;
+  }
+
+  /** 赋值 / 按值传参时按目标声明类型落位（类对象会切片，指针不动） */
+  private copyForTarget(source: RValue, targetType: string, line: number): RValue {
+    if (source.t !== 'struct' || !targetType) return source;
+    const target = lastSegment(targetType.replace(/[&*]/g, '').trim());
+    if (!this.classMap.has(target)) return source;
+    return this.sliceTo(source, target, line);
   }
 
   /** 作用域结束时销毁其中的类对象（调用析构函数，按声明逆序） */
@@ -1292,8 +1427,11 @@ class Interpreter {
 
   private destroyValue(value: RValue): void {
     if (value.t === 'struct') {
-      const dtor = this.findMethod(value.typeName, `~${lastSegment(value.typeName)}`, 0);
-      if (dtor) this.callFunction(dtor, [], this.currentLine, value);
+      // 析构顺序和构造相反：先自己的，再一层层往上
+      for (const className of this.classChain(value.typeName)) {
+        const dtor = this.findMethodIn(className, `~${className}`, 0);
+        if (dtor) this.callFunction(dtor, [], this.currentLine, value);
+      }
       return;
     }
     if (value.t === 'array') {
@@ -1303,7 +1441,7 @@ class Interpreter {
 
   /** 把一个由表达式产生的类对象登记为临时对象，语句结束时析构 */
   private registerTemp(value: StructValue): void {
-    if (!this.findMethod(value.typeName, `~${lastSegment(value.typeName)}`, 0)) return;
+    if (!this.hasDestructor(value.typeName)) return;
     this.temps.push(value);
   }
 
@@ -1328,25 +1466,36 @@ class Interpreter {
   }
 
   private createStructValue(typeName: string, init: ExprNode | undefined): StructValue {
-    const cls = this.classMap.get(lastSegment(typeName));
+    const name = lastSegment(typeName);
     const value: StructValue = {
       t: 'struct',
-      typeName: lastSegment(typeName),
+      typeName: name,
       fields: new Map(),
       fieldTypes: new Map(),
-      typeText: lastSegment(typeName),
+      typeText: name,
     };
+    const cls = this.classMap.get(name);
     if (!cls) return value;
+    // 对象布局和 C++ 一致：基类子对象在前，自己的字段在后。
+    // 平铺成一张字段表之后，派生类里直接写基类字段名就能取到。
+    const bases = this.classChain(name).slice(1).reverse();
+    for (const base of bases) {
+      const baseCls = this.classMap.get(base);
+      if (baseCls) this.layoutFields(value, baseCls, undefined);
+    }
+    this.layoutFields(value, cls, init);
+    return value;
+  }
+
+  private layoutFields(value: StructValue, cls: ClassDeclNode, init: ExprNode | undefined): void {
     const fields = cls.fields.filter((field) => !field.isStatic);
     const initItems = init && init.kind === 'initlist' ? init.items : [];
     for (let i = 0; i < fields.length; i++) {
       const field = fields[i];
       const fieldType = this.fieldTypeText(field);
       value.fieldTypes.set(field.name, fieldType);
-      const item = initItems[i];
-      value.fields.set(field.name, this.defaultFieldValue(field, item));
+      value.fields.set(field.name, this.defaultFieldValue(field, initItems[i]));
     }
-    return value;
   }
 
   private fieldTypeText(field: FieldDeclNode): string {
@@ -1357,10 +1506,14 @@ class Interpreter {
   }
 
   private defaultFieldValue(field: FieldDeclNode, init: ExprNode | undefined): RValue {
+    const typeText = this.fieldTypeText(field);
     const dims = field.arrayDims.map((d) => (d === null ? 0 : d));
     if (dims.length > 0) {
       return this.createArray(field.base, field.pointerDepth, dims, init);
     }
+    // 成员默认值写在声明处（`double radius_ = 0.0;`）时只有源码文本
+    const literal = !init && field.initText ? this.evalLiteralText(field.initText, typeText) : undefined;
+    if (literal) return literal;
     if (field.pointerDepth > 0) {
       return init ? this.coercePointer(this.evalExpr(init), field.base) : nullValue();
     }
@@ -1371,8 +1524,8 @@ class Interpreter {
     if (isStringType(field.typeText)) {
       return init ? coerceValue(this.evalExpr(init), field.typeText) : stringValue('', field.typeText);
     }
-    if (init) return coerceValue(this.evalExpr(init), this.fieldTypeText(field));
-    return this.defaultScalar(field.base, this.fieldTypeText(field));
+    if (init) return coerceValue(this.evalExpr(init), typeText);
+    return this.defaultScalar(field.base, typeText);
   }
 
   /* ============================== 表达式求值 ============================== */
@@ -1693,6 +1846,10 @@ class Interpreter {
           this.callFunction(assign, [raw], expr.line, current);
           return current;
         }
+        // 没有 operator=：按隐式拷贝赋值逐字段复制（赋给基类变量时会切片）
+        const copy = this.copyForTarget(raw, ref.typeText || current.typeName, expr.line);
+        ref.set(copy);
+        return copy;
       }
       const value = this.coerceForRef(this.adoptTemp(raw), ref);
       ref.set(value);
@@ -1920,14 +2077,22 @@ class Interpreter {
       return coerceValue(value, name);
     }
 
+    // 成员函数内部直接写 sound()：先按当前对象的实际类型找，
+    // 这样 introduce() 里那句 sound() 才会分派到 Dog::sound（多态）
+    const self = this.currentFrame()?.thisValue;
+    const args = expr.args.map((arg) => this.evalExpr(arg));
+    if (self) {
+      const method = this.findMethod(self.typeName, name, args);
+      if (method) return this.callFunction(method, args, expr.line, self);
+    }
+
     const fn = this.functionMap.get(name);
     if (!fn) {
       if (name === 'exit' || name === 'abort') throw new SimError(`函数 ${name}() 暂不支持单步执行。`, expr.line, 'unsupported');
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
-    const args = expr.args.map((arg) => this.evalExpr(arg));
-    // 成员函数内部直接调用另一个成员函数（如 alloc(...)）：沿用当前 this
-    const implicitThis = fn.className ? this.currentFrame()?.thisValue : undefined;
+    // 类外定义的成员函数（BigInt::alloc 这种）沿用当前 this
+    const implicitThis = fn.className ? self : undefined;
     return this.callFunction(fn, args, expr.line, implicitThis);
   }
 
@@ -1997,7 +2162,13 @@ class Interpreter {
     }
 
     const { block, pointer } = this.allocateBlock(elemType, length, expr.line, isArray);
-    if (!isArray && expr.args.length > 0) {
+    // new T / new T[n] 里 T 是类时要真的跑构造函数（虚拟函数表只有构造之后才成立）
+    if (this.classMap.has(lastSegment(elemType))) {
+      const ctorArgs = expr.args.map((arg) => this.evalExpr(arg));
+      for (let i = 0; i < block.array.elems.length; i++) {
+        block.array.elems[i] = this.constructObject(elemType, i === 0 ? ctorArgs : [], expr.line);
+      }
+    } else if (!isArray && expr.args.length > 0) {
       block.array.elems[0] = coerceValue(this.evalExpr(expr.args[0]), elemType);
     }
 
@@ -2236,7 +2407,9 @@ class Interpreter {
   }
 
   private evalMemberCall(expr: ExprNode & { kind: 'call' }, callee: ExprNode & { kind: 'member' }): RValue {
-    const object = this.evalExpr(callee.object);
+    let object = this.evalExpr(callee.object);
+    // p->f() 先解引用，拿到实际对象再做分派
+    if (callee.op === '->') object = this.derefValue(object, expr.line, callee);
     const method = callee.name;
     if (method === 'length' || method === 'size') {
       if (object.t === 'string') return intValue(Array.from(object.v).length);
@@ -2250,13 +2423,60 @@ class Interpreter {
     // 用户自定义类的成员函数：找到同名同参数个数的方法，把对象当作 this 传进去
     if (object.t === 'struct') {
       const args = expr.args.map((arg) => this.evalExpr(arg));
-      const target = this.findMethod(object.typeName, method, args);
+      const target = this.resolveMethodCall(object, method, args, callee.object);
       if (target) {
         return this.callFunction(target, args, expr.line, object);
       }
       throw new SimError(`类 ${object.typeName} 没有可匹配的成员函数 ${method}()。`, expr.line);
     }
     throw new SimError(`成员函数 ${method}() 暂不支持单步执行。`, expr.line, 'unsupported');
+  }
+
+  /**
+   * 成员函数调用解析：
+   * - 虚函数按「实际对象类型」查（Dog 对象就调 Dog::sound）；
+   * - 非虚函数按「指针 / 变量的静态类型」查（Animal* 就只能调到 Animal 的那份）。
+   * 这正是多态那一节最容易讲错的地方，所以两条路径分开走。
+   */
+  private resolveMethodCall(
+    object: StructValue,
+    name: string,
+    args: RValue[],
+    objectExpr?: ExprNode,
+  ): FuncDeclNode | undefined {
+    const dynamicType = lastSegment(object.typeName);
+    const staticType = objectExpr ? this.staticClassOf(objectExpr) : undefined;
+    const startType = staticType && this.isAncestorOf(staticType, dynamicType) ? staticType : dynamicType;
+    // 虚函数：先按实际对象类型找，找不到再回到静态类型（纯虚声明本身没有函数体）
+    if (startType !== dynamicType && this.isVirtualMethod(startType, name)) {
+      const dynamic = this.findMethod(dynamicType, name, args);
+      if (dynamic) return dynamic;
+    }
+    return this.findMethod(startType, name, args);
+  }
+
+  /** 表达式声明的（静态）类名，只认变量名这一种最常见的形式 */
+  private staticClassOf(expr: ExprNode): string | undefined {
+    if (expr.kind !== 'ident') return undefined;
+    try {
+      const slot = this.lookupSlot(expr.name, expr.line);
+      const base = lastSegment(baseTypeName(slot.typeText));
+      return this.classMap.has(base) ? base : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** 这个方法在继承链上是不是虚的（声明里带 virtual / override / = 0 都算） */
+  private isVirtualMethod(className: string, name: string): boolean {
+    return this.classChain(className).some((ancestor) => {
+      const cls = this.classMap.get(ancestor);
+      const declared = cls?.methods.some(
+        (method) => method.name === name && (method.isVirtual || method.isPureVirtual),
+      );
+      if (declared) return true;
+      return Boolean(this.methodIndex.get(`${ancestor}::${name}`)?.some((method) => method.isVirtual));
+    });
   }
 
   private evalMember(expr: ExprNode & { kind: 'member' }): RValue {
@@ -2302,10 +2522,14 @@ class Interpreter {
     const cls = this.classMap.get(base);
     if (cls) {
       let total = 0;
-      for (const field of cls.fields) {
-        if (field.isStatic) continue;
-        const dims = field.arrayDims.map((d) => (d === null ? 0 : d));
-        total += this.sizeOfTypeText(this.fieldTypeText(field)) * countElements(dims);
+      // sizeof 要算上基类子对象
+      for (const ancestor of this.classChain(base).slice().reverse()) {
+        const ancestorCls = this.classMap.get(ancestor);
+        for (const field of ancestorCls?.fields ?? []) {
+          if (field.isStatic) continue;
+          const dims = field.arrayDims.map((d) => (d === null ? 0 : d));
+          total += this.sizeOfTypeText(this.fieldTypeText(field)) * countElements(dims);
+        }
       }
       return Math.max(1, total);
     }
@@ -2886,6 +3110,12 @@ class Interpreter {
     if (this.frames.length >= MAX_CALL_DEPTH) {
       throw new SimError(`递归层数超过 ${MAX_CALL_DEPTH} 层，可能是没有终止条件的递归。`, callLine, 'runtime');
     }
+    if (fn.isPureVirtual) {
+      throw new SimError(
+        `纯虚函数 ${lastSegment(fn.name)}() 在 ${lastSegment(fn.className ?? '')} 里没有实现 —— 抽象类只能通过派生类对象调用。`,
+        callLine,
+      );
+    }
     const displayName = fn.className ? `${fn.className}::${fn.name}` : fn.name;
     this.emit({
       event: 'call',
@@ -2937,6 +3167,10 @@ class Interpreter {
       frame.scopes[0].vars.set(param.name, slot);
     }
 
+    // 构造链：基类先构造（`Dog(name) : Animal(name)` 里的 name 就是这里的参数）
+    if (thisValue && (fn.isConstructor || lastSegment(fn.name) === lastSegment(fn.className ?? ''))) {
+      this.runBaseCtors(fn, thisValue, callLine);
+    }
     // 构造初始化列表：x(a), y(b) 在函数体之前执行
     if (thisValue && fn.ctorInit && fn.ctorInit.length > 0) {
       for (const entry of fn.ctorInit) {
@@ -2994,6 +3228,10 @@ class Interpreter {
         };
       }
       return nullValue();
+    }
+    // 按值传类对象：以形参的声明类型落位，传派生类给基类形参就是对象切片
+    if (arg.t === 'struct' && this.classMap.has(lastSegment(baseTypeName(param.typeText)))) {
+      return this.copyForTarget(arg, param.typeText, this.currentLine);
     }
     if (isStringType(param.typeText)) return coerceValue(arg, param.typeText);
     return coerceValue(arg, param.typeText);

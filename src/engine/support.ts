@@ -187,9 +187,7 @@ function scanFunction(
     if (UNSUPPORTED_TYPES.has(base)) {
       return { line: param.line, message: `${param.typeText} 参数暂不支持单步执行。` };
     }
-    if (registry.classes.has(base) && !param.isReference && !param.isPointer && !param.isArray) {
-      return { line: param.line, message: '按值传类对象暂不支持单步执行（缺少拷贝构造调用）。请改成 `const T&`。' };
-    }
+    // 按值传类对象已支持：会按形参类型拷贝（传派生类给基类形参就是对象切片）
   }
 
   // 语句级检查
@@ -218,10 +216,12 @@ export function findUnsupportedFunction(
   return scanFunction(fn, registry, new Set<FuncDeclNode>([fn]), 0);
 }
 
-/** 类层面的子集检查：继承、虚函数、类模板都不在单步执行范围内 */
+/**
+ * 类层面的子集检查。
+ * 单继承 + 虚函数已经支持（字段按基类在前平铺、构造/析构成链、虚函数按实际类型分派），
+ * 这里只拦真正做不到的：多继承、类模板。
+ */
 function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null {
-  // 继承与类模板的问题是「整段代码的组织方式」，优先报出来；
-  // 否则一个虚析构函数会抢在前面，让人以为只是析构函数的问题。
   const flattened: ClassDeclNode[] = [];
   const collect = (list: ClassDeclNode[]): void => {
     for (const cls of list) {
@@ -235,17 +235,12 @@ function findUnsupportedClass(classes: ClassDeclNode[]): UnsupportedIssue | null
     if (cls.isTemplate) {
       return { line: cls.line, message: `类模板 ${cls.name} 暂不支持单步执行，请展开成具体类型再看。` };
     }
-    if (cls.bases.length > 0) {
+    if (cls.bases.length > 1) {
+      // 多继承要处理基类指针偏移与二义性，教学子集先不做
       return {
         line: cls.line,
-        message: `${cls.name} 用了继承（: ${cls.bases.map((base) => base.name).join(', ')}），继承与多态暂不支持单步执行。`,
+        message: `${cls.name} 用了多继承（: ${cls.bases.map((base) => base.name).join(', ')}），多继承暂不支持单步执行。`,
       };
-    }
-  }
-  for (const cls of flattened) {
-    const virtualMethod = cls.methods.find((method) => method.isVirtual || method.isPureVirtual);
-    if (virtualMethod) {
-      return { line: virtualMethod.line, message: `虚函数 ${virtualMethod.name}() 暂不支持单步执行。` };
     }
   }
   return null;

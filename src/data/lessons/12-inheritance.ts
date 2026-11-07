@@ -228,6 +228,51 @@ int main() {
     {
       type: 'diagram',
       diagram: {
+        kind: 'trace',
+        code: `#include <iostream>
+
+class Shape {
+public:
+  virtual ~Shape() { std::cout << "~Shape" << std::endl; }
+  virtual double area() const = 0;
+};
+
+class Circle : public Shape {
+public:
+  Circle(double r) { r_ = r; }
+  ~Circle() { std::cout << "~Circle" << std::endl; }
+  double area() const override { return 3.0 * r_ * r_; }
+
+private:
+  double r_ = 0.0;
+};
+
+class Square : public Shape {
+public:
+  Square(double side) { side_ = side; }
+  ~Square() { std::cout << "~Square" << std::endl; }
+  double area() const override { return side_ * side_; }
+
+private:
+  double side_ = 0.0;
+};
+
+int main() {
+  Shape* a = new Circle(2.0);
+  Shape* b = new Square(3.0);
+  std::cout << a->area() << " " << b->area() << std::endl;
+  delete a;
+  delete b;
+  return 0;
+}`,
+      },
+      title: '同一句 a->area() 走进了哪个函数',
+      caption:
+        '逐步看调用栈：`a` 和 `b` 的静态类型都是 `Shape*`，但 `->area()` 分别进了 `Circle::area` 与 `Square::area` —— 虚函数看的是对象本身；最后两次 `delete` 先析构派生类、再析构基类。',
+    },
+    {
+      type: 'diagram',
+      diagram: {
         kind: 'flow',
         functionName: 'totalArea',
         code: `#include <iostream>
