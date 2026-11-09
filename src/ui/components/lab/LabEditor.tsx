@@ -8,23 +8,16 @@ import {
 } from 'react';
 import { basicSetup } from 'codemirror';
 import { cpp } from '@codemirror/lang-cpp';
-import {
-  EditorView,
-  Decoration,
-  ViewPlugin,
-  keymap,
-  type ViewUpdate,
-  type DecorationSet,
-} from '@codemirror/view';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { EditorView, Decoration, keymap, type DecorationSet } from '@codemirror/view';
 import {
   EditorState,
   Prec,
-  RangeSetBuilder,
   StateEffect,
   StateField,
 } from '@codemirror/state';
+import { tags as t } from '@lezer/highlight';
 import { MAX_CODE_LINES, type SourceLanguage } from '../../../engine/types';
-import { highlightLine, type HighlightState, type TokenKind } from '../../lib/highlight';
 import { Icon } from '../Icon';
 
 export interface LabEditorHandle {
@@ -47,18 +40,6 @@ export interface LabEditorProps {
 }
 
 /* ----------------------------- CodeMirror 主题 ---------------------------- */
-
-const tokenClass: Record<Exclude<TokenKind, 'plain'>, string> = {
-  comment: 'cm-cv-comment',
-  string: 'cm-cv-string',
-  char: 'cm-cv-string',
-  number: 'cm-cv-number',
-  keyword: 'cm-cv-keyword',
-  type: 'cm-cv-type',
-  function: 'cm-cv-function',
-  punct: 'cm-cv-punct',
-  preprocessor: 'cm-cv-preprocessor',
-};
 
 const codeTheme = EditorView.theme(
   {
@@ -91,7 +72,7 @@ const codeTheme = EditorView.theme(
     '.cm-activeLine': { backgroundColor: 'rgba(99, 102, 241, 0.12)' },
     '.cm-activeLineGutter': {
       backgroundColor: 'rgba(99, 102, 241, 0.18)',
-      color: '#c7d2fe',
+      color: 'var(--code-ink, #e2e8f0)',
     },
     '&.cm-focused .cm-cursor': { borderLeftColor: '#818cf8' },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
@@ -100,22 +81,13 @@ const codeTheme = EditorView.theme(
     '.cm-matchingBracket, &.cm-focused .cm-matchingBracket': {
       backgroundColor: 'rgba(99, 102, 241, 0.2)',
       outline: '1px solid rgba(129, 140, 248, 0.6)',
-      color: '#e2e8f0 !important',
+      color: 'inherit !important',
     },
     '.cm-selectionMatch': { backgroundColor: 'rgba(129, 140, 248, 0.25)' },
     '.cm-cv-target-line': {
       backgroundColor: 'rgba(99, 102, 241, 0.16)',
       boxShadow: 'inset 2px 0 0 #818cf8',
     },
-    // 与右侧「单步执行」面板的 cvz-tok--* 同一套配色
-    '.cm-cv-comment': { color: '#64748b !important', fontStyle: 'italic' },
-    '.cm-cv-string': { color: '#86efac !important' },
-    '.cm-cv-number': { color: '#fcd34d !important' },
-    '.cm-cv-keyword': { color: '#c4b5fd !important' },
-    '.cm-cv-type': { color: '#7dd3fc !important' },
-    '.cm-cv-function': { color: '#93c5fd !important' },
-    '.cm-cv-punct': { color: '#94a3b8 !important' },
-    '.cm-cv-preprocessor': { color: '#f0abfc !important' },
     '.cm-tooltip': {
       backgroundColor: 'var(--code-surface, #131c31)',
       border: '1px solid var(--code-line, #1e293b)',
@@ -129,47 +101,39 @@ const codeTheme = EditorView.theme(
   { dark: true },
 );
 
-/* ------------------------------ 语法 token 装饰 --------------------------- */
-
-function buildTokenDecorations(view: EditorView): DecorationSet {
-  const builder = new RangeSetBuilder<Decoration>();
-  let state: HighlightState = { inBlockComment: false };
-  const doc = view.state.doc;
-
-  for (let lineNumber = 1; lineNumber <= doc.lines; lineNumber += 1) {
-    const line = doc.line(lineNumber);
-    const result = highlightLine(line.text, state);
-    state = result.state;
-    let offset = 0;
-    for (const token of result.tokens) {
-      const from = line.from + offset;
-      offset += token.text.length;
-      if (token.kind === 'plain' || token.text.length === 0) continue;
-      builder.add(from, from + token.text.length, Decoration.mark({ class: tokenClass[token.kind] }));
-    }
-  }
-
-  return builder.finish();
-}
-
-const highlightPlugin = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
-
-    constructor(view: EditorView) {
-      this.decorations = buildTokenDecorations(view);
-    }
-
-    update(update: ViewUpdate): void {
-      if (update.docChanged) {
-        this.decorations = buildTokenDecorations(update.view);
-      }
-    }
-  },
+/**
+ * 语法高亮交给 Lezer 解析树（HighlightStyle）。
+ * 之前是自己写 ViewPlugin 打 token 装饰，但 basicSetup 里自带的
+ * defaultHighlightStyle（fallback）仍然会给没被覆盖到的范围上色，
+ * 于是出现了残留的深紫关键字（#708）。这里显式注册一套主题后，
+ * fallback 彻底失效，所有 token 都由下面的色板决定。
+ * 颜色走 --tok-* 变量，与右侧「单步执行」面板（cvz-tok--*）同源，
+ * 浅色主题下也能自动切到深色系文字。
+ */
+const cvzHighlight = HighlightStyle.define([
+  { tag: [t.keyword, t.bool, t.null, t.self], color: 'var(--tok-keyword)' },
+  { tag: [t.typeName, t.className, t.namespace], color: 'var(--tok-type)' },
   {
-    decorations: (instance) => instance.decorations,
+    // t.function 是修饰符（modifier）而非独立 Tag，须写成函数调用形式，
+    // 覆盖 Lezer C++ 文法实际产出的几类节点：
+    // CallExpression/Identifier            → function(variableName)
+    // FunctionDeclarator/Identifier        → function(definition(variableName))
+    // FieldExpression 上的方法调用         → function(propertyName)
+    tag: [
+      t.function(t.variableName),
+      t.function(t.definition(t.variableName)),
+      t.function(t.propertyName),
+      t.function(t.definition(t.propertyName)),
+    ],
+    color: 'var(--tok-function)',
   },
-);
+  { tag: [t.string, t.character, t.escape], color: 'var(--tok-string)' },
+  { tag: [t.processingInstruction, t.meta, t.special(t.string)], color: 'var(--tok-preprocessor)' },
+  { tag: t.number, color: 'var(--tok-number)' },
+  { tag: t.comment, color: 'var(--tok-comment)', fontStyle: 'italic' },
+  { tag: [t.operator, t.punctuation], color: 'var(--tok-punct)' },
+  { tag: [t.macroName, t.special(t.name)], color: 'var(--tok-punct)' },
+]);
 
 /* ----------------------------- 选中行高亮装饰 ---------------------------- */
 
@@ -236,7 +200,7 @@ export const LabEditor = forwardRef<LabEditorHandle, LabEditorProps>(function La
         autocomplete: 'off',
       }),
       codeTheme,
-      highlightPlugin,
+      syntaxHighlighting(cvzHighlight),
       activeLineField,
       EditorView.domEventHandlers({
         paste(event, view) {

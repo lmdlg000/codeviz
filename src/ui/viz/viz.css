@@ -1898,8 +1898,8 @@
 }
 
 .cvz-trace__lang.is-cpp {
-  border-color: #4c1d95;
-  color: #c4b5fd;
+  border-color: color-mix(in srgb, var(--tok-keyword, #c4b5fd) 45%, transparent);
+  color: var(--tok-keyword, #c4b5fd);
 }
 
 .cvz-trace__code-position {
@@ -1964,7 +1964,7 @@
 }
 
 .cvz-trace__line.is-active .cvz-trace__gutter {
-  color: #c7d2fe;
+  color: var(--code-ink, #c7d2fe);
 }
 
 .cvz-trace__code-text {
@@ -1973,36 +1973,36 @@
 }
 
 .cvz-tok--keyword {
-  color: #c4b5fd;
+  color: var(--tok-keyword, #c4b5fd);
 }
 
 .cvz-tok--type {
-  color: #7dd3fc;
+  color: var(--tok-type, #7dd3fc);
 }
 
 .cvz-tok--function {
-  color: #93c5fd;
+  color: var(--tok-function, #93c5fd);
 }
 
 .cvz-tok--string {
-  color: #86efac;
+  color: var(--tok-string, #86efac);
 }
 
 .cvz-tok--number {
-  color: #fcd34d;
+  color: var(--tok-number, #fcd34d);
 }
 
 .cvz-tok--comment {
-  color: #64748b;
+  color: var(--tok-comment, #64748b);
   font-style: italic;
 }
 
 .cvz-tok--preprocessor {
-  color: #f0abfc;
+  color: var(--tok-preprocessor, #f0abfc);
 }
 
 .cvz-tok--punct {
-  color: #94a3b8;
+  color: var(--tok-punct, #94a3b8);
 }
 
 .cvz-tok--ident {

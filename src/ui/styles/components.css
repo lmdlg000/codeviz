@@ -70,6 +70,17 @@
   transform: translateY(1px);
 }
 
+/* 浅色模式：墨绿过重，换成亮一点的绿，纸面观感更轻 */
+[data-theme="light"] .btn--primary {
+  background: #0e9d58;
+  border-color: #0e9d58;
+}
+
+[data-theme="light"] .btn--primary:hover {
+  background: #0b8a4c;
+  border-color: #0b8a4c;
+}
+
 .btn--secondary {
   background: var(--bg-elevated);
   border-color: var(--line-strong);
@@ -881,12 +892,12 @@
 }
 
 .code-block__action--lab {
-  color: #7dd3fc;
+  color: var(--tok-type, #7dd3fc);
 }
 
 .code-block__action--lab:hover {
   background: rgba(56, 189, 248, 0.14);
-  color: #bae6fd;
+  color: var(--code-ink);
 }
 
 .code-block__scroll {
@@ -954,39 +965,39 @@
   line-height: 1.6;
 }
 
-/* 代码 token 配色 */
+/* 代码 token 配色（与单步面板 cvz-tok--* 共用 --tok-* 变量，随主题切换） */
 .code-token--comment {
-  color: #64748b;
+  color: var(--tok-comment, #64748b);
   font-style: italic;
 }
 
 .code-token--string,
 .code-token--char {
-  color: #86efac;
+  color: var(--tok-string, #86efac);
 }
 
 .code-token--number {
-  color: #fcd34d;
+  color: var(--tok-number, #fcd34d);
 }
 
 .code-token--keyword {
-  color: #c4b5fd;
+  color: var(--tok-keyword, #c4b5fd);
 }
 
 .code-token--type {
-  color: #7dd3fc;
+  color: var(--tok-type, #7dd3fc);
 }
 
 .code-token--function {
-  color: #93c5fd;
+  color: var(--tok-function, #93c5fd);
 }
 
 .code-token--punct {
-  color: #94a3b8;
+  color: var(--tok-punct, #94a3b8);
 }
 
 .code-token--preprocessor {
-  color: #f0abfc;
+  color: var(--tok-preprocessor, #f0abfc);
 }
 
 .inline-code {

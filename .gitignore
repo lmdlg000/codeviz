@@ -34,3 +34,4 @@ pdfrender.py
 # WorkBuddy workspace data & published-app markers
 .workbuddy/
 .wbapp_*.genie
+tmp/

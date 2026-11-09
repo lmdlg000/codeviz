@@ -40,6 +40,16 @@
   --code-ink: #cfeedd;
   --code-muted: #6d857a;
 
+  /* 语法 token 色板（深色）：编辑器 / 单步面板 / 课程代码块共用 */
+  --tok-keyword: #c4b5fd;
+  --tok-type: #7dd3fc;
+  --tok-function: #93c5fd;
+  --tok-string: #86efac;
+  --tok-number: #fcd34d;
+  --tok-comment: #64748b;
+  --tok-preprocessor: #f0abfc;
+  --tok-punct: #94a3b8;
+
   --radius-xs: 0px;
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -102,11 +112,21 @@
   --success: #0a7a44;
   --danger: #c22b22;
 
-  --code-bg: #0a100d;
-  --code-surface: #101815;
-  --code-line: #1b2a23;
-  --code-ink: #d7f7e5;
-  --code-muted: #7d9a8c;
+  --code-bg: #f4f7f0;
+  --code-surface: #eaf0e4;
+  --code-line: #d5dfca;
+  --code-ink: #1f2c25;
+  --code-muted: #6b7f72;
+
+  /* 语法 token 色板（浅色）：同一种语义，换成深色系文字保证对比度 */
+  --tok-keyword: #7c3aed;
+  --tok-type: #0369a1;
+  --tok-function: #1d4ed8;
+  --tok-string: #15803d;
+  --tok-number: #b45309;
+  --tok-comment: #6b7280;
+  --tok-preprocessor: #a21caf;
+  --tok-punct: #475569;
   --term-glow: none;
   --term-glow-soft: none;
 
