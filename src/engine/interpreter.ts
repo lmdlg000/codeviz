@@ -66,10 +66,19 @@ class SimError extends Error {
   }
 }
 
+/** 输入流已耗尽：由 cin / scanf / getchar 捕获后返回 EOF 语义，而不是直接报错。 */
+class InputEofError extends SimError {
+  constructor(what: string, line: number) {
+    super(`输入数据不足：还需要一个${what}。`, line);
+    this.name = 'InputEofError';
+  }
+}
+
 class StepLimitError extends Error {
   constructor() {
     super('step limit');
     this.name = 'StepLimitError';
+
   }
 }
 
@@ -918,6 +927,17 @@ class Interpreter {
     return frame.scopes[frame.scopes.length - 1];
   }
 
+  /** 判断变量是否已在某个作用域里声明（用于 EOF 这类内置常量的兜底） */
+  private hasSlot(name: string): boolean {
+    const frame = this.currentFrame();
+    if (frame) {
+      for (let i = frame.scopes.length - 1; i >= 0; i--) {
+        if (frame.scopes[i].vars.has(name)) return true;
+      }
+    }
+    return this.globalScope.vars.has(name);
+  }
+
   private lookupSlot(name: string, line: number): Slot {
     const frame = this.currentFrame();
     if (frame) {
@@ -1731,6 +1751,21 @@ class Interpreter {
     };
   }
 
+  /**
+   * 指针 / 迭代器相等：按「同一个目标 + 同一个偏移」判断。
+   * 之前用 label 比较，导致同一个 vector 的 begin() 与 end()（label 都是「int 迭代器」）
+   * 永远相等，`it != ivec.end()` 第一次判断就为假，循环体一次都不执行。
+   */
+  private pointersEqual(left: PointerValue, right: PointerValue): boolean {
+    if (left.str !== undefined || right.str !== undefined) {
+      return left.str === right.str && left.offset === right.offset;
+    }
+    if (left.array !== undefined || right.array !== undefined) {
+      return left.array === right.array && left.offset === right.offset;
+    }
+    return left.target === right.target;
+  }
+
   private coercePointer(value: RValue, base: string): RValue {
     if (value.t === 'array') return arrayToPointer(value, 'arr');
     if (value.t === 'pointer' || value.t === 'null') return value;
@@ -2359,6 +2394,8 @@ class Interpreter {
 
   private evalIdent(expr: ExprNode & { kind: 'ident' }): RValue {
     if (expr.name === 'endl') return stringValue('\n');
+    // EOF：stdio 的输入结束标记（-1），配合 while (scanf(...) != EOF) / getchar() 使用
+    if (expr.name === 'EOF' && !this.hasSlot('EOF')) return intValue(-1, 'int');
     const enumValue = this.enumValues.get(expr.name);
     if (enumValue !== undefined) return intValue(enumValue, 'int');
     if (expr.name === 'std') throw new SimError('std 命名空间不能直接当作值使用。', expr.line, 'unsupported');
@@ -2514,7 +2551,7 @@ class Interpreter {
     if (left.t === 'pointer' && (op === '==' || op === '!=')) {
       const rightIsNull = right.t === 'null' || (right.t === 'int' && right.v === 0);
       const leftIsNull = left.target === null && left.array === undefined && left.str === undefined;
-      const equal = rightIsNull ? leftIsNull : right.t === 'pointer' && left.label === right.label;
+      const equal = rightIsNull ? leftIsNull : right.t === 'pointer' && this.pointersEqual(left, right);
       return boolValue(op === '==' ? equal : !equal);
     }
     if (right.t === 'pointer' && (op === '==' || op === '!=')) {
@@ -2759,6 +2796,11 @@ class Interpreter {
       case 'free':
         return this.evalFree(expr);
       case 'getchar': {
+        // 读不到字符时按 C 语义返回 EOF(-1)，支持 while ((c = getchar()) != EOF)
+        if (!this.hasMoreInput()) {
+          if (this.stdinNeverProvided()) throw new SimError(Interpreter.NO_INPUT_HINT, expr.line);
+          return intValue(-1);
+        }
         const char = this.readRawChar('字符');
         return intValue(char.charCodeAt(0), 'char');
       }
@@ -3727,21 +3769,36 @@ class Interpreter {
     return intValue(0);
   }
 
+  /**
+   * `cin >> a >> b`：按 C++ 语义返回流状态 —— 全部读取成功返回 1，读到 EOF 返回 0。
+   * 这样 `while (cin >> x)` 才能在输入用完后自然结束循环，而不是抛错。
+   */
   private execCin(expr: ExprNode & { kind: 'binary' }): RValue {
     const { items } = flattenBinaryChain(expr, '>>');
     for (const item of items) {
       const ref = this.resolveLValue(item);
       const typeText = ref.typeText ?? 'int';
       let value: RValue;
-      if (isCharType(typeText)) {
-        this.skipWhitespace();
-        value = intValue(this.readRawChar('字符').charCodeAt(0), 'char');
-      } else if (isStringType(typeText)) {
-        value = stringValue(this.readToken('字符串'));
-      } else if (isFloatType(typeText)) {
-        value = floatValue(this.readNumberToken(typeText));
-      } else {
-        value = intValue(this.readNumberToken(typeText));
+      try {
+        if (isCharType(typeText)) {
+          this.skipWhitespace();
+          value = intValue(this.readRawChar('字符').charCodeAt(0), 'char');
+        } else if (isStringType(typeText)) {
+          value = stringValue(this.readToken('字符串'));
+        } else if (isFloatType(typeText)) {
+          value = floatValue(this.readNumberToken(typeText));
+        } else {
+          value = intValue(this.readNumberToken(typeText));
+        }
+      } catch (error) {
+        if (!(error instanceof InputEofError)) throw error;
+        if (this.stdinNeverProvided()) throw new SimError(Interpreter.NO_INPUT_HINT, expr.line);
+        this.emit({
+          event: 'step',
+          description: '输入数据已读完，cin 读不到新值（流状态为 false）',
+          line: expr.line,
+        });
+        return intValue(0);
       }
       ref.set(coerceValue(value, typeText));
       this.emit({
@@ -3750,7 +3807,7 @@ class Interpreter {
         line: expr.line,
       });
     }
-    return intValue(0);
+    return intValue(1);
   }
 
   /** memcpy / memset / memcmp：按字节处理，元素宽度大于 1 时按元素个数换算 */
@@ -3926,6 +3983,22 @@ class Interpreter {
   }
 
   private builtinScanf(expr: ExprNode & { kind: 'call' }): RValue {
+    try {
+      return this.scanfAssign(expr);
+    } catch (error) {
+      if (!(error instanceof InputEofError)) throw error;
+      if (this.stdinNeverProvided()) throw new SimError(Interpreter.NO_INPUT_HINT, expr.line);
+      // C 语义：读不到任何数据时 scanf 返回 EOF(-1)，配合 while (scanf(...) != EOF) 使用
+      this.emit({
+        event: 'step',
+        description: '输入数据已读完，scanf 返回 EOF(-1)',
+        line: expr.line,
+      });
+      return intValue(-1);
+    }
+  }
+
+  private scanfAssign(expr: ExprNode & { kind: 'call' }): RValue {
     const formatValue_ = this.evalExpr(expr.args[0] ?? {
       kind: 'string',
       value: '',
@@ -4068,7 +4141,7 @@ class Interpreter {
   private readToken(what: string): string {
     this.skipWhitespace();
     if (this.inputPos >= this.input.length) {
-      throw new SimError(`输入数据不足：还需要一个${what}。`, this.currentLine);
+      throw new InputEofError(what, this.currentLine);
     }
     const start = this.inputPos;
     while (this.inputPos < this.input.length && !/\s/.test(this.input[this.inputPos])) this.inputPos++;
@@ -4077,7 +4150,7 @@ class Interpreter {
 
   private readRawChar(what: string): string {
     if (this.inputPos >= this.input.length) {
-      throw new SimError(`输入数据不足：还需要一个${what}。`, this.currentLine);
+      throw new InputEofError(what, this.currentLine);
     }
     const char = this.input[this.inputPos];
     this.inputPos++;
@@ -4092,6 +4165,26 @@ class Interpreter {
     }
     return number;
   }
+
+  /** 输入是否还有可读数据（跳过空白后判断），供 cin / scanf 判断 EOF。 */
+  private hasMoreInput(): boolean {
+    let pos = this.inputPos;
+    while (pos < this.input.length && /\s/.test(this.input[pos])) pos++;
+    return pos < this.input.length;
+  }
+
+  /**
+   * 输入从头到尾一个字都没有。
+   * 这种情况几乎都是「忘了填输入数据」，直接给提示比静默按 EOF 处理更有帮助；
+   * 一旦读过一部分数据，后面的读空就按正常的 EOF 语义走（while (cin >> x) 靠这个结束）。
+   */
+  private stdinNeverProvided(): boolean {
+    return this.inputPos === 0 && this.input.trim().length === 0;
+  }
+
+  private static readonly NO_INPUT_HINT =
+    '这段代码需要从输入读取数据，但「输入数据」还是空的 —— 请先在上方输入框里填写，或删掉读取语句。';
+
 
   private arrayBaseLabel(label: string): string {
     return label.replace(/\[\d+\]$/, '');

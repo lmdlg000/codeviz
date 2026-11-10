@@ -139,7 +139,7 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
     lessonId: 'c11-classes',
     entries: [
       trace('cout', 'std::cout << x << std::endl;', '链式输出，endl 会换行并刷新缓冲区。'),
-      trace('cin', 'std::cin >> x;', '自动按类型解析，不需要格式串。'),
+      trace('cin', 'std::cin >> x;', '自动按类型解析，不需要格式串；读到输入结束返回 false，可以写 while (cin >> x)。'),
       trace('endl', 'std::endl', '换行符 + flush。'),
       stat('setw', 'std::setw(8)', '设置下一次输出的最小宽度，需要 <iomanip>。'),
       stat('getline', 'std::getline(std::cin, s)', '读一整行，包含空格。'),

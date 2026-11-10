@@ -560,6 +560,69 @@ int main() {
     expect(result.output).toBe('42\n');
   });
 
+  it('while (cin >> x) 在输入读完后结束循环', () => {
+    const result = run(
+      `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int main() {
+  int input;
+  vector<int> ivec;
+  while (cin >> input)
+    ivec.push_back(input);
+  sort(ivec.begin(), ivec.end());
+  for (vector<int>::iterator it = ivec.begin(); it != ivec.end(); ++it) {
+    cout << *it << " ";
+  }
+  cout << endl;
+  return 0;
+}
+`,
+      '3 6 4 2 10 7',
+    );
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('2 3 4 6 7 10 \n');
+  });
+
+  it('while (scanf("%d", &x) != EOF)', () => {
+    const result = run(
+      `#include <stdio.h>
+int main() {
+  int x, sum = 0;
+  while (scanf("%d", &x) != EOF) {
+    sum += x;
+  }
+  printf("%d\\n", sum);
+  return 0;
+}
+`,
+      '1 2 3 4',
+    );
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('10\n');
+  });
+
+  it('getchar() 读到末尾返回 EOF', () => {
+    const result = run(
+      `#include <stdio.h>
+int main() {
+  int c = getchar();
+  int n = 0;
+  while (c != EOF) {
+    n++;
+    c = getchar();
+  }
+  printf("%d\\n", n);
+  return 0;
+}
+`,
+      'abc',
+    );
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('3\n');
+  });
+
   it('文件操作返回 unsupported', () => {
     const result = run(`
 #include <stdio.h>
