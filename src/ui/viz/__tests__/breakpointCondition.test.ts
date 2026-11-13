@@ -88,3 +88,37 @@ describe('条件断点：语法检查', () => {
     expect(validateCondition('i == 3 &&& n')).not.toBeNull();
   });
 });
+
+describe('条件断点：算术运算', () => {
+  it('四则与取余', () => {
+    expect(conditionMatches('i % 2 == 0', STEP)).toBe(true);
+    expect(conditionMatches('i % 3 == 0', STEP)).toBe(false);
+    expect(conditionMatches('i + 1 == 11', STEP)).toBe(true);
+    expect(conditionMatches('i - 1 == 9', STEP)).toBe(true);
+    expect(conditionMatches('i * 2 == 20', STEP)).toBe(true);
+    expect(conditionMatches('i / 2 == 5', STEP)).toBe(true);
+  });
+
+  it('优先级与括号', () => {
+    expect(conditionMatches('2 + 3 * 4 == 14', STEP)).toBe(true);
+    expect(conditionMatches('(2 + 3) * 4 == 20', STEP)).toBe(true);
+    expect(conditionMatches('a.len / 2 + 1 == 11', STEP)).toBe(true);
+  });
+
+  it('与比较、逻辑混用', () => {
+    expect(conditionMatches('i - 1 > 8 && n == 0', STEP)).toBe(true);
+    expect(conditionMatches('i % 2 == 1 || flag', STEP)).toBe(true);
+  });
+
+  it('负号与除零', () => {
+    expect(conditionMatches('-i == -10', STEP)).toBe(true);
+    expect(conditionMatches('-n == 0', STEP)).toBe(true);
+    // 除零得到 NaN，与任何数比较都不成立
+    expect(conditionMatches('1 / 0 == 0', STEP)).toBe(false);
+    expect(conditionMatches('i % 0 == 0', STEP)).toBe(false);
+  });
+
+  it('算术里引用不存在的变量时不命中', () => {
+    expect(conditionMatches('missing + 1 == 1', STEP)).toBe(false);
+  });
+});

@@ -15,6 +15,44 @@ const NOT_FOUND = -1;
 export interface Breakpoint {
   line: number;
   condition?: string;
+  /** 该行的源码文本（去首尾空白），编辑代码后靠它把断点挪回正确位置 */
+  anchor?: string;
+}
+
+function splitLines(code: string): string[] {
+  return code.split(/\r?\n/);
+}
+
+/**
+ * 代码改动后重定位断点。
+ * 优先在「新代码」里找文本完全相同的行（取离旧行号最近的那一行），
+ * 找不到就按旧行号位置保留（内容被改写的情况），行号越界由调用方裁掉。
+ */
+export function remapBreakpoints(
+  breakpoints: Breakpoint[],
+  previousCode: string,
+  nextCode: string,
+): Breakpoint[] {
+  if (previousCode === nextCode || breakpoints.length === 0) return breakpoints;
+  const previousLines = splitLines(previousCode);
+  const nextLines = splitLines(nextCode).map((line) => line.trim());
+
+  return breakpoints.map((breakpoint) => {
+    const anchor = breakpoint.anchor ?? (previousLines[breakpoint.line - 1] ?? '').trim();
+    if (!anchor) return breakpoint;
+
+    let best = -1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let index = 0; index < nextLines.length; index++) {
+      if (nextLines[index] !== anchor) continue;
+      const distance = Math.abs(index + 1 - breakpoint.line);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index + 1;
+      }
+    }
+    return best > 0 ? { ...breakpoint, line: best, anchor } : { ...breakpoint, anchor };
+  });
 }
 
 export function depthAt(steps: TraceStep[], position: number): number {

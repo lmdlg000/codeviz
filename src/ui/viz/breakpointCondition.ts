@@ -23,7 +23,7 @@ interface Token {
 }
 
 interface Value {
-  kind: 'num' | 'str' | 'bool';
+  kind: 'num' | 'str' | 'bool' | 'undef';
   num?: number;
   str?: string;
   bool?: boolean;
@@ -33,6 +33,8 @@ type Node =
   | { kind: 'value'; value: Value }
   | { kind: 'var'; path: string[] }
   | { kind: 'not'; operand: Node }
+  | { kind: 'neg'; operand: Node }
+  | { kind: 'arith'; op: string; left: Node; right: Node }
   | { kind: 'and' | 'or'; left: Node; right: Node }
   | { kind: 'compare'; op: string; left: Node; right: Node };
 
@@ -42,7 +44,7 @@ export interface ConditionResult {
   error?: string;
 }
 
-const OPERATORS = ['==', '!=', '<=', '>=', '&&', '||', '<', '>', '!', '(', ')'];
+const OPERATORS = ['==', '!=', '<=', '>=', '&&', '||', '<', '>', '!', '(', ')', '+', '-', '*', '/', '%'];
 
 function tokenize(source: string): Token[] | { error: string } {
   const tokens: Token[] = [];
@@ -140,36 +142,71 @@ function parse(tokens: Token[]): Node | { error: string } {
   }
 
   function parseAnd(): Node | { error: string } {
-    let left = parseNot();
+    let left = parseComparison();
     if ('error' in left) return left;
     while (eat('&&')) {
-      const right = parseNot();
+      const right = parseComparison();
       if ('error' in right) return right;
       left = { kind: 'and', left, right };
     }
     return left;
   }
 
-  function parseNot(): Node | { error: string } {
-    if (eat('!')) {
-      const operand = parseNot();
-      if ('error' in operand) return operand;
-      return { kind: 'not', operand };
-    }
-    return parseComparison();
-  }
-
+  /** 比较：两侧先算完算术 */
   function parseComparison(): Node | { error: string } {
-    const left = parsePrimary();
+    const left = parseAdditive();
     if ('error' in left) return left;
     const token = peek();
     if (token && token.kind === 'op' && ['==', '!=', '<', '<=', '>', '>='].includes(token.text)) {
       position++;
-      const right = parsePrimary();
+      const right = parseAdditive();
       if ('error' in right) return right;
       return { kind: 'compare', op: token.text, left, right };
     }
     return left;
+  }
+
+  /** 加减（左结合） */
+  function parseAdditive(): Node | { error: string } {
+    let left = parseMultiplicative();
+    if ('error' in left) return left;
+    while (peek()?.kind === 'op' && ['+', '-'].includes(peek()!.text)) {
+      const op = peek()!.text;
+      position++;
+      const right = parseMultiplicative();
+      if ('error' in right) return right;
+      left = { kind: 'arith', op, left, right };
+    }
+    return left;
+  }
+
+  /** 乘除取余（左结合） */
+  function parseMultiplicative(): Node | { error: string } {
+    let left = parseUnary();
+    if ('error' in left) return left;
+    while (peek()?.kind === 'op' && ['*', '/', '%'].includes(peek()!.text)) {
+      const op = peek()!.text;
+      position++;
+      const right = parseUnary();
+      if ('error' in right) return right;
+      left = { kind: 'arith', op, left, right };
+    }
+    return left;
+  }
+
+  /** 一元：! 与负号 */
+  function parseUnary(): Node | { error: string } {
+    if (eat('!')) {
+      const operand = parseUnary();
+      if ('error' in operand) return operand;
+      return { kind: 'not', operand };
+    }
+    if (eat('-')) {
+      const operand = parseUnary();
+      if ('error' in operand) return operand;
+      return { kind: 'neg', operand };
+    }
+    return parsePrimary();
   }
 
   function parsePrimary(): Node | { error: string } {
@@ -263,12 +300,16 @@ function toNumber(value: Value): number | undefined {
 }
 
 function truthy(value: Value): boolean {
+  if (value.kind === 'undef') return false;
   if (value.kind === 'num') return (value.num ?? 0) !== 0;
   if (value.kind === 'bool') return value.bool === true;
   return (value.str ?? '').length > 0;
 }
 
 function compare(op: string, left: Value, right: Value): boolean {
+  // 变量不存在 / 结构体里没有这个字段：任何比较都不成立，
+  // 避免打成 `i == 10` 但写错变量名时“处处命中”
+  if (left.kind === 'undef' || right.kind === 'undef') return false;
   const a = toNumber(left);
   const b = toNumber(right);
   if (a !== undefined && b !== undefined) {
@@ -314,9 +355,30 @@ function evaluate(node: Node, step: TraceStep): Value {
     case 'value':
       return node.value;
     case 'var':
-      return readVar(step, node.path) ?? { kind: 'bool', bool: false };
+      return readVar(step, node.path) ?? { kind: 'undef' };
     case 'not':
       return { kind: 'bool', bool: !truthy(evaluate(node.operand, step)) };
+    case 'neg':
+      return { kind: 'num', num: -(toNumber(evaluate(node.operand, step)) ?? Number.NaN) };
+    case 'arith': {
+      const a = toNumber(evaluate(node.left, step));
+      const b = toNumber(evaluate(node.right, step));
+      if (a === undefined || b === undefined) return { kind: 'num', num: Number.NaN };
+      switch (node.op) {
+        case '+':
+          return { kind: 'num', num: a + b };
+        case '-':
+          return { kind: 'num', num: a - b };
+        case '*':
+          return { kind: 'num', num: a * b };
+        case '/':
+          return { kind: 'num', num: b === 0 ? Number.NaN : a / b };
+        case '%':
+          return { kind: 'num', num: b === 0 ? Number.NaN : a % b };
+        default:
+          return { kind: 'num', num: Number.NaN };
+      }
+    }
     case 'and':
       return {
         kind: 'bool',

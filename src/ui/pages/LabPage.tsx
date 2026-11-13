@@ -11,7 +11,7 @@ import type { CodeSample } from '../../data/types';
 import { detectLanguage } from '../../engine';
 import type { AnalysisResult, SourceLanguage, TraceResult } from '../../engine/types';
 import { analyzeCached, simulateCached } from '../viz/analysisCache';
-import type { Breakpoint } from '../viz/traceNav';
+import { remapBreakpoints, type Breakpoint } from '../viz/traceNav';
 import { useToast } from '../hooks/useToast';
 import {
   FILE_ACCEPT,
@@ -20,6 +20,7 @@ import {
   loadCodeFile,
 } from '../lib/files';
 import { clearHandoff, saveDraft } from '../lib/lab';
+import { STORAGE_KEYS, readJson, writeJson } from '../lib/storage';
 import {
   resolveLabInitial,
   sampleFilename,
@@ -53,6 +54,8 @@ export function LabPage({ search }: LabPageProps) {
   const [sampleOpen, setSampleOpen] = useState(false);
   /** 断点放在页面级：切到别的标签页再切回来、重新运行都不会丢 */
   const [breakpoints, setBreakpoints] = useState<Breakpoint[]>([]);
+  const filenameRef = useRef(filename);
+  filenameRef.current = filename;
   /** 单步播放位置：用 ref 存，切标签页回来不丢，又不会每步触发重渲染 */
   const playbackIndexRef = useRef(0);
 
@@ -259,16 +262,34 @@ export function LabPage({ search }: LabPageProps) {
   }, []);
 
   const handleCodeChange = useCallback((next: string) => {
+    const previous = latestSource.current.code;
     setCode(next);
     setActiveLine(null);
-    // 代码变了行号会漂移：超出当前行数的断点直接丢掉，避免停在错的行上
+    // 代码变了行号会漂移：先按行文本把断点挪回对应位置，再丢掉越界的
     const total = countCodeLines(next);
     setBreakpoints((current) =>
-      current.some((item) => item.line > total)
-        ? current.filter((item) => item.line <= total)
-        : current,
+      remapBreakpoints(current, previous, next).filter((item) => item.line <= total),
     );
   }, []);
+
+  /** 断点统一入口：内存 + 按文件名持久化 */
+  const applyBreakpoints = useCallback((next: Breakpoint[]) => {
+    setBreakpoints(next);
+    writeJson(STORAGE_KEYS.labBreakpoints(filenameRef.current), next);
+  }, []);
+
+  // 换文件 / 首次进入：把该文件上次的断点读回来，并按当前代码重定位
+  useEffect(() => {
+    const saved = readJson<Breakpoint[]>(STORAGE_KEYS.labBreakpoints(filename), []);
+    if (saved.length === 0) {
+      setBreakpoints([]);
+      return;
+    }
+    const current = latestSource.current.code;
+    const total = countCodeLines(current);
+    setBreakpoints(remapBreakpoints(saved, '', current).filter((item) => item.line <= total));
+    // 只在文件名变化时重新加载
+  }, [filename]);
 
   const handleSelectLine = useCallback((line: number) => {
     setActiveLine(line);
@@ -448,7 +469,7 @@ export function LabPage({ search }: LabPageProps) {
           traceLoading={traceLoading}
           onRunTrace={(stdin) => runTraceOn(code, stdin)}
           breakpoints={breakpoints}
-          onBreakpointsChange={setBreakpoints}
+          onBreakpointsChange={applyBreakpoints}
           resumeIndexRef={playbackIndexRef}
         />
       </div>

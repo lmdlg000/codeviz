@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   lessons: `${PREFIX}progress.lessons`,
   quiz: (lessonId: string) => `${PREFIX}quiz.${lessonId}`,
   labDraft: `${PREFIX}lab.draft`,
+  labBreakpoints: (filename: string) => `${PREFIX}lab.breakpoints.${filename}`,
   theme: `${PREFIX}theme`,
   path: `${PREFIX}path`,
 } as const;

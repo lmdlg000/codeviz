@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { TraceStep } from '../../../engine/types';
 import { simulate } from '../../../engine';
-import { findLineStep, findNextBreakpoint, findStepOut, findStepOver } from '../traceNav';
+import { findLineStep, findNextBreakpoint, findStepOut, findStepOver, remapBreakpoints } from '../traceNav';
 
 /** 只关心 line / depth 的最小步；其余字段对导航无意义 */
 function step(line: number, depth: number): TraceStep {
@@ -136,5 +136,47 @@ int main() {
     const result = simulate(code);
     const line = result.steps.find((item) => item.event === 'loop')!.line;
     expect(findNextBreakpoint(result.steps, 0, [{ line, condition: 'len == 999' }])).toBe(-1);
+  });
+});
+
+describe('traceNav：断点锚定（编辑代码后重定位）', () => {
+  const BEFORE = ['int main() {', '  int a = 1;', '  cout << a;', '  return 0;', '}'].join('\n');
+
+  it('在文件开头插入若干行，断点跟着下移', () => {
+    const after = ['// 新加的说明', '// 第二行', ...BEFORE.split('\n')].join('\n');
+    const mapped = remapBreakpoints([{ line: 3, anchor: 'cout << a;' }], BEFORE, after);
+    expect(mapped[0].line).toBe(5);
+  });
+
+  it('删掉前面的行，断点跟着上移', () => {
+    const after = ['int main() {', '  cout << a;', '  return 0;', '}'].join('\n');
+    const mapped = remapBreakpoints([{ line: 3, anchor: 'cout << a;' }], BEFORE, after);
+    expect(mapped[0].line).toBe(2);
+  });
+
+  it('没有 anchor 时按旧代码推导，并保留条件', () => {
+    const after = ['// x', ...BEFORE.split('\n')].join('\n');
+    const mapped = remapBreakpoints([{ line: 3, condition: 'a > 0' }], BEFORE, after);
+    expect(mapped[0].line).toBe(4);
+    expect(mapped[0].condition).toBe('a > 0');
+    expect(mapped[0].anchor).toBe('cout << a;');
+  });
+
+  it('原行被改写时按旧行号保留（不误删断点）', () => {
+    const after = ['int main() {', '  int a = 2;', '  cout << a << endl;', '  return 0;', '}'].join('\n');
+    const mapped = remapBreakpoints([{ line: 3, anchor: 'cout << a;' }], BEFORE, after);
+    expect(mapped[0].line).toBe(3);
+  });
+
+  it('代码没变时原样返回', () => {
+    const list = [{ line: 3, anchor: 'cout << a;' }];
+    expect(remapBreakpoints(list, BEFORE, BEFORE)).toBe(list);
+  });
+
+  it('同名行有多处时，取离旧行号最近的那一处', () => {
+    const before = ['a();', 'x', 'y', 'a();', 'z'].join('\n');
+    const after = ['a();', 'x', 'y', 'z', 'a();', 'w'].join('\n');
+    const mapped = remapBreakpoints([{ line: 4, anchor: 'a();' }], before, after);
+    expect(mapped[0].line).toBe(5);
   });
 });

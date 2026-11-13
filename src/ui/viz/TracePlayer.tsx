@@ -210,6 +210,8 @@ export function TracePlayer({
   const detected = useMemo<'c' | 'cpp'>(() => language ?? guessLanguage(code ?? ''), [language, code]);
   const highlighted = useMemo(() => highlightCode(code ?? '', detected), [code, detected]);
   const steps = useMemo(() => safeSteps(trace), [trace]);
+  /** 源码按行切好，打断点时记下该行文本作为锚点 */
+  const sourceLines = useMemo(() => code.split(/\r?\n/).map((line) => line.trim()), [code]);
   const reduced = useReducedMotion();
   // 几千步的长轨迹不自动播放：否则页面会自己闪好几分钟
   const canAutoplay = Boolean(autoplay) && steps.length > 1 && steps.length <= AUTOPLAY_MAX_STEPS && !reduced;
@@ -438,7 +440,9 @@ export function TracePlayer({
     setBreakpoints(
       breakpoints.some((item) => item.line === line)
         ? breakpoints.filter((item) => item.line !== line)
-        : [...breakpoints, { line }].sort((left, right) => left.line - right.line),
+        : [...breakpoints, { line, anchor: sourceLines[line - 1] }].sort(
+            (left, right) => left.line - right.line,
+          ),
     );
   };
 
@@ -1061,7 +1065,7 @@ export function TracePlayer({
               <span className="cvz-trace__bp-error">条件有误：{conditionError}</span>
             ) : (
               <span className="cvz-trace__bp-hint">
-                条件支持 == ≠ &lt; &lt;= &gt; &gt;= &amp;&amp; || ! 和括号，变量取自「变量监视」里的名字
+                条件支持 == != &lt; &lt;= &gt; &gt;= &amp;&amp; || !、+ - * / % 与括号；变量名取自「变量监视」
               </span>
             )}
             {breakpoints.length > 0 ? (
