@@ -291,7 +291,8 @@ export function charsOf(value: RValue): string | null {
     return chars.join('');
   }
   if (value.t === 'pointer') {
-    if (value.str !== undefined) return value.str;
+    // str 指针要按偏移截取：`const char* p = str; ++p;` 之后 strlen(p) / printf("%s") 只看后半段
+    if (value.str !== undefined) return value.str.slice(value.offset);
     // 指向字符数组的指针也能当字符串使用
     if (value.array && /char/i.test(value.array.elemType)) {
       const chars: string[] = [];

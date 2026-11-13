@@ -277,3 +277,86 @@ int main() {
     expect(r.heapIssues ?? []).toHaveLength(0);
   });
 });
+
+describe('simulate：成员函数返回对象 / 类作用域常量 / 指针自增', () => {
+  it('局部对象声明 B r(5) 在方法体里不会被当成函数声明', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+class B {
+  int v;
+public:
+  B(int x) { v = x; }
+  B(const B& o) { v = o.v; }
+  int get() { return v; }
+  B makeLocal() { B r(5); return r; }
+  B makeFromParam(int n) { B r(n); return r; }
+};
+int main() {
+  B x(1);
+  cout << x.makeLocal().get() << " " << x.makeFromParam(7).get() << endl;
+  return 0;
+}`);
+    expect(r.output).toBe('5 7\n');
+  });
+
+  it('B z = x.make(7); 真的执行这次调用，而不是变成 B z(7)', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+class B {
+  int v;
+public:
+  B(int x) { v = x; }
+  B(const B& o) { v = o.v; }
+  int get() { return v; }
+  B make(int n) { B r(n * 2); return r; }
+};
+int main() {
+  B x(1);
+  B z = x.make(7);
+  cout << z.get() << endl;
+  return 0;
+}`);
+    expect(r.output).toBe('14\n');
+  });
+
+  it('类作用域枚举常量 BigInt::NEGATIVE 可以取用', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+class Num {
+public:
+  enum Sign { NEGATIVE = -1, ZERO = 0, POSITIVE = 1 };
+  Sign sign;
+  Num(int s) { sign = s > 0 ? POSITIVE : (s < 0 ? NEGATIVE : ZERO); }
+};
+ostream& operator<<(ostream& os, const Num& n) {
+  if (n.sign == Num::NEGATIVE) os << "neg";
+  else if (n.sign == Num::ZERO) os << "zero";
+  else os << "pos";
+  return os;
+}
+int main() {
+  Num a(-3), b(0), c(4);
+  cout << a << " " << b << " " << c << endl;
+  return 0;
+}`);
+    expect(r.output).toBe('neg zero pos\n');
+  });
+
+  it('const char* 可以 ++p，偏移后的 strlen / 下标同步生效', () => {
+    const r = run(`
+#include <iostream>
+#include <cstring>
+using namespace std;
+int main() {
+  const char* str = "-12345";
+  const char* p = str;
+  if (*p == '-' || *p == '+') { ++p; }
+  cout << strlen(p) << " " << *p << " " << p[4] << endl;
+  return 0;
+}`);
+    expect(r.output).toBe('5 1 5\n');
+  });
+});

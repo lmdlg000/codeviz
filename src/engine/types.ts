@@ -485,9 +485,10 @@ export const MAX_CODE_LINES = 1000;
 /**
  * 单步执行的默认步数预算。
  * 纯 C 小程序一般几百步就结束；带类 / 动态内存的完整示例（BigInt 那种）
- * 约 4000 步，所以留到 6000，同时保持每步都记录完整变量与堆快照的开销可控。
+ * 约 4000 步，而把大数四则运算全跑一遍要 13000+ 步，所以直接放到硬上限：
+ * 每步的堆快照在内容不变时复用同一份引用，36MB 量级、1 秒出头，页面扛得住。
  */
-export const DEFAULT_MAX_STEPS = 6000;
+export const DEFAULT_MAX_STEPS = 20000;
 
 /** 单步执行的步数硬上限，防止死循环把页面拖垮 */
 export const MAX_TRACE_STEPS = 20000;

@@ -618,12 +618,15 @@ export class Parser {
       }
     }
 
+    // 先把类名登记为已知类型，再解析类体：
+    // 否则方法体里的 `B r(5);` 会被当成「局部函数声明」丢掉（B 还不算类型）。
+    if (name) this.knownTypes.add(name);
     const classNode = this.parseClassBody(kwTok, name, bases);
     if (!name) {
       name = `anon_${kwTok.text}_${this.program.classes.length + 1}`;
       classNode.name = name;
+      this.knownTypes.add(name);
     }
-    this.knownTypes.add(name);
     this.program.classes.push(classNode);
     if (!nested) this.program.items.push(classNode);
     return classNode;

@@ -1496,8 +1496,26 @@ class Interpreter {
         return this.createStructValue(cls.name, declarator.init);
       }
       if (declarator.init && declarator.init.kind === 'call') {
-        const args = declarator.init.args.map((arg) => this.evalExpr(arg));
-        return this.constructObject(cls.name, args, declarator.init.line);
+        const call = declarator.init;
+        // 只有「直接写类型名」才是构造调用：B(5) / BigInt("123")。
+        // `B z = x.make(7);` 的 callee 是成员访问，必须真的执行这次调用；
+        // 之前一律按构造处理，等于把它变成了 `B z(7)` —— 方法没跑，参数还被当成构造实参。
+        // 模板类型 Box<int> 的名字要按「去掉尖括号实参」比较
+        const plainClassName = className.replace(/<.*$/, '').trim();
+        const calleeBase =
+          call.callee.kind === 'ident'
+            ? lastSegment(call.callee.name).replace(/<.*$/, '').trim()
+            : '';
+        const isCtorCall = calleeBase.length > 0 && calleeBase === plainClassName;
+        if (isCtorCall) {
+          const args = call.args.map((arg) => this.evalExpr(arg));
+          return this.constructObject(cls.name, args, call.line);
+        }
+        const evaluated = this.evalExpr(call);
+        if (evaluated.t === 'struct') {
+          return this.sliceTo(evaluated, cls.name, call.line);
+        }
+        return this.constructObject(cls.name, [], call.line);
       }
       if (declarator.init) {
         // Point c = a + b; 采用表达式的值；同类对象优先走拷贝构造，保证深拷贝
@@ -2477,7 +2495,8 @@ class Interpreter {
     let next: RValue;
     if (current.t === 'float') next = floatValue(current.v + delta, current.typeText);
     else if (current.t === 'int') next = intValue(current.v + delta, current.typeText);
-    else if (current.t === 'pointer' && current.array) {
+    else if (current.t === 'pointer') {
+      // 指针 ++ / --：只改偏移，数组指针与字符串指针（const char* p = "..."; ++p）都适用
       next = { ...current, offset: current.offset + delta };
     } else {
       throw new SimError('这个值不能自增 / 自减。', line);
@@ -3468,6 +3487,9 @@ class Interpreter {
   private evalMember(expr: ExprNode & { kind: 'member' }): RValue {
     if (expr.op === '::') {
       if (expr.name === 'endl') return stringValue('\n');
+      // 类作用域枚举常量：BigInt::NEGATIVE —— 枚举名登记在全局表里，这里补上限定写法
+      const enumValue = this.enumValues.get(expr.name);
+      if (enumValue !== undefined) return intValue(enumValue, 'int');
       // 兄弟基类同名字段的限定写法：`c.A::x`（成员函数里直接写 `A::x`）
       const qualified = this.qualifiedFieldTarget(expr);
       if (qualified) {
@@ -3571,8 +3593,13 @@ class Interpreter {
         return object.array.elems[absolute];
       }
       if (index === 0 && object.target) return object.target.get();
-      if (object.str !== undefined && index >= 0 && index < object.str.length) {
-        return intValue(object.str.charCodeAt(index), 'char');
+      if (object.str !== undefined) {
+        // 字符串指针的下标要叠加偏移：++p 之后 p[0] 是第二个字符
+        const position = object.offset + index;
+        if (position < 0 || position >= object.str.length) {
+          throw new SimError(`指针下标 ${index} 越界。`, line);
+        }
+        return intValue(object.str.charCodeAt(position), 'char');
       }
       throw new SimError(`空指针或无效指针不能取下标。`, line);
     }

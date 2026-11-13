@@ -55,7 +55,7 @@ export function TraceTab({ code, language, analysis, trace, loading, onRun }: Tr
       <div className="lab-trace-state">
         <span className="lab-spinner" aria-hidden="true" />
         <h3>正在执行代码…</h3>
-        <p>教学子集会逐句运行，最多记录 6000 步；带类与动态内存的示例也能完整跑完。</p>
+        <p>教学子集会逐句运行，最多记录 20000 步；带类与动态内存的示例也能完整跑完。</p>
       </div>
     );
   }
