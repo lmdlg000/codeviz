@@ -19,6 +19,9 @@ export type VizIconName =
   | 'pause'
   | 'stepBack'
   | 'stepForward'
+  | 'stepOver'
+  | 'stepOut'
+  | 'continue'
   | 'skipStart'
   | 'skipEnd'
   | 'chevronDown'
@@ -69,6 +72,12 @@ const ICON_PATHS: Record<VizIconName, string[]> = {
   pause: ['M9 5v14', 'M15 5v14'],
   stepBack: ['M15 5l-8 7 8 7z'],
   stepForward: ['M9 5l8 7-8 7z'],
+  // 步过：跨过一段（弧线）+ 落点，表示「跳过函数内部」
+  stepOver: ['M5 19h4.5a6 6 0 0 0 6-6V8', 'M12.5 11l3-3 3 3'],
+  // 跳出：从方框里向上跃出，表示「跑完当前函数回到调用处」
+  stepOut: ['M9 20V13a3 3 0 0 1 3-3h6', 'M15 7l3 3-3 3'],
+  // 继续：播放三角 + 终止条（一直跑到断点）
+  continue: ['M7 5l9 7-9 7z', 'M18 5v14'],
   skipStart: ['M18 5l-9 7 9 7z', 'M6 5v14'],
   skipEnd: ['M6 5l9 7-9 7z', 'M18 5v14'],
   chevronDown: ['M6 9l6 6 6-6'],

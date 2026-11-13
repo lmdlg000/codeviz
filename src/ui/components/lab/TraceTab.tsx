@@ -105,7 +105,8 @@ export function TraceTab({ code, language, analysis, trace, loading, onRun }: Tr
         {showStdin ? <StdinField value={stdin} onChange={setStdin} /> : null}
 
         <p className="lab-trace-intro__note">
-          程序会从头执行到结束；遇到死循环会在步数或操作数上限处截断。
+          程序会从头执行到结束；遇到死循环会在步数或操作数上限处截断。步数很多时用「步过」跳过函数内部，
+          点行号打断点后按 F5 继续，鼠标移到某一行还能「运行到此」。
         </p>
       </div>
     );

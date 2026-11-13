@@ -1954,13 +1954,91 @@
 }
 
 .cvz-trace__gutter {
+  position: relative;
   flex: none;
-  width: 34px;
-  padding-right: 10px;
+  width: 40px;
+  padding: 0 10px 0 12px;
+  border: 0;
+  background: transparent;
   color: var(--code-muted, #7c8ba1);
-  text-align: right;
+  font: inherit;
   font-variant-numeric: tabular-nums;
+  text-align: right;
   user-select: none;
+  cursor: pointer;
+}
+
+.cvz-trace__gutter:hover {
+  color: var(--code-ink, #c7d2fe);
+}
+
+/* 断点小圆点：点一下行号就在这一行插 / 拔 */
+.cvz-trace__bp {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: background-color 0.15s ease;
+}
+
+.cvz-trace__gutter:hover .cvz-trace__bp {
+  background: rgba(239, 68, 68, 0.35);
+}
+
+.cvz-trace__line.has-bp .cvz-trace__bp {
+  background: #ef4444;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35);
+}
+
+.cvz-trace__line.has-bp {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* 悬停某行时出现在代码区右下角的操作条（不随横向滚动跑掉） */
+.cvz-trace__code-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.cvz-trace__code-wrap > .cvz-trace__code {
+  flex: 1;
+  min-width: 0;
+}
+
+.cvz-trace__hoverbar {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  border: 1px solid var(--code-line, #1e293b);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--code-surface, #131c31) 92%, transparent);
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.cvz-trace__hoverbar-line {
+  padding: 0 4px;
+  color: var(--code-muted, #7c8ba1);
+  font-size: 10px;
+}
+
+.cvz-trace__bp--inline {
+  position: static;
+  margin: 0;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
 }
 
 .cvz-trace__line.is-active .cvz-trace__gutter {
@@ -2305,6 +2383,105 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+/* 导航 + 控制条吸附在面板底部（相对 .lab-panel__content 这个滚动容器） */
+.cvz-trace__dock {
+  position: sticky;
+  bottom: -2px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 6px 0 2px;
+  background: var(--bg-inset, #f8fafc);
+  box-shadow: 0 -10px 12px -10px rgba(2, 6, 23, 0.35);
+}
+
+/* 长轨迹的快捷导航：继续 / 步过 / 跳出 + 断点状态 */
+.cvz-trace__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 2px 6px;
+}
+
+.cvz-trace__jumps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cvz-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--line, #e4e8f0);
+  border-radius: 7px;
+  background: var(--bg-elevated, #ffffff);
+  color: var(--ink-secondary, #475569);
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.cvz-jump:hover:not(:disabled) {
+  border-color: var(--line-strong, #cbd5e1);
+  color: var(--ink, #0f172a);
+  background: var(--bg-subtle, #eef1f7);
+}
+
+.cvz-jump:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cvz-jump kbd {
+  padding: 0 3px;
+  border: 1px solid var(--line, #e4e8f0);
+  border-radius: 3px;
+  color: var(--ink-muted, #94a3b8);
+  font-family: var(--font-mono, Consolas, monospace);
+  font-size: 9px;
+}
+
+.cvz-jump--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-muted, #94a3b8);
+}
+
+.cvz-jump--mini {
+  height: 20px;
+  padding: 0 6px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--code-ink, #c7d2fe);
+  font-size: 10px;
+}
+
+.cvz-jump--mini:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.22);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.cvz-trace__bp-info {
+  color: var(--ink-muted, #94a3b8);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.cvz-trace__notice {
+  color: var(--ink-secondary, #475569);
+  font-size: 10px;
 }
 
 .cvz-trace__slider {

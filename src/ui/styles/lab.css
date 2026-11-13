@@ -1115,7 +1115,8 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--bg-inset);
-  overflow: hidden;
+  /* 用 clip 而不是 hidden：不产生滚动容器，底部的吸附控制条才能相对面板滚动 */
+  overflow: clip;
 }
 
 /* -------------------------------- 示例库 -------------------------------- */
