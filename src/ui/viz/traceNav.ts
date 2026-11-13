@@ -79,8 +79,3 @@ export function findLineStep(steps: TraceStep[], from: number, line: number): nu
   }
   return NOT_FOUND;
 }
-
-/** 这一行在整次执行里有没有被执行过（用于给「没经过」的提示） */
-export function lineEverExecuted(steps: TraceStep[], line: number): boolean {
-  return steps.some((step) => step.line === line);
-}

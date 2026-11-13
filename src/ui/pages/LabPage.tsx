@@ -11,6 +11,7 @@ import type { CodeSample } from '../../data/types';
 import { detectLanguage } from '../../engine';
 import type { AnalysisResult, SourceLanguage, TraceResult } from '../../engine/types';
 import { analyzeCached, simulateCached } from '../viz/analysisCache';
+import type { Breakpoint } from '../viz/traceNav';
 import { useToast } from '../hooks/useToast';
 import {
   FILE_ACCEPT,
@@ -50,6 +51,10 @@ export function LabPage({ search }: LabPageProps) {
   const [traceCode, setTraceCode] = useState<string | null>(null);
   const [traceLoading, setTraceLoading] = useState(false);
   const [sampleOpen, setSampleOpen] = useState(false);
+  /** 断点放在页面级：切到别的标签页再切回来、重新运行都不会丢 */
+  const [breakpoints, setBreakpoints] = useState<Breakpoint[]>([]);
+  /** 单步播放位置：用 ref 存，切标签页回来不丢，又不会每步触发重渲染 */
+  const playbackIndexRef = useRef(0);
 
   const editorRef = useRef<LabEditorHandle>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -256,6 +261,13 @@ export function LabPage({ search }: LabPageProps) {
   const handleCodeChange = useCallback((next: string) => {
     setCode(next);
     setActiveLine(null);
+    // 代码变了行号会漂移：超出当前行数的断点直接丢掉，避免停在错的行上
+    const total = countCodeLines(next);
+    setBreakpoints((current) =>
+      current.some((item) => item.line > total)
+        ? current.filter((item) => item.line <= total)
+        : current,
+    );
   }, []);
 
   const handleSelectLine = useCallback((line: number) => {
@@ -435,6 +447,9 @@ export function LabPage({ search }: LabPageProps) {
           trace={activeTrace}
           traceLoading={traceLoading}
           onRunTrace={(stdin) => runTraceOn(code, stdin)}
+          breakpoints={breakpoints}
+          onBreakpointsChange={setBreakpoints}
+          resumeIndexRef={playbackIndexRef}
         />
       </div>
 

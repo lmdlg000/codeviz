@@ -6,10 +6,10 @@
  * 底：首、上一步、播放暂停、下一步、末 + 进度滑块 + 速度 0.5×/1×/2×。
  * compact 模式压缩状态区与控制条；autoplay 与平滑滚动尊重 prefers-reduced-motion。
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DataCategory, TraceEvent, TraceResult, TraceStep } from '../../engine/types';
-import { guessLanguage, highlightCode } from './codeHighlight';
-import { validateCondition } from './breakpointCondition';
+import { guessLanguage, highlightCode, type CodeToken } from './codeHighlight';
+import { conditionMatches, validateCondition } from './breakpointCondition';
 import { findLineStep, findNextBreakpoint, findStepOut, findStepOver, type Breakpoint } from './traceNav';
 import { VizIcon } from './icons';
 import { VizEmpty } from './feedback';
@@ -21,6 +21,11 @@ export interface TracePlayerProps {
   autoplay?: boolean;
   compact?: boolean;
   onLineChange?: (line: number) => void;
+  /** 断点由外层托管：切标签页 / 重新运行都不会丢 */
+  breakpoints?: Breakpoint[];
+  onBreakpointsChange?: (next: Breakpoint[]) => void;
+  /** 播放位置也存到外层（用 ref 存，避免每步都触发页面级重渲染） */
+  resumeIndexRef?: { current: number };
 }
 
 const EVENT_META: Record<TraceEvent, { label: string; tone: string }> = {
@@ -75,6 +80,122 @@ function safeSteps(trace: TraceResult | null | undefined): TraceStep[] {
   return trace.steps.filter((step) => step && typeof step === 'object');
 }
 
+/**
+ * 代码行单独 memo：几千步的轨迹里，每步只会有一行的 is-active 变化，
+ * 不 memo 的话每步都要重渲染上百行（实测播放一步要几百毫秒）。
+ */
+interface TraceCodeLineProps {
+  lineNumber: number;
+  tokens: CodeToken[];
+  breakpoint?: Breakpoint;
+  onToggleBreakpoint: (line: number) => void;
+  onRunToLine: (line: number) => void;
+  onHoverLine: (line: number) => void;
+  registerLineRef: (line: number, node: HTMLDivElement | null) => void;
+}
+
+/**
+ * 条件输入框自己管编辑状态，失焦 / 回车才提交。
+ * 直接在父组件里 setState 的话，每敲一个字符都会重渲染整个播放器（实测 100ms+/键）。
+ */
+const ConditionInput = memo(function ConditionInput({
+  line,
+  value,
+  onCommit,
+}: {
+  line: number;
+  value: string;
+  onCommit: (line: number, condition: string) => void;
+}) {
+  const [text, setText] = useState(value);
+  useEffect(() => {
+    setText(value);
+  }, [value]);
+  const commit = (): void => {
+    if (text !== value) onCommit(line, text);
+  };
+  // 输入停顿 350ms 自动提交：用户敲完条件直接按 F5 也能生效，
+  // 又不必每敲一个字符就重渲染整个播放器
+  useEffect(() => {
+    if (text === value) return undefined;
+    const timer = window.setTimeout(() => onCommit(line, text), 350);
+    return () => window.clearTimeout(timer);
+  }, [text, value, line, onCommit]);
+  return (
+    <input
+      className="cvz-trace__bp-cond"
+      value={text}
+      placeholder="条件（可选），如 i == 10"
+      spellCheck={false}
+      onChange={(event) => setText(event.target.value)}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          commit();
+          event.currentTarget.blur();
+        }
+      }}
+      aria-label={`第 ${line} 行断点的条件`}
+    />
+  );
+});
+
+const TraceCodeLine = memo(function TraceCodeLine({
+  lineNumber,
+  tokens,
+  breakpoint,
+  onToggleBreakpoint,
+  onRunToLine,
+  onHoverLine,
+  registerLineRef,
+}: TraceCodeLineProps) {
+  const hasBreakpoint = Boolean(breakpoint);
+  return (
+    <div
+      className={`cvz-trace__line${hasBreakpoint ? ' has-bp' : ''}${
+        breakpoint?.condition ? ' has-bp-cond' : ''
+      }`}
+      onMouseEnter={() => onHoverLine(lineNumber)}
+      onClick={(event) => {
+        // Alt + 点击某行 = 运行到这一行，习惯与 IDE 的 Alt+F9 一致
+        if (event.altKey) onRunToLine(lineNumber);
+      }}
+      ref={(node) => registerLineRef(lineNumber, node)}
+    >
+      <button
+        type="button"
+        className="cvz-trace__gutter"
+        onClick={() => onToggleBreakpoint(lineNumber)}
+        aria-label={`${hasBreakpoint ? '取消' : '设置'}第 ${lineNumber} 行的断点`}
+        aria-pressed={hasBreakpoint}
+        title={
+          hasBreakpoint
+            ? breakpoint?.condition
+              ? `条件断点：${breakpoint.condition}（右键改条件）`
+              : '取消断点（右键加条件）'
+            : '点击设置断点，右键设置条件断点'
+        }
+      >
+        <i className="cvz-trace__bp" aria-hidden="true" />
+        {lineNumber}
+      </button>
+      <span className="cvz-trace__code-text">
+        {tokens.length === 0
+          ? ' '
+          : tokens.map((token, tokenIndex) =>
+              token.kind === 'plain' ? (
+                token.text
+              ) : (
+                <span key={tokenIndex} className={`cvz-tok cvz-tok--${token.kind}`}>
+                  {token.text}
+                </span>
+              ),
+            )}
+      </span>
+    </div>
+  );
+});
+
 export function TracePlayer({
   code,
   trace,
@@ -82,6 +203,9 @@ export function TracePlayer({
   autoplay = false,
   compact = false,
   onLineChange,
+  breakpoints: controlledBreakpoints,
+  onBreakpointsChange,
+  resumeIndexRef,
 }: TracePlayerProps) {
   const detected = useMemo<'c' | 'cpp'>(() => language ?? guessLanguage(code ?? ''), [language, code]);
   const highlighted = useMemo(() => highlightCode(code ?? '', detected), [code, detected]);
@@ -90,11 +214,16 @@ export function TracePlayer({
   // 几千步的长轨迹不自动播放：否则页面会自己闪好几分钟
   const canAutoplay = Boolean(autoplay) && steps.length > 1 && steps.length <= AUTOPLAY_MAX_STEPS && !reduced;
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => resumeIndexRef?.current ?? 0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  /** 断点：行号 + 可选条件。点到没执行过的行也不会命中，符合直觉。 */
-  const [breakpoints, setBreakpoints] = useState<Breakpoint[]>([]);
+  /** 断点：行号 + 可选条件。外部托管时用外面的状态，切标签页也不会丢。 */
+  const [localBreakpoints, setLocalBreakpoints] = useState<Breakpoint[]>([]);
+  const breakpoints = controlledBreakpoints ?? localBreakpoints;
+  const setBreakpoints = (next: Breakpoint[]): void => {
+    if (controlledBreakpoints === undefined) setLocalBreakpoints(next);
+    onBreakpointsChange?.(next);
+  };
   /** 断点列表面板（点「断点 N 个」展开，里面可以写条件） */
   const [breakpointPanelOpen, setBreakpointPanelOpen] = useState(false);
   /** 悬停的行：Alt+F9 运行到悬停行时用 */
@@ -124,13 +253,29 @@ export function TracePlayer({
   const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const lastLineRef = useRef<number | undefined>(undefined);
 
+  // 记住当前步，切标签页 / 切回来都能回到原处
+  useEffect(() => {
+    if (resumeIndexRef) resumeIndexRef.current = index;
+  }, [index, resumeIndexRef]);
+
   const stepsKey = useMemo(
     () => `${trace?.ok ?? false}|${trace?.error?.message ?? ''}|${steps.length}|${code.length}`,
     [trace, steps.length, code.length],
   );
 
-  // 代码 / 追踪结果变化时回到第一步
+  // 代码 / 追踪结果变化时回到第一步；首次挂载保留上次的播放位置。
+  // 用 stepsKey 比较而不是「首次标记」：StrictMode 下 effect 会执行两次，
+  // 标记法会误判成第二次从而把位置重置掉。
+  const lastStepsKeyRef = useRef<string | null>(null);
   useEffect(() => {
+    if (lastStepsKeyRef.current === stepsKey) return;
+    const isFirstMount = lastStepsKeyRef.current === null;
+    lastStepsKeyRef.current = stepsKey;
+    if (isFirstMount) {
+      if (canAutoplay) setPlaying(true);
+      lastLineRef.current = undefined;
+      return;
+    }
     setIndex(0);
     setPlaying(canAutoplay);
     lastLineRef.current = undefined;
@@ -150,10 +295,25 @@ export function TracePlayer({
     }
     const delay = Math.round(760 / Math.max(0.5, speed));
     const timer = window.setTimeout(() => {
-      setIndex((value) => Math.min(value + 1, steps.length - 1));
+      const next = Math.min(index + 1, steps.length - 1);
+      // 连续播放时命中断点也停下，和调试器一致
+      const hit =
+        breakpoints.length > 0 &&
+        next !== index &&
+        breakpoints.some(
+          (breakpoint) =>
+            breakpoint.line === steps[next].line && conditionMatches(breakpoint.condition, steps[next]),
+        );
+      if (hit) {
+        setIndex(next);
+        setPlaying(false);
+        say(`第 ${steps[next].line} 行断点命中，已暂停`);
+        return;
+      }
+      setIndex(next);
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [playing, index, speed, steps.length]);
+  }, [playing, index, speed, steps, steps.length, breakpoints]);
 
   // 当前行变化通知外层
   useEffect(() => {
@@ -275,17 +435,16 @@ export function TracePlayer({
   };
 
   const toggleBreakpoint = (line: number) => {
-    setBreakpoints((current) => {
-      if (current.some((item) => item.line === line)) {
-        return current.filter((item) => item.line !== line);
-      }
-      return [...current, { line }].sort((left, right) => left.line - right.line);
-    });
+    setBreakpoints(
+      breakpoints.some((item) => item.line === line)
+        ? breakpoints.filter((item) => item.line !== line)
+        : [...breakpoints, { line }].sort((left, right) => left.line - right.line),
+    );
   };
 
   const setBreakpointCondition = (line: number, condition: string) => {
-    setBreakpoints((current) =>
-      current.map((item) => (item.line === line ? { ...item, condition } : item)),
+    setBreakpoints(
+      breakpoints.map((item) => (item.line === line ? { ...item, condition } : item)),
     );
   };
 
@@ -300,6 +459,72 @@ export function TracePlayer({
     }
     return null;
   }, [breakpoints]);
+
+  const breakpointMap = useMemo(
+    () => new Map(breakpoints.map((item) => [item.line, item])),
+    [breakpoints],
+  );
+
+  // 行组件的回调保持稳定引用，否则 memo 会失效，每步又要重渲染上百行
+  const actionRef = useRef({ toggleBreakpoint, runToLine });
+  actionRef.current = { toggleBreakpoint, runToLine };
+  const onToggleBreakpoint = useCallback(
+    (line: number) => actionRef.current.toggleBreakpoint(line),
+    [],
+  );
+  const onRunToLine = useCallback((line: number) => actionRef.current.runToLine(line), []);
+  const registerLineRef = useCallback((line: number, node: HTMLDivElement | null) => {
+    if (node) lineRefs.current.set(line, node);
+    else lineRefs.current.delete(line);
+  }, []);
+  /**
+   * 整张代码行列表只创建一次：当前行的高亮改用 DOM 操作切换。
+   * 否则每走一步都要重新创建几百个 <div>（profile 里 55% 时间花在 jsxDEV 上）。
+   */
+  const codeLines = useMemo(
+    () =>
+      highlighted.map((line, lineIndex) => {
+        const lineNumber = lineIndex + 1;
+        return (
+          <TraceCodeLine
+            key={lineNumber}
+            lineNumber={lineNumber}
+            tokens={line.tokens}
+            breakpoint={breakpointMap.get(lineNumber)}
+            onToggleBreakpoint={onToggleBreakpoint}
+            onRunToLine={onRunToLine}
+            onHoverLine={setHoverLine}
+            registerLineRef={registerLineRef}
+          />
+        );
+      }),
+    [highlighted, breakpointMap, onToggleBreakpoint, onRunToLine, registerLineRef],
+  );
+
+  // 当前行高亮：直接改 class，避免让几百行参与 React 协调
+  const activeLineRef = useRef<number | undefined>(undefined);
+  useLayoutEffect(() => {
+    const previous = activeLineRef.current;
+    if (previous !== currentLine && previous !== undefined) {
+      const node = lineRefs.current.get(previous);
+      node?.classList.remove('is-active');
+      node?.removeAttribute('aria-current');
+    }
+    activeLineRef.current = currentLine;
+    if (currentLine === undefined) return;
+    const node = lineRefs.current.get(currentLine);
+    if (node && !node.classList.contains('is-active')) {
+      node.classList.add('is-active');
+      node.setAttribute('aria-current', 'step');
+    }
+  });
+
+  const conditionActionRef = useRef(setBreakpointCondition);
+  conditionActionRef.current = setBreakpointCondition;
+  const onSetBreakpointCondition = useCallback(
+    (line: number, condition: string) => conditionActionRef.current(line, condition),
+    [],
+  );
 
   const togglePlay = () => {
     if (steps.length === 0) return;
@@ -423,6 +648,12 @@ export function TracePlayer({
   const callStack = current?.callStack ?? [];
   const heap = current?.heap ?? [];
   const liveHeap = heap.filter((block) => !block.freed);
+  // 已释放的块只留最近的几块：长程序会累积上百块「已释放」，
+  // 既拖慢每步渲染（实测每步 100ms+），也把「在用」的块挤下去。
+  const recentFreed = heap.filter((block) => block.freed).slice(-6);
+  const recentFreedIds = new Set(recentFreed.map((block) => block.id));
+  const shownHeap = heap.filter((block) => !block.freed || recentFreedIds.has(block.id));
+  const hiddenFreed = heap.length - shownHeap.length;
   const heapIssues = trace.heapIssues ?? [];
   const heapLeaks = heapIssues.filter((issue) => issue.kind === 'leak');
   const stdout = current?.stdout ?? '';
@@ -466,68 +697,11 @@ export function TracePlayer({
               </span>
             </span>
           </div>
-          <div className="cvz-trace__code-wrap">
-          <div className="cvz-trace__code" ref={codeScrollRef} onMouseLeave={() => setHoverLine(undefined)}>
-            {highlighted.map((line, lineIndex) => {
-              const lineNumber = lineIndex + 1;
-              const active = currentLine === lineNumber;
-              const hasBreakpoint = breakpointAt(lineNumber);
-              return (
-                <div
-                  key={lineNumber}
-                  className={`cvz-trace__line${active ? ' is-active' : ''}${
-                    hasBreakpoint ? ' has-bp' : ''
-                  }${hasBreakpoint?.condition ? ' has-bp-cond' : ''}`}
-                  aria-current={active ? 'step' : undefined}
-                  onMouseEnter={() => setHoverLine(lineNumber)}
-                  onClick={(event) => {
-                    // Alt + 点击某行 = 运行到这一行，习惯与 IDE 的 Alt+F9 一致
-                    if (event.altKey) runToLine(lineNumber);
-                  }}
-                  ref={(node) => {
-                    if (node) lineRefs.current.set(lineNumber, node);
-                    else lineRefs.current.delete(lineNumber);
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="cvz-trace__gutter"
-                    onClick={() => toggleBreakpoint(lineNumber)}
-                    onContextMenu={(event) => {
-                      // 右键行号：给这一行加 / 改条件（没断点就先打上）
-                      event.preventDefault();
-                      if (!hasBreakpoint) toggleBreakpoint(lineNumber);
-                      setBreakpointPanelOpen(true);
-                    }}
-                    aria-label={`${hasBreakpoint ? '取消' : '设置'}第 ${lineNumber} 行的断点`}
-                    aria-pressed={Boolean(hasBreakpoint)}
-                    title={
-                      hasBreakpoint
-                        ? hasBreakpoint.condition
-                          ? `条件断点：${hasBreakpoint.condition}（右键改条件）`
-                          : '取消断点（右键加条件）'
-                        : '点击设置断点，右键设置条件断点'
-                    }
-                  >
-                    <i className="cvz-trace__bp" aria-hidden="true" />
-                    {lineNumber}
-                  </button>
-                  <span className="cvz-trace__code-text">
-                    {line.tokens.length === 0
-                      ? ' '
-                      : line.tokens.map((token, tokenIndex) =>
-                          token.kind === 'plain' ? (
-                            token.text
-                          ) : (
-                            <span key={tokenIndex} className={`cvz-tok cvz-tok--${token.kind}`}>
-                              {token.text}
-                            </span>
-                          ),
-                        )}
-                  </span>
-                </div>
-              );
-            })}
+          {/* onMouseLeave 挂在 wrap 上：悬浮条是 code 的兄弟节点，
+              挂在 code 上会导致「鼠标移向悬浮条 → 悬浮条自己先消失」 */}
+          <div className="cvz-trace__code-wrap" onMouseLeave={() => setHoverLine(undefined)}>
+          <div className="cvz-trace__code" ref={codeScrollRef}>
+            {codeLines}
           </div>
           {hoverLine !== undefined ? (
             <div className="cvz-trace__hoverbar" role="group" aria-label={`第 ${hoverLine} 行的操作`}>
@@ -669,7 +843,7 @@ export function TracePlayer({
                 </span>
               </div>
               <div className="cvz-heap">
-                {heap.map((block) => (
+                {shownHeap.map((block) => (
                   <div
                     className={`cvz-heap__block${block.freed ? ' is-freed' : ''}`}
                     key={block.id}
@@ -707,6 +881,11 @@ export function TracePlayer({
                     </div>
                   </div>
                 ))}
+                {hiddenFreed > 0 ? (
+                  <p className="cvz-trace__muted">
+                    另有 {hiddenFreed} 个已释放的块未显示（只保留最近释放的）
+                  </p>
+                ) : null}
               </div>
             </div>
           ) : null}
@@ -859,13 +1038,10 @@ export function TracePlayer({
                   >
                     L{breakpoint.line}
                   </button>
-                  <input
-                    className="cvz-trace__bp-cond"
+                  <ConditionInput
+                    line={breakpoint.line}
                     value={breakpoint.condition ?? ''}
-                    placeholder="条件（可选），如 i == 10"
-                    spellCheck={false}
-                    onChange={(event) => setBreakpointCondition(breakpoint.line, event.target.value)}
-                    aria-label={`第 ${breakpoint.line} 行断点的条件`}
+                    onCommit={onSetBreakpointCondition}
                   />
                   <button
                     type="button"
@@ -977,7 +1153,7 @@ export function TracePlayer({
 
         {!compact ? (
           <div className="cvz-trace__speed" role="group" aria-label="播放速度">
-            {[0.5, 1, 2].map((value) => (
+            {[0.5, 1, 2, 4].map((value) => (
               <button
                 key={value}
                 type="button"

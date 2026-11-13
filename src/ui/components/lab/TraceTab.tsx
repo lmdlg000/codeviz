@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AnalysisResult, SourceLanguage, TraceResult } from '../../../engine/types';
 import { TracePlayer } from '../../viz';
+import type { Breakpoint } from '../../viz/traceNav';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { EmptyState } from '../EmptyState';
@@ -13,6 +14,9 @@ export interface TraceTabProps {
   trace: TraceResult | null;
   loading: boolean;
   onRun: (stdin: string) => void;
+  breakpoints: Breakpoint[];
+  onBreakpointsChange: (next: Breakpoint[]) => void;
+  resumeIndexRef: { current: number };
 }
 
 function StdinField({
@@ -42,7 +46,17 @@ function StdinField({
 }
 
 /** 实验室「单步执行」：说明 → 运行 → 播放器。 */
-export function TraceTab({ code, language, analysis, trace, loading, onRun }: TraceTabProps) {
+export function TraceTab({
+  code,
+  language,
+  analysis,
+  trace,
+  loading,
+  onRun,
+  breakpoints,
+  onBreakpointsChange,
+  resumeIndexRef,
+}: TraceTabProps) {
   const [stdin, setStdin] = useState('');
   const [showStdin, setShowStdin] = useState(false);
 
@@ -200,7 +214,15 @@ export function TraceTab({ code, language, analysis, trace, loading, onRun }: Tr
       {showStdin ? <StdinField value={stdin} onChange={setStdin} /> : null}
 
       <div className="lab-trace__player">
-        <TracePlayer code={code} trace={trace} language={language} autoplay={false} />
+        <TracePlayer
+          code={code}
+          trace={trace}
+          language={language}
+          autoplay={false}
+          breakpoints={breakpoints}
+          onBreakpointsChange={onBreakpointsChange}
+          resumeIndexRef={resumeIndexRef}
+        />
       </div>
 
       {trace.interpreterNote ? <p className="lab-inline-note">{trace.interpreterNote}</p> : null}

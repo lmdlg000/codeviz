@@ -5,6 +5,7 @@ import { EmptyState, CodeToDiagramArt } from '../EmptyState';
 import { ClassesTab, CallsTab, DiagnosticsTab, FlowTab, MemoryTab } from './GraphTabs';
 import { OverviewTab } from './OverviewTab';
 import { TraceTab } from './TraceTab';
+import type { Breakpoint } from '../../viz/traceNav';
 
 export type LabTab =
   | 'overview'
@@ -30,6 +31,9 @@ export interface LabAnalysisPanelProps {
   trace: TraceResult | null;
   traceLoading: boolean;
   onRunTrace: (stdin: string) => void;
+  breakpoints: Breakpoint[];
+  onBreakpointsChange: (next: Breakpoint[]) => void;
+  resumeIndexRef: { current: number };
 }
 
 function AnalysisEmpty({ onOpenSamplePicker }: { onOpenSamplePicker: () => void }) {
@@ -75,6 +79,9 @@ export function LabAnalysisPanel({
   trace,
   traceLoading,
   onRunTrace,
+  breakpoints,
+  onBreakpointsChange,
+  resumeIndexRef,
 }: LabAnalysisPanelProps) {
   const tabs: Array<TabItem<LabTab>> = analysis
     ? [
@@ -148,6 +155,9 @@ export function LabAnalysisPanel({
             trace={trace}
             loading={traceLoading}
             onRun={onRunTrace}
+            breakpoints={breakpoints}
+            onBreakpointsChange={onBreakpointsChange}
+            resumeIndexRef={resumeIndexRef}
           />
         ) : (
           <DiagnosticsTab analysis={analysis} onSelectLine={onSelectLine} />
