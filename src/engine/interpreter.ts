@@ -900,6 +900,28 @@ class Interpreter {
       }
       return entry;
     });
+
+    // 成员函数里把 this 的字段也摊到变量监视里（`this->len`）：
+    // 否则方法内部只能看到一个 this 指针，对象状态是黑盒，条件断点也没法写 len == 3。
+    const frame = this.frames[this.frames.length - 1];
+    const self = frame?.thisValue;
+    if (self) {
+      for (const [field, value] of self.fields) {
+        const name = `this->${field}`;
+        if (nextSnapshot.has(name)) continue;
+        const valueText = formatValue(value);
+        nextSnapshot.set(name, valueText);
+        const entry: RuntimeVar = {
+          name,
+          typeText: internText(self.fieldTypes.get(field) ?? 'int'),
+          valueText: internText(valueText),
+          category: categoryOfValue(value),
+          changed: this.lastSnapshot.get(name) !== valueText,
+        };
+        if (value.t === 'array') entry.arrayValues = arrayElementTexts(value);
+        vars.push(entry);
+      }
+    }
     this.lastSnapshot = nextSnapshot;
     return vars;
   }

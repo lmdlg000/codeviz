@@ -45,9 +45,9 @@ describe('traceNav：长轨迹跳转计算', () => {
   });
 
   it('继续只认断点行', () => {
-    expect(findNextBreakpoint(TRACE, 0, [13])).toBe(6);
-    expect(findNextBreakpoint(TRACE, 0, [11])).toBe(2);
-    expect(findNextBreakpoint(TRACE, 6, [11])).toBe(-1);
+    expect(findNextBreakpoint(TRACE, 0, [{ line: 13 }])).toBe(6);
+    expect(findNextBreakpoint(TRACE, 0, [{ line: 11 }])).toBe(2);
+    expect(findNextBreakpoint(TRACE, 6, [{ line: 11 }])).toBe(-1);
     expect(findNextBreakpoint(TRACE, 0, [])).toBe(-1);
   });
 
@@ -91,6 +91,50 @@ int main() {
 
     // 断点设在 return 行，继续执行能直接命中
     const returnLine = steps[steps.length - 2].line;
-    expect(findNextBreakpoint(steps, 0, [returnLine])).toBeGreaterThan(0);
+    expect(findNextBreakpoint(steps, 0, [{ line: returnLine }])).toBeGreaterThan(0);
+  });
+});
+
+describe('traceNav：条件断点', () => {
+  const code = `
+#include <iostream>
+using namespace std;
+class Counter {
+  int len;
+public:
+  Counter(int n) { len = 0; while (n > 0) { n /= 10; len++; } }
+  int size() { return len; }
+};
+int main() {
+  Counter c(12345);
+  cout << c.size() << endl;
+  return 0;
+}`;
+
+  it('同一个断点行上，只在条件成立的那一次停住', () => {
+    const result = simulate(code);
+    expect(result.ok).toBe(true);
+    const steps = result.steps;
+    const loopStep = steps.find((item) => item.event === 'loop' && item.description.includes('n > 0'));
+    expect(loopStep).toBeDefined();
+    const line = loopStep!.line;
+
+    // 普通断点：停在循环第一次判断
+    const plain = findNextBreakpoint(steps, 0, [{ line }]);
+    expect(plain).toBeGreaterThan(0);
+    const plainLen = steps[plain].vars.find((variable) => variable.name === 'this->len');
+    expect(plainLen?.valueText).not.toBe('3');
+
+    // 条件断点 len == 3：直接跳到第三次迭代
+    const conditioned = findNextBreakpoint(steps, 0, [{ line, condition: 'len == 3' }]);
+    expect(conditioned).toBeGreaterThan(plain);
+    const lenVar = steps[conditioned].vars.find((variable) => variable.name === 'this->len');
+    expect(lenVar?.valueText).toBe('3');
+  });
+
+  it('条件永远不成立时不会命中', () => {
+    const result = simulate(code);
+    const line = result.steps.find((item) => item.event === 'loop')!.line;
+    expect(findNextBreakpoint(result.steps, 0, [{ line, condition: 'len == 999' }])).toBe(-1);
   });
 });

@@ -6,9 +6,16 @@
  * 不需要重新执行代码，也不受步数规模影响。
  */
 import type { TraceStep } from '../../engine/types';
+import { conditionMatches } from './breakpointCondition';
 
 /** 找不到时统一返回 -1 */
 const NOT_FOUND = -1;
+
+/** 断点：行号 + 可选条件（`i == 10` 这种，命中时才停） */
+export interface Breakpoint {
+  line: number;
+  condition?: string;
+}
 
 export function depthAt(steps: TraceStep[], position: number): number {
   return steps[position]?.depth ?? 0;
@@ -36,12 +43,28 @@ export function findStepOut(steps: TraceStep[], from: number): number {
   return NOT_FOUND;
 }
 
-/** 继续：从 from 往后第一个落在断点行上的步 */
-export function findNextBreakpoint(steps: TraceStep[], from: number, lines: number[]): number {
-  if (lines.length === 0) return NOT_FOUND;
-  const set = new Set(lines);
+/**
+ * 继续：从 from 往后第一个「命中断点」的步。
+ * 带条件的断点只在该步的变量快照满足条件时才算命中。
+ */
+export function findNextBreakpoint(
+  steps: TraceStep[],
+  from: number,
+  breakpoints: Breakpoint[],
+): number {
+  if (breakpoints.length === 0) return NOT_FOUND;
+  const byLine = new Map<number, Breakpoint[]>();
+  for (const breakpoint of breakpoints) {
+    const list = byLine.get(breakpoint.line) ?? [];
+    list.push(breakpoint);
+    byLine.set(breakpoint.line, list);
+  }
   for (let i = from + 1; i < steps.length; i++) {
-    if (set.has(steps[i].line)) return i;
+    const candidates = byLine.get(steps[i].line);
+    if (!candidates) continue;
+    for (const breakpoint of candidates) {
+      if (conditionMatches(breakpoint.condition, steps[i])) return i;
+    }
   }
   return NOT_FOUND;
 }

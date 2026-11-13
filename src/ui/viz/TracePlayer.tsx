@@ -7,10 +7,10 @@
  * compact 模式压缩状态区与控制条；autoplay 与平滑滚动尊重 prefers-reduced-motion。
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent } from 'react';
 import type { DataCategory, TraceEvent, TraceResult, TraceStep } from '../../engine/types';
 import { guessLanguage, highlightCode } from './codeHighlight';
-import { findLineStep, findNextBreakpoint, findStepOut, findStepOver } from './traceNav';
+import { validateCondition } from './breakpointCondition';
+import { findLineStep, findNextBreakpoint, findStepOut, findStepOver, type Breakpoint } from './traceNav';
 import { VizIcon } from './icons';
 import { VizEmpty } from './feedback';
 
@@ -93,13 +93,18 @@ export function TracePlayer({
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  /** 断点行号（1-based，升序）。点到没执行过的行也不会命中，符合直觉。 */
-  const [breakpoints, setBreakpoints] = useState<number[]>([]);
+  /** 断点：行号 + 可选条件。点到没执行过的行也不会命中，符合直觉。 */
+  const [breakpoints, setBreakpoints] = useState<Breakpoint[]>([]);
+  /** 断点列表面板（点「断点 N 个」展开，里面可以写条件） */
+  const [breakpointPanelOpen, setBreakpointPanelOpen] = useState(false);
   /** 悬停的行：Alt+F9 运行到悬停行时用 */
   const [hoverLine, setHoverLine] = useState<number | undefined>(undefined);
   /** 一次性提示（如「这一行这次执行没经过」） */
   const [notice, setNotice] = useState('');
   const noticeTimer = useRef<number | null>(null);
+  /** 停留点历史：大步跳转后可以「回退」到上一个停留位置 */
+  const jumpHistory = useRef<number[]>([]);
+  const [historySize, setHistorySize] = useState(0);
 
   const say = (text: string): void => {
     setNotice(text);
@@ -129,6 +134,8 @@ export function TracePlayer({
     setIndex(0);
     setPlaying(canAutoplay);
     lastLineRef.current = undefined;
+    jumpHistory.current = [];
+    setHistorySize(0);
   }, [stepsKey, canAutoplay, steps.length]);
 
   const current = steps.length > 0 ? steps[Math.min(index, steps.length - 1)] : undefined;
@@ -189,6 +196,26 @@ export function TracePlayer({
     setIndex(Math.max(0, Math.min(value, steps.length - 1)));
   };
 
+  /** 大步跳转：先把当前停留点记进历史，「回退」才能一步退回来 */
+  const jumpTo = (target: number) => {
+    if (steps.length === 0) return;
+    const clamped = Math.max(0, Math.min(target, steps.length - 1));
+    if (clamped !== currentIndex) {
+      jumpHistory.current.push(currentIndex);
+      if (jumpHistory.current.length > 60) jumpHistory.current.shift();
+      setHistorySize(jumpHistory.current.length);
+    }
+    goTo(clamped);
+  };
+
+  /** 回退：回到上一次跳转前停留的位置 */
+  const undoJump = () => {
+    const previous = jumpHistory.current.pop();
+    setHistorySize(jumpHistory.current.length);
+    if (previous === undefined) return;
+    goTo(previous);
+  };
+
   const stepBy = (delta: number) => {
     goTo((steps.length > 0 ? Math.min(index, steps.length - 1) : 0) + delta);
   };
@@ -201,8 +228,12 @@ export function TracePlayer({
    */
   const stepOver = () => {
     const target = findStepOver(steps, currentIndex);
-    goTo(target >= 0 ? target : steps.length - 1);
-    if (target < 0) say('已经到程序结尾');
+    if (target < 0) {
+      say('已经到程序结尾');
+      jumpTo(steps.length - 1);
+      return;
+    }
+    jumpTo(target);
   };
 
   /** 跳出：跳到深度更小的一步，即当前函数返回后的第一行 */
@@ -212,42 +243,63 @@ export function TracePlayer({
       say((current?.depth ?? 0) <= 0 ? '已经在最外层，没有可以跳出的函数' : '后面没有可跳出的位置了');
       return;
     }
-    goTo(target);
+    jumpTo(target);
   };
 
-  /** 继续：一直执行到下一个断点；没有断点就跑到程序结束 */
+  /** 继续到断点：命中下一个断点就停；没有断点或后面没有了就跑到结尾 */
   const resume = () => {
     if (breakpoints.length === 0) {
-      goTo(steps.length - 1);
+      jumpTo(steps.length - 1);
       say('没有设置断点，直接执行到结尾');
       return;
     }
     const target = findNextBreakpoint(steps, currentIndex, breakpoints);
     if (target < 0) {
-      goTo(steps.length - 1);
-      say('后面没有断点了，执行到结尾');
+      jumpTo(steps.length - 1);
+      say('后面没有命中的断点了，执行到结尾');
       return;
     }
-    goTo(target);
+    jumpTo(target);
+    const hit = breakpoints.find((item) => item.line === steps[target].line);
+    if (hit?.condition) say(`第 ${hit.line} 行断点命中（${hit.condition}）`);
   };
 
   /** 运行到指定行：优先向后找；走完了就回到该行最后一次执行的位置 */
   const runToLine = (line: number) => {
     const target = findLineStep(steps, currentIndex, line);
     if (target >= 0) {
-      goTo(target);
+      jumpTo(target);
       return;
     }
     say(`第 ${line} 行这次执行没有经过（注释、声明或没走到的分支）`);
   };
 
   const toggleBreakpoint = (line: number) => {
+    setBreakpoints((current) => {
+      if (current.some((item) => item.line === line)) {
+        return current.filter((item) => item.line !== line);
+      }
+      return [...current, { line }].sort((left, right) => left.line - right.line);
+    });
+  };
+
+  const setBreakpointCondition = (line: number, condition: string) => {
     setBreakpoints((current) =>
-      current.includes(line)
-        ? current.filter((value) => value !== line)
-        : [...current, line].sort((left, right) => left - right),
+      current.map((item) => (item.line === line ? { ...item, condition } : item)),
     );
   };
+
+  const breakpointAt = (line: number): Breakpoint | undefined =>
+    breakpoints.find((item) => item.line === line);
+
+  /** 断点条件写错时在面板里直接提示，别等到按 F5 才发现不命中 */
+  const conditionError = useMemo(() => {
+    for (const breakpoint of breakpoints) {
+      const error = validateCondition(breakpoint.condition ?? '');
+      if (error) return `L${breakpoint.line} ${error}`;
+    }
+    return null;
+  }, [breakpoints]);
 
   const togglePlay = () => {
     if (steps.length === 0) return;
@@ -259,31 +311,21 @@ export function TracePlayer({
     setPlaying(true);
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  /**
+   * 快捷键走页面级监听：调试时焦点可能在按钮、代码区或页面上任何地方，
+   * 只依赖容器焦点会出现「点了回退按钮之后 F5 就不响应」这种坑。
+   * 代码编辑器（CodeMirror）和输入框里不抢键。
+   */
+  const keyHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (event: KeyboardEvent) => {
+    if (steps.length === 0) return;
     const target = event.target as HTMLElement | null;
     const tag = target?.tagName ?? '';
-    // 输入框里一切快捷键都让给原生行为
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || target?.isContentEditable) return;
-    if (event.key === ' ' || event.key === 'Spacebar') {
-      // 空格 / 方向键在按钮、链接上按原生语义走，别抢
-      if (/^(BUTTON|A)$/.test(tag)) return;
-      event.preventDefault();
-      togglePlay();
-      return;
-    }
-    if (event.key === 'ArrowRight') {
-      if (/^(BUTTON|A)$/.test(tag)) return;
-      event.preventDefault();
-      stepBy(1);
-      return;
-    }
-    if (event.key === 'ArrowLeft') {
-      if (/^(BUTTON|A)$/.test(tag)) return;
-      event.preventDefault();
-      stepBy(-1);
-      return;
-    }
-    // 调试器快捷键：与常见 IDE 一致（焦点落在播放器内的按钮上也照样生效）
+    const inField = /^(INPUT|TEXTAREA|SELECT)$/.test(tag) || Boolean(target?.isContentEditable);
+    // 代码编辑器里键盘属于编辑器，全部让行
+    if (target?.closest?.('.cm-editor')) return;
+
+    // 功能键不影响打字，输入框（如断点条件）里也照常生效
     if (event.key === 'F5') {
       event.preventDefault();
       resume();
@@ -300,11 +342,52 @@ export function TracePlayer({
       else stepBy(1);
       return;
     }
-    if (event.altKey && event.key === 'F9' && hoverLine !== undefined) {
+    if (event.altKey && event.key === 'F9') {
+      if (hoverLine !== undefined) {
+        event.preventDefault();
+        runToLine(hoverLine);
+      }
+      return;
+    }
+
+    // 剩下的是「打字语义」的键：输入框里让给原生行为
+    if (inField) return;
+
+    // 按钮、链接上的空格 / 方向键走原生行为
+    if (event.key === ' ' || event.key === 'Spacebar') {
+      if (/^(BUTTON|A)$/.test(tag)) return;
       event.preventDefault();
-      runToLine(hoverLine);
+      togglePlay();
+      return;
+    }
+    if (event.key === 'ArrowRight') {
+      if (/^(BUTTON|A)$/.test(tag)) return;
+      event.preventDefault();
+      stepBy(1);
+      return;
+    }
+    if (event.key === 'ArrowLeft') {
+      if (event.altKey) {
+        event.preventDefault();
+        undoJump();
+        return;
+      }
+      if (/^(BUTTON|A)$/.test(tag)) return;
+      event.preventDefault();
+      stepBy(-1);
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      undoJump();
     }
   };
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent): void => keyHandlerRef.current(event);
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, []);
 
   // ---------- 空 / 不支持状态 ----------
   if (!trace || steps.length === 0) {
@@ -352,7 +435,6 @@ export function TracePlayer({
       role="region"
       aria-label="单步执行播放器"
       tabIndex={0}
-      onKeyDown={handleKeyDown}
     >
       {trace.error ? (
         <div className="cvz-trace__banner cvz-trace__banner--error" role="status">
@@ -389,13 +471,13 @@ export function TracePlayer({
             {highlighted.map((line, lineIndex) => {
               const lineNumber = lineIndex + 1;
               const active = currentLine === lineNumber;
-              const hasBreakpoint = breakpoints.includes(lineNumber);
+              const hasBreakpoint = breakpointAt(lineNumber);
               return (
                 <div
                   key={lineNumber}
                   className={`cvz-trace__line${active ? ' is-active' : ''}${
                     hasBreakpoint ? ' has-bp' : ''
-                  }`}
+                  }${hasBreakpoint?.condition ? ' has-bp-cond' : ''}`}
                   aria-current={active ? 'step' : undefined}
                   onMouseEnter={() => setHoverLine(lineNumber)}
                   onClick={(event) => {
@@ -411,9 +493,21 @@ export function TracePlayer({
                     type="button"
                     className="cvz-trace__gutter"
                     onClick={() => toggleBreakpoint(lineNumber)}
+                    onContextMenu={(event) => {
+                      // 右键行号：给这一行加 / 改条件（没断点就先打上）
+                      event.preventDefault();
+                      if (!hasBreakpoint) toggleBreakpoint(lineNumber);
+                      setBreakpointPanelOpen(true);
+                    }}
                     aria-label={`${hasBreakpoint ? '取消' : '设置'}第 ${lineNumber} 行的断点`}
-                    aria-pressed={hasBreakpoint}
-                    title={hasBreakpoint ? '取消断点' : '点击设置断点，按 F5 继续到断点'}
+                    aria-pressed={Boolean(hasBreakpoint)}
+                    title={
+                      hasBreakpoint
+                        ? hasBreakpoint.condition
+                          ? `条件断点：${hasBreakpoint.condition}（右键改条件）`
+                          : '取消断点（右键加条件）'
+                        : '点击设置断点，右键设置条件断点'
+                    }
                   >
                     <i className="cvz-trace__bp" aria-hidden="true" />
                     {lineNumber}
@@ -451,10 +545,14 @@ export function TracePlayer({
                 type="button"
                 className="cvz-jump cvz-jump--mini"
                 onClick={() => toggleBreakpoint(hoverLine)}
-                title="在这一行设置 / 取消断点"
+                title={
+                  breakpointAt(hoverLine)
+                    ? '取消这一行的断点（右键行号可以改条件）'
+                    : '在这一行打断点（右键行号可设条件断点）'
+                }
               >
                 <span className="cvz-trace__bp cvz-trace__bp--inline" aria-hidden="true" />
-                {breakpoints.includes(hoverLine) ? '取消断点' : '打断点'}
+                {breakpointAt(hoverLine) ? '取消断点' : '打断点'}
               </button>
             </div>
           ) : null}
@@ -675,12 +773,27 @@ export function TracePlayer({
           <button
             type="button"
             className="cvz-jump"
+            onClick={undoJump}
+            disabled={historySize === 0}
+            title="回退到上一次跳转前停留的位置（Ctrl+Z / Alt+←）"
+          >
+            <VizIcon name="reset" size={12} />
+            回退
+            <kbd>Ctrl+Z</kbd>
+          </button>
+          <button
+            type="button"
+            className="cvz-jump cvz-jump--primary"
             onClick={resume}
             disabled={stepNumber >= steps.length}
-            title="继续执行到下一个断点（F5）；没有断点就跑到程序结束"
+            title={
+              breakpoints.length > 0
+                ? '继续执行到下一个命中的断点（F5）'
+                : '当前没有断点：直接执行到程序结尾（F5）'
+            }
           >
             <VizIcon name="continue" size={12} />
-            继续
+            {breakpoints.length > 0 ? '继续到断点' : '运行到结束'}
             <kbd>F5</kbd>
           </button>
           <button
@@ -705,21 +818,21 @@ export function TracePlayer({
             跳出
             <kbd>⇧F11</kbd>
           </button>
-          <span className="cvz-trace__bp-info">
-            {breakpoints.length > 0
-              ? `断点 ${breakpoints.length} 个`
-              : '点行号可打断点'}
-          </span>
-          {breakpoints.length > 0 ? (
-            <button
-              type="button"
-              className="cvz-jump cvz-jump--ghost"
-              onClick={() => setBreakpoints([])}
-              title="清除全部断点"
-            >
-              清除断点
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={`cvz-jump cvz-jump--bp${breakpointPanelOpen ? ' is-open' : ''}`}
+            onClick={() => setBreakpointPanelOpen((open) => !open)}
+            aria-expanded={breakpointPanelOpen}
+            title="查看 / 编辑断点，可以给断点加条件（如 i == 10）"
+          >
+            <span className="cvz-trace__bp cvz-trace__bp--inline" aria-hidden="true" />
+            {breakpoints.length > 0 ? `断点 ${breakpoints.length}` : '断点'}
+            {breakpoints.some((item) => item.condition) ? (
+              <span className="cvz-trace__bp-cond-mark" title="含条件断点">
+                条件
+              </span>
+            ) : null}
+          </button>
         </div>
         {notice ? (
           <span className="cvz-trace__notice" role="status">
@@ -727,6 +840,67 @@ export function TracePlayer({
           </span>
         ) : null}
       </div>
+
+      {breakpointPanelOpen ? (
+        <div className="cvz-trace__bp-panel">
+          {breakpoints.length === 0 ? (
+            <p className="cvz-trace__bp-empty">
+              点代码行号就能打断点；右键行号可以直接加条件。按 F5 会跑到下一个命中的断点。
+            </p>
+          ) : (
+            <ul className="cvz-trace__bp-list">
+              {breakpoints.map((breakpoint) => (
+                <li key={breakpoint.line} className="cvz-trace__bp-row">
+                  <button
+                    type="button"
+                    className="cvz-trace__bp-line"
+                    onClick={() => runToLine(breakpoint.line)}
+                    title={`运行到第 ${breakpoint.line} 行`}
+                  >
+                    L{breakpoint.line}
+                  </button>
+                  <input
+                    className="cvz-trace__bp-cond"
+                    value={breakpoint.condition ?? ''}
+                    placeholder="条件（可选），如 i == 10"
+                    spellCheck={false}
+                    onChange={(event) => setBreakpointCondition(breakpoint.line, event.target.value)}
+                    aria-label={`第 ${breakpoint.line} 行断点的条件`}
+                  />
+                  <button
+                    type="button"
+                    className="cvz-trace__bp-remove"
+                    onClick={() => toggleBreakpoint(breakpoint.line)}
+                    aria-label={`删除第 ${breakpoint.line} 行的断点`}
+                    title="删除这个断点"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="cvz-trace__bp-foot">
+            {conditionError ? (
+              <span className="cvz-trace__bp-error">条件有误：{conditionError}</span>
+            ) : (
+              <span className="cvz-trace__bp-hint">
+                条件支持 == ≠ &lt; &lt;= &gt; &gt;= &amp;&amp; || ! 和括号，变量取自「变量监视」里的名字
+              </span>
+            )}
+            {breakpoints.length > 0 ? (
+              <button
+                type="button"
+                className="cvz-jump cvz-jump--ghost"
+                onClick={() => setBreakpoints([])}
+                title="清除全部断点"
+              >
+                清除全部
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <div className="cvz-trace__controls">
         <div className="cvz-trace__buttons">
