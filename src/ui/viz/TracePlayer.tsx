@@ -456,6 +456,25 @@ export function TracePlayer({
     breakpoints.find((item) => item.line === line);
 
   /** 断点条件写错时在面板里直接提示，别等到按 F5 才发现不命中 */
+  /**
+   * 带条件的断点在整条轨迹里会命中几次。
+   * 写条件时最怕「看起来对、其实一次都不命中」，这里直接把次数摆出来。
+   */
+  const breakpointHits = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const breakpoint of breakpoints) {
+      if (!breakpoint.condition) continue;
+      let count = 0;
+      for (const step of steps) {
+        if (step.line !== breakpoint.line) continue;
+        if (conditionMatches(breakpoint.condition, step)) count++;
+        if (count >= 1000) break;
+      }
+      counts.set(breakpoint.line, count);
+    }
+    return counts;
+  }, [steps, breakpoints]);
+
   const conditionError = useMemo(() => {
     for (const breakpoint of breakpoints) {
       const error = validateCondition(breakpoint.condition ?? '');
@@ -1038,7 +1057,7 @@ export function TracePlayer({
                     type="button"
                     className="cvz-trace__bp-line"
                     onClick={() => runToLine(breakpoint.line)}
-                    title={`运行到第 ${breakpoint.line} 行`}
+                    title={`运行到第 ${breakpoint.line} 行：${breakpoint.anchor ?? '（该行）'}`}
                   >
                     L{breakpoint.line}
                   </button>
@@ -1047,6 +1066,20 @@ export function TracePlayer({
                     value={breakpoint.condition ?? ''}
                     onCommit={onSetBreakpointCondition}
                   />
+                  {breakpoint.condition ? (
+                    <span
+                      className={`cvz-trace__bp-hits${
+                        (breakpointHits.get(breakpoint.line) ?? 0) === 0 ? ' is-zero' : ''
+                      }`}
+                      title={
+                        (breakpointHits.get(breakpoint.line) ?? 0) === 0
+                          ? '这条条件下一次都不会命中，检查变量名或阈值'
+                          : '整条轨迹里满足条件的步数'
+                      }
+                    >
+                      命中 {breakpointHits.get(breakpoint.line) ?? 0}
+                    </span>
+                  ) : null}
                   <button
                     type="button"
                     className="cvz-trace__bp-remove"
