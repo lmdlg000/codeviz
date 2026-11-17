@@ -19,7 +19,17 @@ import type {
   TraceStep,
 } from './types';
 import { DEFAULT_MAX_STEPS, MAX_TRACE_STEPS } from './types';
-import type { ClassDeclNode, ExprNode, FieldDeclNode, FuncDeclNode, ParamNode, ProgramNode, StmtNode } from './ast';
+import type {
+  BlockStmt,
+  ClassDeclNode,
+  ExprNode,
+  FieldDeclNode,
+  FuncDeclNode,
+  LambdaCapture as LambdaCaptureDef,
+  ParamNode,
+  ProgramNode,
+  StmtNode,
+} from './ast';
 import type { FormatSpec } from './io';
 import { flattenBinaryChain, parseFormat, rootName } from './io';
 import { buildSupportRegistry, findUnsupportedProgram } from './support';
@@ -49,7 +59,7 @@ import {
   truthy,
   voidValue,
 } from './values';
-import type { ArrayValue, MapEntryValue, MapValue, PointerValue, Ref, RValue, StructValue } from './values';
+import type { ArrayValue, LambdaValue, MapEntryValue, MapValue, PointerValue, Ref, RValue, StructValue } from './values';
 import { exprToText, formatNumber, scalarSize, truncateText } from './utils';
 
 const MAX_CALL_DEPTH = 64;
@@ -292,6 +302,25 @@ function collectEnums(program: ProgramNode): Map<string, number> {
   return values;
 }
 
+/** lambda 捕获到的一格变量：按值捕获存快照，按引用捕获存 Ref */
+interface LambdaCaptureBinding {
+  name: string;
+  byRef: boolean;
+  typeText: string;
+  category: ReturnType<typeof categoryOfValue>;
+  value?: RValue;
+  ref?: Ref;
+}
+
+/** lambda 的真实定义：参数、函数体、捕获，都存在解释器这一侧 */
+interface LambdaDefinition {
+  params: ParamNode[];
+  body: BlockStmt;
+  returnType: string;
+  captures: LambdaCaptureBinding[];
+  label: string;
+}
+
 /** 解释器内部的堆块：用 ArrayValue 统一承载，标量也当成 1 个元素的数组 */
 interface HeapBlock {
   id: number;
@@ -343,6 +372,9 @@ class Interpreter {
   private freeFunctions = new Map<string, FuncDeclNode[]>();
   /** 类外定义的成员函数：`类名::方法名` → 实现（class.methods 里往往只有声明） */
   private methodIndex = new Map<string, FuncDeclNode[]>();
+  /** lambda 句柄表：值里只存 id，真实定义在这里 */
+  private lambdaDefs = new Map<number, LambdaDefinition>();
+  private nextLambdaId = 1;
 
   private indexMethod(fn: FuncDeclNode): void {
     if (!fn.className || !fn.body) return;
@@ -2412,6 +2444,17 @@ class Interpreter {
         return this.evalAssign(expr);
       case 'ternary':
         return truthy(this.evalExpr(expr.cond)) ? this.evalExpr(expr.whenTrue) : this.evalExpr(expr.whenFalse);
+      case 'lambda': {
+        const id = this.nextLambdaId++;
+        this.lambdaDefs.set(id, {
+          params: expr.params,
+          body: expr.body,
+          returnType: expr.returnType,
+          captures: this.captureLambdaBindings(expr.captures, expr.line),
+          label: expr.text,
+        });
+        return { t: 'lambda', id, label: expr.text, typeText: 'lambda' };
+      }
       case 'call':
         return this.evalCall(expr);
       case 'index': {
@@ -2760,6 +2803,14 @@ class Interpreter {
       return this.evalMemberCall(expr, callee);
     }
     const name = expr.name || (callee.kind === 'ident' ? callee.name : '');
+    // 变量里存的 lambda：auto cmp = [...]; cmp(a, b);
+    if (callee.kind === 'ident' && this.hasSlot(callee.name)) {
+      const slot = this.lookupSlot(callee.name, expr.line);
+      if (slot.value.t === 'lambda') {
+        const args = expr.args.map((arg) => this.evalExpr(arg));
+        return this.callLambdaValue(slot.value, args, expr.line);
+      }
+    }
     // char(x) / int(x) 这种函数式类型转换
     if (BUILTIN_CAST_NAMES.has(name) && expr.args.length === 1) {
       return coerceValue(this.evalExpr(expr.args[0]), name);
@@ -3113,27 +3164,21 @@ class Interpreter {
     }
     const from = first.t === 'pointer' ? Math.max(0, first.offset) : 0;
     const to = last.t === 'pointer' ? Math.min(array.elems.length, last.offset) : array.elems.length;
-    const comparatorExpr = expr.args[2];
-    let comparator: FuncDeclNode | undefined;
-    if (comparatorExpr) {
-      if (comparatorExpr.kind === 'ident') {
-        comparator = this.functionMap.get(comparatorExpr.name);
-      }
-      if (!comparator) {
-        throw new SimError(
-          `${name}() 的比较器只支持源码里定义的函数名，例如 sort(v.begin(), v.end(), lessThen)。`,
-          expr.line,
-          'unsupported',
-        );
-      }
+    // 比较器可以是函数名，也可以是 lambda（含存进变量的 lambda）
+    const comparator = this.resolveComparator(expr.args[2], expr.line);
+    if (expr.args[2] && !comparator) {
+      throw new SimError(
+        `${name}() 的比较器需要是函数名或 lambda，例如 sort(v.begin(), v.end(), [](P& a, P& b) { return a.x < b.x; })。`,
+        expr.line,
+        'unsupported',
+      );
     }
     const slice = array.elems.slice(from, to);
     if (name === 'reverse') slice.reverse();
     else
       slice.sort((a, b) => {
         if (!comparator) return this.compareForSort(a, b);
-        const verdict = this.callFunction(comparator, [a, b], expr.line);
-        return truthy(verdict) ? -1 : 1;
+        return truthy(comparator(a, b)) ? -1 : 1;
       });
     array.elems.splice(from, slice.length, ...slice);
     return voidValue();
@@ -3195,6 +3240,108 @@ class Interpreter {
     });
     destArray.dims = [destArray.elems.length];
     return voidValue();
+  }
+
+  /* ============================== lambda ============================== */
+
+  /** 把 lambda 的捕获列表落成绑定：`[=]` 快照当前全部可见变量，`[&]` 存引用 */
+  private captureLambdaBindings(captures: LambdaCaptureDef[], line: number): LambdaCaptureBinding[] {
+    const bindings: LambdaCaptureBinding[] = [];
+    const seen = new Set<string>();
+    const pushSlot = (name: string, byRef: boolean, slot: Slot): void => {
+      if (seen.has(name)) return;
+      seen.add(name);
+      bindings.push({
+        name,
+        byRef,
+        typeText: slot.typeText,
+        category: slot.category,
+        value: byRef ? undefined : this.snapshotValue(slot.value),
+        ref: byRef ? slot.ref : undefined,
+      });
+    };
+
+    for (const capture of captures) {
+      if (capture.name === '=' || capture.name === '&') {
+        const byRef = capture.name === '&';
+        for (const slot of this.visibleSlots()) pushSlot(slot.name, byRef, slot);
+        continue;
+      }
+      if (capture.name === 'this') continue;
+      if (!this.hasSlot(capture.name)) {
+        throw new SimError(`lambda 捕获了未声明的变量 ${capture.name}。`, line, 'runtime');
+      }
+      pushSlot(capture.name, capture.byRef, this.lookupSlot(capture.name, line));
+    }
+    return bindings;
+  }
+
+  /** 按值捕获要冻结当下这一份：结构体做一次深拷贝，符合 C++ 的按值语义 */
+  private snapshotValue(value: RValue): RValue {
+    if (value.t === 'struct') return this.cloneObject(value);
+    if (value.t === 'array') {
+      return { ...value, elems: value.elems.map((item) => (item.t === 'struct' ? this.cloneObject(item) : item)) };
+    }
+    return value;
+  }
+
+  /** 调用一个 lambda 值：把参数与捕获交给 callFunction */
+  private callLambdaValue(value: LambdaValue, args: RValue[], line: number): RValue {
+    const definition = this.lambdaDefs.get(value.id);
+    if (!definition) {
+      throw new SimError('这个 lambda 已经失效，无法调用。', line, 'runtime');
+    }
+    const fn: FuncDeclNode = {
+      kind: 'function',
+      name: `lambda${value.label}`,
+      returnType: definition.returnType,
+      baseType: definition.returnType,
+      params: definition.params,
+      body: definition.body,
+      isPrototype: false,
+      isVirtual: false,
+      isStatic: false,
+      isConst: false,
+      isPureVirtual: false,
+      isInline: true,
+      isExplicit: false,
+      isTemplate: false,
+      isOperator: false,
+      isConstructor: false,
+      isDestructor: false,
+      specifiers: [],
+      signature: `lambda${value.label}`,
+      line,
+      column: 1,
+      endLine: this.currentLine,
+      endColumn: 1,
+    };
+    return this.callFunction(fn, args, line, undefined, undefined, definition.captures);
+  }
+
+  /** 把一个表达式求值成「可以当比较器用」的调用器 */
+  private resolveComparator(
+    expr: ExprNode | undefined,
+    line: number,
+  ): ((left: RValue, right: RValue) => RValue) | undefined {
+    if (!expr) return undefined;
+    if (expr.kind === 'lambda') {
+      const value = this.evalExpr(expr);
+      if (value.t !== 'lambda') return undefined;
+      return (left, right) => this.callLambdaValue(value, [left, right], line);
+    }
+    if (expr.kind === 'ident') {
+      const fn = this.functionMap.get(expr.name);
+      if (fn) return (left, right) => this.callFunction(fn, [left, right], line);
+      if (this.hasSlot(expr.name)) {
+        const slot = this.lookupSlot(expr.name, line);
+        if (slot.value.t === 'lambda') {
+          const value = slot.value;
+          return (left, right) => this.callLambdaValue(value, [left, right], line);
+        }
+      }
+    }
+    return undefined;
   }
 
   private compareForSort(left: RValue, right: RValue): number {
@@ -4374,6 +4521,7 @@ class Interpreter {
     callLine: number,
     thisValue?: StructValue,
     argRefs?: (Ref | undefined)[],
+    captures?: LambdaCaptureBinding[],
   ): RValue {
     if (this.frames.length >= MAX_CALL_DEPTH) {
       throw new SimError(`递归层数超过 ${MAX_CALL_DEPTH} 层，可能是没有终止条件的递归。`, callLine, 'runtime');
@@ -4431,6 +4579,28 @@ class Interpreter {
       });
     }
     this.frames.push(frame);
+
+    // lambda 的捕获先落位：参数同名时会被后面的参数绑定覆盖（参数应当遮蔽捕获）
+    if (captures) {
+      for (const capture of captures) {
+        if (capture.byRef && capture.ref) {
+          const value = capture.ref.get();
+          frame.scopes[0].vars.set(capture.name, {
+            name: capture.name,
+            value,
+            ref: capture.ref,
+            typeText: capture.typeText,
+            category: capture.category,
+            isConst: false,
+          });
+        } else {
+          frame.scopes[0].vars.set(
+            capture.name,
+            this.makeSlot(capture.name, capture.value ?? intValue(0), capture.typeText),
+          );
+        }
+      }
+    }
 
     for (let i = 0; i < fn.params.length; i++) {
       const param = fn.params[i];

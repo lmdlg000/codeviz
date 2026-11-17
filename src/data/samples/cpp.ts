@@ -438,6 +438,44 @@ int main() {
     focus: 'trace'
   },
   {
+    id: 'cpp-lambda',
+    title: 'lambda：把比较规则写在调用处',
+    description:
+      '同一个 sort，换个 lambda 就变成降序；[&] 捕获让 lambda 能改到外面的计数器。单步执行能看到每次比较的入参、返回值，以及捕获变量在 lambda 内外是同一个。',
+    language: 'cpp',
+    code: `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+  vector<int> scores;
+  scores.push_back(82);
+  scores.push_back(95);
+  scores.push_back(67);
+  scores.push_back(90);
+
+  // 比较器直接写成 lambda：返回 true 表示 a 应该排在 b 前面
+  sort(scores.begin(), scores.end(), [](int a, int b) { return a > b; });
+
+  int pass = 90;
+  int count = 0;
+  // [&] 按引用捕获：lambda 里改到的就是外面的 count
+  auto countAbove = [&](int score) {
+    if (score >= pass) count++;
+  };
+  for (int i = 0; i < 4; i++) countAbove(scores[i]);
+
+  cout << "降序：";
+  for (int i = 0; i < 4; i++) cout << scores[i] << " ";
+  cout << endl << ">=" << pass << " 的有 " << count << " 个" << endl;
+  return 0;
+}`,
+    tags: ['lambda', 'STL', '自定义排序'],
+    level: 2,
+    focus: 'trace'
+  },
+  {
     id: 'cpp-hello',
     title: 'C++ 的第一次问候',
     description: '用固定变量演示 cout 的链式输出：文本与数值交替拼接，最后算出一个带小数的结果。',

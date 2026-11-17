@@ -94,6 +94,14 @@ export interface VoidValue {
   t: 'void';
 }
 
+/** lambda 值：真正的参数 / 函数体 / 捕获存在解释器那边，这里只留一个句柄 */
+export interface LambdaValue {
+  t: 'lambda';
+  id: number;
+  label: string;
+  typeText: string;
+}
+
 export type RValue =
   | IntValue
   | FloatValue
@@ -103,7 +111,8 @@ export type RValue =
   | StructValue
   | MapValue
   | NullValue
-  | VoidValue;
+  | VoidValue
+  | LambdaValue;
 
 /* ============================== 类型判断 ============================== */
 
@@ -167,6 +176,8 @@ export function categoryOfValue(value: RValue): DataCategory {
       return 'struct';
     case 'map':
       return 'array';
+    case 'lambda':
+      return 'unknown';
     case 'null':
       return 'pointer';
     case 'void':
@@ -241,6 +252,8 @@ export function truthy(value: RValue): boolean {
       return value.target !== null || value.str !== undefined;
     case 'null':
       return false;
+    case 'lambda':
+      return true;
     case 'struct':
       return true;
     case 'void':
@@ -339,6 +352,8 @@ export function formatValue(value: RValue, depth = 0): string {
       if (value.str !== undefined) return `-> "${escapeText(value.str, 20)}"`;
       if (value.target === null && value.array === undefined) return 'nullptr';
       return `-> ${value.label}`;
+    case 'lambda':
+      return `<lambda ${value.label}>`;
     case 'struct': {
       if (depth > 2) return `${value.typeName} { ... }`;
       const parts: string[] = [];

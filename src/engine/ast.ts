@@ -204,9 +204,20 @@ export interface CommaExpr extends NodePos {
   items: ExprNode[];
 }
 
+/** lambda 的捕获项：`[]` 没有；`[=]` / `[&]` 是默认捕获；`[x]` / `[&x]` 是具名捕获 */
+export interface LambdaCapture {
+  name: string;
+  byRef: boolean;
+}
+
 export interface LambdaExpr extends NodePos {
   kind: 'lambda';
   text: string;
+  captures: LambdaCapture[];
+  params: ParamNode[];
+  body: BlockStmt;
+  /** `[](int a) -> int { ... }` 的返回类型，没写就是 auto（按 return 推断） */
+  returnType: string;
 }
 
 export interface UnknownExpr extends NodePos {

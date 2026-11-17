@@ -419,3 +419,106 @@ int main() {
     expect(r.output).toBe('Spike 5000\nTom 8000\nJerry 12000\n');
   });
 });
+
+describe('lambda：自定义比较器与捕获', () => {
+  it('lambda 直接作为 sort 的比较器', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int main() {
+  vector<int> v;
+  v.push_back(3); v.push_back(1); v.push_back(2);
+  sort(v.begin(), v.end(), [](int a, int b) { return a < b; });
+  for (int i = 0; i < 3; i++) cout << v[i] << " ";
+  cout << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1 2 3 \n');
+  });
+
+  it('lambda 存进变量再传给 sort', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int main() {
+  vector<int> v;
+  v.push_back(3); v.push_back(1); v.push_back(2);
+  auto cmp = [](int a, int b) { return a > b; };
+  sort(v.begin(), v.end(), cmp);
+  for (int i = 0; i < 3; i++) cout << v[i] << " ";
+  cout << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3 2 1 \n');
+  });
+
+  it('按值捕获是快照：外部变量改了也不影响 lambda 里的副本', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+int main() {
+  int base = 10;
+  auto add = [base](int x) { return x + base; };
+  cout << add(5) << endl;
+  base = 100;
+  cout << add(5) << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('15\n15\n');
+  });
+
+  it('按引用捕获能改到外部变量', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+int main() {
+  int count = 0;
+  auto bump = [&count]() { count++; };
+  bump(); bump(); bump();
+  cout << count << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3\n');
+  });
+
+  it('课程写法：map 转 vector<pair> 后用 lambda 按薪水排序', () => {
+    const r = run(`
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+#include <algorithm>
+using namespace std;
+class Employee {
+    string name; double salary;
+public:
+    Employee(string n, double s) { name = n; salary = s; }
+    string getName() { return name; }
+    double getSalary() { return salary; }
+};
+int main() {
+  map<string, Employee*> employees;
+  employees["e1"] = new Employee("Tom", 8000);
+  employees["e2"] = new Employee("Jerry", 12000);
+  employees["e3"] = new Employee("Spike", 5000);
+  vector< pair<string, Employee*> > vec;
+  copy(employees.begin(), employees.end(), back_inserter(vec));
+  sort(vec.begin(), vec.end(), [](pair<string, Employee*>& a, pair<string, Employee*>& b) {
+    return (a.second)->getSalary() < (b.second)->getSalary();
+  });
+  for (auto it = vec.begin(); it != vec.end(); ++it)
+    cout << (it->second)->getName() << " " << (it->second)->getSalary() << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('Spike 5000\nTom 8000\nJerry 12000\n');
+  });
+});

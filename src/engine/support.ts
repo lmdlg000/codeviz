@@ -34,6 +34,8 @@ export interface SupportRegistry {
   structs: Set<string>;
   classes: Set<string>;
   methods: Set<string>;
+  /** 源码里出现过的变量名：`auto cmp = [...]; cmp(a, b);` 这种调用要放行 */
+  variables: Set<string>;
 }
 
 /** 模板形式出现时可直接放行的类型名（容器 / 工具类型） */
@@ -78,7 +80,38 @@ export function buildSupportRegistry(program: ProgramNode, classDecls: ProgramNo
       methods.add(method.name);
     }
   }
-  return { functions, structs, classes, methods };
+  const variables = new Set<string>();
+  const collectVars = (stmt: StmtNode): void => {
+    switch (stmt.kind) {
+      case 'decl':
+        for (const declarator of stmt.decl.declarators) variables.add(declarator.name);
+        break;
+      case 'block':
+        stmt.statements.forEach(collectVars);
+        break;
+      case 'if':
+        collectVars(stmt.then);
+        if (stmt.else) collectVars(stmt.else);
+        break;
+      case 'while':
+      case 'doWhile':
+      case 'for':
+      case 'rangeFor':
+        collectVars(stmt.body);
+        break;
+      case 'switch':
+        for (const item of stmt.cases) item.statements.forEach(collectVars);
+        break;
+      default:
+        break;
+    }
+  };
+  for (const fn of program.functions) if (fn.body) collectVars(fn.body);
+  for (const cls of classDecls) {
+    for (const method of cls.methods) if (method.body) collectVars(method.body);
+  }
+
+  return { functions, structs, classes, methods, variables };
 }
 
 const UNSUPPORTED_TYPES = new Set([
@@ -111,8 +144,14 @@ function checkExpression(
     case 'delete':
       // 堆内存已支持：解释器会分配真实堆块、跟踪 delete，并在结束时报告泄漏
       return null;
-    case 'lambda':
-      return { line: expr.line, message: 'lambda 表达式暂不支持单步执行。' };
+    case 'lambda': {
+      // lambda 自己可以单步执行，但函数体里的写法仍然要过一遍
+      for (const stmt of expr.body.statements) {
+        const issue = scanStatement(stmt, registry, visited, depth + 1);
+        if (issue) return issue;
+      }
+      return null;
+    }
     case 'unknown':
       return { line: expr.line, message: `表达式 "${expr.text}" 暂不支持单步执行。` };
     case 'ident':
@@ -150,6 +189,8 @@ function checkExpression(
         if (CONTAINER_TYPE_NAMES.has(templateBase)) return null;
         if (registry.classes.has(templateBase) || registry.structs.has(templateBase)) return null;
       }
+      // 变量里可能存着 lambda：`auto add = [...]; add(5);`
+      if (registry.variables.has(name)) return null;
       return { line: expr.line, message: `调用了源码中没有定义的函数 ${name}()，无法执行。` };
     }
     default:

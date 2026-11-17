@@ -21,6 +21,8 @@ import type {
   ForStmt,
   FuncDeclNode,
   IfStmt,
+  LambdaCapture,
+  LambdaExpr,
   ParamNode,
   ProgramNode,
   RangeForStmt,
@@ -2047,6 +2049,58 @@ export class Parser {
     return this.parsePostfix(this.parsePrimary());
   }
 
+  /**
+   * lambda 表达式：`[捕获](参数) -> 返回类型 { 体 }`
+   * 参数与函数体复用普通函数那套解析，捕获列表单独处理。
+   */
+  private parseLambda(): LambdaExpr {
+    const startTok = this.expect('[');
+    const captures: LambdaCapture[] = [];
+    while (!this.atEnd() && !this.check(']')) {
+      const byRef = this.check('&');
+      if (byRef) this.advance();
+      // [&] / [&, x]：默认按引用捕获，没有变量名
+      if (byRef && (this.check(']') || this.check(','))) {
+        captures.push({ name: '&', byRef: true });
+      } else {
+        const token = this.peek();
+        if (token.kind === 'ident' || token.kind === 'keyword' || token.text === '=') {
+          captures.push({ name: this.advance().text, byRef });
+        } else {
+          this.advance();
+        }
+      }
+      if (!this.match(',')) break;
+    }
+    this.expect(']');
+
+    // mutable / constexpr 这类修饰，解析时忽略
+    while (['mutable', 'constexpr', 'noexcept'].includes(this.peek().text)) this.advance();
+
+    const params = this.check('(') ? this.parseParams() : [];
+    let returnType = 'auto';
+    if (this.match('->')) {
+      const spec = this.parseDeclSpecifiers();
+      if (spec) {
+        const header = this.parseDeclaratorHeader();
+        returnType = `${spec.text}${header.pointerDepth > 0 ? '*'.repeat(header.pointerDepth) : ''}`;
+      }
+    }
+    const body = this.parseBlock();
+    const text = `[${captures
+      .map((item) => (item.name === '=' || item.name === '&' ? item.name : (item.byRef ? '&' : '') + item.name))
+      .join(', ')}]`;
+    return {
+      kind: 'lambda',
+      text,
+      captures,
+      params,
+      body,
+      returnType,
+      ...this.span(startTok),
+    };
+  }
+
   private tryCastTypeText(): string | null {
     const saved = this.pos;
     if (!this.check('(')) return null;
@@ -2199,26 +2253,7 @@ export class Parser {
       return this.parseInitList();
     }
     if (tok.text === '[') {
-      // lambda：整体跳过
-      const startTok = tok;
-      let text = '';
-      let guard = 0;
-      while (!this.atEnd() && guard++ < 400) {
-        if (this.check('[')) {
-          text += this.collectBalanced('[', ']');
-          continue;
-        }
-        if (this.check('(')) {
-          text += this.collectBalanced('(', ')');
-          continue;
-        }
-        if (this.check('{')) {
-          text += this.collectBalanced('{', '}');
-          break;
-        }
-        break;
-      }
-      return { kind: 'lambda', text: text || '[]', ...this.span(startTok) };
+      return this.parseLambda();
     }
     if (tok.text === '::') {
       this.advance();
