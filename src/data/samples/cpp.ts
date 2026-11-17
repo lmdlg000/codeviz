@@ -385,6 +385,59 @@ int main() {
     focus: 'trace'
   },
   {
+    id: 'cpp-map-sort',
+    title: 'map → vector<pair> → 自定义排序',
+    description:
+      '课程里最常见的组合：map 按 key 存对象指针，copy + back_inserter 摊成 vector<pair>，再用自己的比较器按薪水排序，最后用迭代器逐个输出。单步执行里能看清每一次拷贝、比较与解引用。',
+    language: 'cpp',
+    code: `#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Employee {
+    string name;
+    double salary;
+public:
+    Employee(string n, double s) { name = n; salary = s; }
+    string getName() { return name; }
+    double getSalary() { return salary; }
+};
+
+bool lessThen(pair<string, Employee*>& l, pair<string, Employee*>& r) {
+    return (l.second)->getSalary() < (r.second)->getSalary();
+}
+
+int main() {
+    map<string, Employee*> employees;
+    employees["e1"] = new Employee("Tom", 8000);
+    employees["e2"] = new Employee("Jerry", 12000);
+    employees["e3"] = new Employee("Spike", 5000);
+
+    // 把 map 里的键值对摊进 vector，才能按自定义规则排序
+    vector< pair<string, Employee*> > employeeVec;
+    copy( employees.begin(), employees.end(), back_inserter( employeeVec ) );
+
+    sort( employeeVec.begin(), employeeVec.end(), lessThen );
+
+    vector< pair<string, Employee*> >::iterator it;
+    for ( it = employeeVec.begin(); it != employeeVec.end(); ++it ) {
+        cout << (it->second)->getName() << " "
+             << (it->second)->getSalary() << endl;
+    }
+
+    for ( it = employeeVec.begin(); it != employeeVec.end(); ++it ) {
+        delete it->second;
+    }
+    return 0;
+}`,
+    tags: ['STL', 'map 与 vector', '自定义排序'],
+    level: 3,
+    focus: 'trace'
+  },
+  {
     id: 'cpp-hello',
     title: 'C++ 的第一次问候',
     description: '用固定变量演示 cout 的链式输出：文本与数值交替拼接，最后算出一个带小数的结果。',

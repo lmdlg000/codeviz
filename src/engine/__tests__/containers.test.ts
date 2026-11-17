@@ -277,3 +277,145 @@ int main() {
     expect(r.output).toBe('9\n5\n');
   });
 });
+
+describe('STL 组合：pair 构造 / map 迭代器 / copy / 自定义比较器', () => {
+  it('表达式位置的 pair<T1,T2>() 构造', () => {
+    const r = run(`
+#include <iostream>
+#include <string>
+using namespace std;
+int main() {
+  pair<string, int> p("a", 1);
+  cout << p.first << p.second << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('a1\n');
+  });
+
+  it('vector<pair<...>> 迭代器遍历，it->first / it->second', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+int main() {
+  vector< pair<string, int> > v;
+  v.push_back(pair<string,int>("a", 1));
+  v.push_back(pair<string,int>("b", 2));
+  vector< pair<string, int> >::iterator it;
+  for (it = v.begin(); it != v.end(); ++it) {
+    cout << it->first << "=" << it->second << " ";
+  }
+  cout << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('a=1 b=2 \n');
+  });
+
+  it('sort 使用自定义比较器（之前会忽略比较器、静默排出错序）', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+struct P { int a; };
+bool cmp(P& l, P& r) { return l.a < r.a; }
+int main() {
+  vector<P> v;
+  P p1; p1.a = 3; v.push_back(p1);
+  P p2; p2.a = 1; v.push_back(p2);
+  P p3; p3.a = 2; v.push_back(p3);
+  sort(v.begin(), v.end(), cmp);
+  for (int i = 0; i < 3; i++) cout << v[i].a << " ";
+  cout << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1 2 3 \n');
+  });
+
+  it('map 的 begin()/end() 可以迭代', () => {
+    const r = run(`
+#include <iostream>
+#include <map>
+#include <string>
+using namespace std;
+int main() {
+  map<string, int> m;
+  m["b"] = 2;
+  m["a"] = 1;
+  for (map<string,int>::iterator it = m.begin(); it != m.end(); ++it) {
+    cout << it->first << ":" << it->second << " ";
+  }
+  cout << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('a:1 b:2 \n');
+  });
+
+  it('copy + back_inserter 把 map 拷进 vector', () => {
+    const r = run(`
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+int main() {
+  map<string, int> m;
+  m["x"] = 1;
+  m["y"] = 2;
+  vector< pair<string,int> > v;
+  copy(m.begin(), m.end(), back_inserter(v));
+  cout << v.size() << " " << v[0].first << v[0].second << endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('2 x1\n');
+  });
+
+  it('课程例子：map → vector<pair> → 按薪水排序 → 迭代输出', () => {
+    const r = run(`
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Employee {
+    string name;
+    double salary;
+public:
+    Employee(string n, double s) { name = n; salary = s; }
+    string getName() { return name; }
+    double getSalary() { return salary; }
+};
+
+bool lessThen(pair<string, Employee*>& l, pair<string, Employee*>& r) {
+    return (l.second)->getSalary() < (r.second)->getSalary();
+}
+
+int main() {
+    map<string, Employee*> employees;
+    employees["e1"] = new Employee("Tom", 8000);
+    employees["e2"] = new Employee("Jerry", 12000);
+    employees["e3"] = new Employee("Spike", 5000);
+
+    vector< pair<string, Employee*> > employeeVec;
+    copy( employees.begin(), employees.end(), back_inserter( employeeVec ) );
+    sort( employeeVec.begin(), employeeVec.end(), lessThen );
+
+    vector< pair<string, Employee*> >::iterator it;
+    for ( it = employeeVec.begin(); it != employeeVec.end(); ++it ) {
+        cout << (it->second)->getName() << " "
+             << (it->second)->getSalary() << endl;
+    }
+    return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('Spike 5000\nTom 8000\nJerry 12000\n');
+  });
+});

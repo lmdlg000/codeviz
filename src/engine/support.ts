@@ -36,6 +36,24 @@ export interface SupportRegistry {
   methods: Set<string>;
 }
 
+/** 模板形式出现时可直接放行的类型名（容器 / 工具类型） */
+const CONTAINER_TYPE_NAMES = new Set([
+  'pair',
+  'tuple',
+  'vector',
+  'map',
+  'set',
+  'multimap',
+  'multiset',
+  'stack',
+  'queue',
+  'deque',
+  'list',
+  'priority_queue',
+  'string',
+  'basic_string',
+]);
+
 /** 从 ProgramNode 建立支持度检查所需的注册表 */
 export function buildSupportRegistry(program: ProgramNode, classDecls: ProgramNode['classes']): SupportRegistry {
   const functions = new Map<string, FuncDeclNode[]>();
@@ -126,6 +144,12 @@ function checkExpression(
       if (CAST_NAMES.has(name) && expr.args.length === 1) return null;
       // std::string("abc") / string(3, 'a') 这类函数式构造
       if (/^(string|basic_string)$/.test(name)) return null;
+      // pair<string, Employee*>("a", p) / vector<int>(3)：模板类型当构造函数
+      const templateBase = /^\s*(?:std::)?([A-Za-z_]\w*)\s*</.exec(name)?.[1];
+      if (templateBase) {
+        if (CONTAINER_TYPE_NAMES.has(templateBase)) return null;
+        if (registry.classes.has(templateBase) || registry.structs.has(templateBase)) return null;
+      }
       return { line: expr.line, message: `调用了源码中没有定义的函数 ${name}()，无法执行。` };
     }
     default:

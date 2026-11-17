@@ -58,6 +58,11 @@ export interface MapValue {
   valueType: string;
   typeText: string;
   entries: MapEntryValue[];
+  /**
+   * 遍历用的「视图」数组：begin()/end() 必须返回同一份数组上的指针，
+   * 否则 it != end() 永远成立（会死循环）。entries 变化时按长度重建。
+   */
+  iterationView?: { array: ArrayValue; size: number };
 }
 
 export interface PointerValue {

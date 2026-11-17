@@ -2029,6 +2029,21 @@ export class Parser {
       }
     }
 
+    // 表达式位置的模板构造：pair<string, Employee*>("Tom", p) / vector<int>(3)
+    // 只有「<...> 后面紧跟 (」才按构造处理，否则仍是普通的比较运算
+    if (tok.kind === 'ident' && this.peek(1).text === '<') {
+      const closeIndex = this.skipBalancedIndex(1, '<', '>');
+      if (this.peek(closeIndex).text === '(') {
+        this.advance();
+        const open = this.pos;
+        this.consumeTemplateArgText();
+        const argsText = this.tokensText(open, this.pos).trim();
+        const typeText = `${tok.text}${argsText}`;
+        // 只造一个「类型名标识符」，实参交给 parsePostfix 里的调用解析
+        return this.parsePostfix({ kind: 'ident', name: typeText, ...this.span(tok) });
+      }
+    }
+
     return this.parsePostfix(this.parsePrimary());
   }
 

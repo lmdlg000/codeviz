@@ -1742,16 +1742,45 @@ class Interpreter {
           return boolValue(this.mapInsertEntry(map, key, value));
         }
       case 'begin':
-      case 'end':
-      case 'find':
-        throw new SimError(
-          `map / set 的迭代器（${method}()）暂不支持单步执行，请用 count() / contains() / at() 或范围 for。`,
-          expr.line,
-          'unsupported',
-        );
+      case 'end': {
+        const view = this.mapIterationView(map);
+        return this.vectorIterator(view, method === 'begin' ? 0 : view.elems.length, expr.line);
+      }
+      case 'find': {
+        if (!expr.args[0]) throw new SimError('find() 需要一个键。', expr.line);
+        const view = this.mapIterationView(map);
+        const index = this.mapKeyIndex(map, keyArg());
+        return this.vectorIterator(view, index < 0 ? view.elems.length : index, expr.line);
+      }
       default:
         return undefined;
     }
+  }
+
+  /**
+   * map / set 的遍历视图：把 entries 摊成一个 pair 数组，并缓存下来。
+   * begin()/end() 必须落在同一份数组上，`it != m.end()` 才能正确终止。
+   * 容器发生增删（长度变化）时重建。
+   */
+  private mapIterationView(map: MapValue): ArrayValue {
+    if (map.iterationView && map.iterationView.size === map.entries.length) {
+      // 长度没变也可能改过值，就地刷新一遍元素
+      const view = map.iterationView.array;
+      map.entries.forEach((entry, index) => {
+        view.elems[index] = this.mapIterationItem(map, entry);
+      });
+      return view;
+    }
+    const elems = map.entries.map((entry) => this.mapIterationItem(map, entry));
+    const view: ArrayValue = {
+      t: 'array',
+      elems,
+      dims: [elems.length],
+      elemType: map.kind === 'set' ? map.keyType : `pair<${map.keyType}, ${map.valueType}>`,
+      typeText: map.typeText,
+    };
+    map.iterationView = { array: view, size: map.entries.length };
+    return view;
   }
 
   /** 范围 for 遍历 map / set 时的元素：map 给出 pair，set 给出键 */
@@ -2735,6 +2764,10 @@ class Interpreter {
     if (BUILTIN_CAST_NAMES.has(name) && expr.args.length === 1) {
       return coerceValue(this.evalExpr(expr.args[0]), name);
     }
+    // pair<string, Employee*>("Tom", p)：模板实参写明的 pair 构造
+    if (pairTypeOf(name)) {
+      return this.buildPairValue(expr, name);
+    }
     // Point(1, 2) 这种临时对象：类名当构造函数用
     if (this.classMap.has(lastSegment(name))) {
       const args = expr.args.map((arg) => this.evalExpr(arg));
@@ -2751,19 +2784,8 @@ class Interpreter {
         const char = String.fromCharCode(asInt(this.evalExpr(expr.args[1])));
         return stringValue(char.repeat(count));
       }
-      case 'make_pair': {
-        const first = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
-        const second = expr.args[1] ? this.evalExpr(expr.args[1]) : intValue(0);
-        const firstType = this.valueTypeText(first) || 'int';
-        const secondType = this.valueTypeText(second) || 'int';
-        const pair = this.createStructValue('pair', undefined);
-        pair.typeText = `pair<${firstType}, ${secondType}>`;
-        pair.fields.set('first', first);
-        pair.fieldTypes.set('first', firstType);
-        pair.fields.set('second', second);
-        pair.fieldTypes.set('second', secondType);
-        return pair;
-      }
+      case 'make_pair':
+        return this.buildPairValue(expr, undefined);
       case 'printf':
         return this.builtinPrintf(expr);
       case 'scanf':
@@ -2831,6 +2853,14 @@ class Interpreter {
       case 'stable_sort':
       case 'reverse':
         return this.builtinRangeSort(name, expr);
+      case 'copy':
+        return this.builtinCopy(expr);
+      case 'back_inserter':
+        throw new SimError(
+          'back_inserter() 只能作为 copy() 的第三个参数使用，例如 copy(a.begin(), a.end(), back_inserter(b))。',
+          expr.line,
+          'unsupported',
+        );
       case 'malloc':
       case 'calloc':
         return this.evalMalloc(expr, name === 'calloc');
@@ -3083,10 +3113,87 @@ class Interpreter {
     }
     const from = first.t === 'pointer' ? Math.max(0, first.offset) : 0;
     const to = last.t === 'pointer' ? Math.min(array.elems.length, last.offset) : array.elems.length;
+    const comparatorExpr = expr.args[2];
+    let comparator: FuncDeclNode | undefined;
+    if (comparatorExpr) {
+      if (comparatorExpr.kind === 'ident') {
+        comparator = this.functionMap.get(comparatorExpr.name);
+      }
+      if (!comparator) {
+        throw new SimError(
+          `${name}() 的比较器只支持源码里定义的函数名，例如 sort(v.begin(), v.end(), lessThen)。`,
+          expr.line,
+          'unsupported',
+        );
+      }
+    }
     const slice = array.elems.slice(from, to);
     if (name === 'reverse') slice.reverse();
-    else slice.sort((a, b) => this.compareForSort(a, b));
+    else
+      slice.sort((a, b) => {
+        if (!comparator) return this.compareForSort(a, b);
+        const verdict = this.callFunction(comparator, [a, b], expr.line);
+        return truthy(verdict) ? -1 : 1;
+      });
     array.elems.splice(from, slice.length, ...slice);
+    return voidValue();
+  }
+
+  /**
+   * copy(first, last, dest)：
+   * 目标支持 back_inserter(容器)（追加）或一个迭代器 / 指针（原位覆盖）。
+   * 结构体元素按值复制，避免两个容器共享同一个对象。
+   */
+  private builtinCopy(expr: ExprNode & { kind: 'call' }): RValue {
+    const first = expr.args[0] ? this.evalExpr(expr.args[0]) : undefined;
+    const last = expr.args[1] ? this.evalExpr(expr.args[1]) : undefined;
+    const destExpr = expr.args[2];
+    if (!first || !last || !destExpr) {
+      throw new SimError('copy() 需要三个参数：区间起点、区间终点、目标。', expr.line, 'unsupported');
+    }
+    const sourceArray = first.t === 'array' ? first : first.t === 'pointer' ? first.array : undefined;
+    const lastArray = last.t === 'array' ? last : last.t === 'pointer' ? last.array : undefined;
+    if (!sourceArray || lastArray !== sourceArray) {
+      throw new SimError(
+        'copy() 目前只支持「同一个容器的 begin(), end()」这种区间写法。',
+        expr.line,
+        'unsupported',
+      );
+    }
+    const from = first.t === 'pointer' ? Math.max(0, first.offset) : 0;
+    const to = last.t === 'pointer' ? Math.min(sourceArray.elems.length, last.offset) : sourceArray.elems.length;
+    const items = sourceArray.elems
+      .slice(from, to)
+      .map((item) => (item.t === 'struct' ? this.cloneObject(item) : item));
+
+    if (destExpr.kind === 'call' && destExpr.name === 'back_inserter') {
+      const targetExpr = destExpr.args[0];
+      const target = targetExpr ? this.evalExpr(targetExpr) : undefined;
+      if (!target || target.t !== 'array') {
+        throw new SimError('back_inserter() 需要一个容器，例如 back_inserter(v)。', expr.line, 'unsupported');
+      }
+      this.assertHeapAlive(target, expr.line);
+      target.elems.push(...items);
+      target.dims = [target.elems.length];
+      return voidValue();
+    }
+
+    const dest = this.evalExpr(destExpr);
+    const destArray = dest.t === 'array' ? dest : dest.t === 'pointer' ? dest.array : undefined;
+    if (!destArray) {
+      throw new SimError(
+        'copy() 的目标需要是 back_inserter(容器) 或指向容器的迭代器。',
+        expr.line,
+        'unsupported',
+      );
+    }
+    const offset = dest.t === 'pointer' ? Math.max(0, dest.offset) : 0;
+    items.forEach((item, index) => {
+      const position = offset + index;
+      if (position < destArray.elems.length) destArray.elems[position] = item;
+      else destArray.elems.push(item);
+    });
+    destArray.dims = [destArray.elems.length];
     return voidValue();
   }
 
@@ -3379,6 +3486,26 @@ class Interpreter {
     const refs = args.map((arg) => this.argRef(arg));
     const values = args.map((arg, index) => refs[index]?.get() ?? this.evalExpr(arg));
     return { values, refs };
+  }
+
+  /**
+   * 造一个 pair。
+   * - make_pair(a, b)：两个分量按实参的实际类型记录；
+   * - pair<T1, T2>(a, b)：按模板里写的类型记录（指针分量才能继续用 -> 访问）。
+   */
+  private buildPairValue(expr: ExprNode & { kind: 'call' }, typeName: string | undefined): RValue {
+    const declared = typeName ? pairTypeOf(typeName) : undefined;
+    const first = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
+    const second = expr.args[1] ? this.evalExpr(expr.args[1]) : intValue(0);
+    const firstType = declared?.first?.trim() || this.valueTypeText(first) || 'int';
+    const secondType = declared?.second?.trim() || this.valueTypeText(second) || 'int';
+    const pair = this.createStructValue('pair', undefined);
+    pair.typeText = `pair<${firstType}, ${secondType}>`;
+    pair.fields.set('first', first);
+    pair.fieldTypes.set('first', firstType);
+    pair.fields.set('second', second);
+    pair.fieldTypes.set('second', secondType);
+    return pair;
   }
 
   private evalMemberCall(expr: ExprNode & { kind: 'call' }, callee: ExprNode & { kind: 'member' }): RValue {
