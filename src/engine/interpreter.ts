@@ -929,6 +929,8 @@ class Interpreter {
         );
       } else if (slot.value.t === 'pointer') {
         entry.pointerTarget = slot.value.target ? slot.value.label : slot.value.str !== undefined ? '(字符串常量)' : '空指针';
+        const deref = this.peekDerefValue(slot.value);
+        if (deref !== undefined) entry.derefValue = internText(deref);
       }
       return entry;
     });
@@ -3999,6 +4001,27 @@ class Interpreter {
   private elementLabel(expr: ExprNode & { kind: 'index' }, index: number): string {
     if (expr.object.kind === 'ident') return `${expr.object.name}[${index}]`;
     return `元素[${index}]`;
+  }
+
+  /**
+   * 监视窗用的「只读解引用」：只取当前值，不抛错、不触发释放后使用检查。
+   * 越界 / 空指针返回 undefined（界面就不显示 *p 那一行）。
+   */
+  private peekDerefValue(value: PointerValue): string | undefined {
+    try {
+      if (value.array) {
+        const element = value.array.elems[value.offset];
+        return element === undefined ? undefined : formatValue(element);
+      }
+      if (value.target) return formatValue(value.target.get());
+      if (value.str !== undefined) {
+        const code = value.offset < value.str.length ? value.str.charCodeAt(value.offset) : 0;
+        return formatValue(intValue(code, 'char'));
+      }
+      return undefined;
+    } catch {
+      return undefined;
+    }
   }
 
   private derefValue(value: RValue, line: number, expr: ExprNode): RValue {

@@ -473,6 +473,59 @@ int main() {
     expect(pointer?.valueText).toContain('->');
   });
 
+  it('指针变量快照包含 derefValue（*p 解引用后的值）', () => {
+    const result = run(`
+int main() {
+  char s[] = "a1B";
+  char *p = s;
+  char *t = p;
+  *t = *(t+1);
+  return 0;
+}
+`);
+    const pointer = result.steps
+      .flatMap((step) => step.vars)
+      .find((variable) => variable.name === 't');
+    expect(pointer?.pointerTarget).toBe('arr[0]');
+    expect(pointer?.derefValue).toBe("'a'");
+
+    // 写入 *t 之后，解引用值跟着变
+    const afterWrite = [...result.steps].reverse()
+      .flatMap((step) => step.vars)
+      .find((variable) => variable.name === 't');
+    expect(afterWrite?.derefValue).toBe("'1'");
+  });
+
+  it('取地址得到的指针：derefValue 是被指变量的值，且会随赋值更新', () => {
+    const result = run(`
+int main() {
+  int x = 1;
+  int *p = &x;
+  x = 7;
+  return 0;
+}
+`);
+    const values = result.steps
+      .map((step) => step.vars.find((variable) => variable.name === 'p')?.derefValue)
+      .filter((value): value is string => value !== undefined);
+    expect(values).toContain('1');
+    expect(values).toContain('7');
+  });
+
+  it('指向字符串常量的指针：derefValue 是当前字符', () => {
+    const result = run(`
+int main() {
+  char *p = "hello";
+  p++;
+  return 0;
+}
+`);
+    const values = result.steps
+      .map((step) => step.vars.find((variable) => variable.name === 'p')?.derefValue)
+      .filter((value): value is string => value !== undefined);
+    expect(values.some((value) => value.includes('h'))).toBe(true);
+  });
+
   it('超过 maxSteps 时截断但保留步骤', () => {
     const result = simulate(
       `int main() { int i = 0; while (1) { i++; } return 0; }`,

@@ -817,10 +817,22 @@ export function TracePlayer({
                           </span>
                         </td>
                         <td className="cvz-trace__col-type">{variable.typeText}</td>
-                        <td className="cvz-trace__var-value" title={variable.valueText}>
-                          {variable.pointerTarget && !variable.valueText.includes('→')
-                            ? `→ ${variable.pointerTarget}`
-                            : variable.valueText || '—'}
+                        <td
+                          className="cvz-trace__var-value"
+                          title={
+                            variable.derefValue !== undefined
+                              ? `${variable.valueText}\n* = ${variable.derefValue}`
+                              : variable.valueText
+                          }
+                        >
+                          <span>
+                            {variable.pointerTarget && !variable.valueText.includes('→')
+                              ? `→ ${variable.pointerTarget}`
+                              : variable.valueText || '—'}
+                          </span>
+                          {variable.derefValue !== undefined ? (
+                            <span className="cvz-trace__var-deref">* = {variable.derefValue}</span>
+                          ) : null}
                         </td>
                       </tr>
                     ))}

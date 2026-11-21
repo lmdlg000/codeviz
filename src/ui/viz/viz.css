@@ -2303,6 +2303,18 @@
   white-space: nowrap;
 }
 
+/* 指针变量在「指向哪」下面补一行「* 解引用的值」 */
+.cvz-trace__var-deref {
+  display: block;
+  margin-top: 1px;
+  color: var(--primary, #4f46e5);
+  font-family: var(--font-mono, Consolas, monospace);
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
+}
+
 .cvz-trace__col-type {
   color: var(--ink-tertiary, #94a3b8);
 }

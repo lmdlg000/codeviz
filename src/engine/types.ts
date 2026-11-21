@@ -381,6 +381,8 @@ export interface RuntimeVar {
   changed: boolean;
   arrayValues?: string[];
   pointerTarget?: string;
+  /** 指针解引用后的值（*p）：让监视窗同时看到「指向哪」和「指到的是多少」 */
+  derefValue?: string;
   scopeDepth?: number;
 }
 
