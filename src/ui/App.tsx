@@ -7,6 +7,7 @@ import { useIsMobile } from './hooks/useMediaQuery';
 import { scrollToTop } from './lib/router';
 import { applyTheme, resolveInitialTheme } from './lib/theme';
 import { ToastProvider } from './components/ToastProvider';
+import { BackToTop } from './components/BackToTop';
 import { Sidebar } from './layout/Sidebar';
 import { MobileTopbar } from './layout/MobileTopbar';
 import { MobileDrawer } from './layout/MobileDrawer';
@@ -142,6 +143,8 @@ export default function App() {
           theme={theme}
           onToggleTheme={toggleTheme}
         />
+
+        <BackToTop />
       </div>
     </ToastProvider>
   );

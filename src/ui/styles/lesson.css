@@ -1089,6 +1089,10 @@
 
 .lesson-aside {
   min-width: 0;
+  /* 网格默认 align-items: start，侧栏只有内容高度，
+     里面的 sticky 元素没有可移动空间 → 目录滚出屏幕就再也不回来。
+     撑满整行后目录能从页头一直跟到文末。 */
+  align-self: stretch;
 }
 
 .lesson-aside__inner {

@@ -81,3 +81,35 @@ export function useScrollProgress(): number {
 
   return progress;
 }
+
+/**
+ * 是否已经滚过某个高度（用于"回到顶部"按钮的显隐）。
+ * 只在跨过阈值时更新 state，滚动过程中不触发重渲染。
+ */
+export function useScrolledPast(threshold: number): boolean {
+  const [passed, setPassed] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+    const compute = (): void => {
+      frame = 0;
+      const next = window.scrollY > threshold;
+      setPassed((previous) => (previous === next ? previous : next));
+    };
+    const onScroll = (): void => {
+      if (frame !== 0) return;
+      frame = window.requestAnimationFrame(compute);
+    };
+
+    compute();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame !== 0) window.cancelAnimationFrame(frame);
+    };
+  }, [threshold]);
+
+  return passed;
+}
