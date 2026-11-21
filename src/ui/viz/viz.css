@@ -1931,6 +1931,10 @@
   font-family: var(--font-mono, Consolas, monospace);
   font-size: 11.5px;
   line-height: 1.7;
+  /* 与左侧编辑器（tabSize=2）和 .code-block__lines 保持一致：
+     否则源码里的 Tab 在这里被浏览器按 8 格宽显示，缩进看着全乱了 */
+  tab-size: 2;
+  -moz-tab-size: 2;
   scrollbar-width: thin;
 }
 
