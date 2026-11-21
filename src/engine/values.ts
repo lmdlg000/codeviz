@@ -143,6 +143,17 @@ export function isBoolType(typeText: string): boolean {
   return /\bbool\b/i.test(outerTypeText(typeText));
 }
 
+/** `vector<double>` → `'double'`；`vector<vector<int>>` → `'vector<int>'`；不是 vector 返回 undefined */
+export function vectorElementTypeOf(typeText: string): string | undefined {
+  const trimmed = typeText.trim();
+  if (baseTypeName(outerTypeText(trimmed)).toLowerCase() !== 'vector') return undefined;
+  const open = trimmed.indexOf('<');
+  const close = trimmed.lastIndexOf('>');
+  if (open < 0 || close <= open) return undefined;
+  const inner = trimmed.slice(open + 1, close).trim();
+  return inner.length > 0 ? inner : undefined;
+}
+
 export function typeBase(typeText: string): string {
   const text = typeText
     .replace(/\b(const|volatile|static|extern|register|inline|constexpr|mutable|struct|class|union|enum)\b/g, '')
@@ -400,6 +411,19 @@ export function arrayElementTexts(value: ArrayValue): string[] {
 
 /** 根据类型文本做一次简单转换（赋值 / 参数传递时使用） */
 export function coerceValue(value: RValue, typeText: string): RValue {
+  // 容器：按声明类型逐层收窄元素类型。
+  // 花括号实参 / 字面量初始化得到的数组，elemType 只是推断值（往往是 int），
+  // 不收窄的话 vector<vector<double>> 会把 4/7 算成整数除法得 0。
+  const vectorElem = vectorElementTypeOf(typeText);
+  if (vectorElem && value.t === 'array') {
+    if (value.elemType === vectorElem && value.typeText === typeText) return value;
+    return {
+      ...value,
+      elemType: vectorElem,
+      typeText,
+      elems: value.elems.map((item) => coerceValue(item, vectorElem)),
+    };
+  }
   if (isPointerType(typeText)) {
     if (value.t === 'array') {
       return arrayToPointer(value, 'p');

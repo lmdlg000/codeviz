@@ -1592,8 +1592,13 @@ class Interpreter {
   /** `std::vector<T>` 的运行时表示：一个可增长的数组 */
   private createVectorValue(elemType: string, init: ExprNode | undefined, typeText: string): ArrayValue {
     const items = init && init.kind === 'initlist' ? init.items : [];
+    // vector<vector<double>> 的每一行是 vector<double>，行内元素要按内层类型
+    // 收窄（否则 double 会被当 int 存，4/7 变成整数除法得 0）
+    const innerElemType = vectorElemType(elemType) ?? elemType;
     const elems = items.map((item) =>
-      item.kind === 'initlist' ? this.createVectorValue(elemType, item, typeText) : this.coerceVectorElement(item, elemType),
+      item.kind === 'initlist'
+        ? this.createVectorValue(innerElemType, item, elemType)
+        : this.coerceVectorElement(item, elemType),
     );
     return { t: 'array', elems, dims: [elems.length], elemType, typeText };
   }
@@ -2866,7 +2871,11 @@ class Interpreter {
       case 'abs':
       case 'fabs': {
         const value = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
-        return name === 'fabs' ? floatValue(Math.abs(asNumber(value))) : intValue(Math.abs(asInt(value)));
+        // C++ 的 <cmath> 里有 abs(double) 重载：浮点走浮点，别截断成整数
+        if (name === 'fabs' || value.t === 'float') {
+          return floatValue(Math.abs(asNumber(value)), value.t === 'float' ? value.typeText : 'double');
+        }
+        return intValue(Math.abs(asInt(value)));
       }
       case 'sqrt': {
         const value = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
@@ -3065,6 +3074,7 @@ class Interpreter {
           'unsupported',
         );
       }
+      if (name === 'swap') return this.builtinSwap(expr);
       if (name === 'exit' || name === 'abort') throw new SimError(`函数 ${name}() 暂不支持单步执行。`, expr.line, 'unsupported');
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
@@ -3194,6 +3204,30 @@ class Interpreter {
         return truthy(comparator(a, b)) ? -1 : 1;
       });
     array.elems.splice(from, slice.length, ...slice);
+    return voidValue();
+  }
+
+  /**
+   * swap(a, b) / std::swap(a, b)：把两个左值的值对调。
+   * 参数按引用解析，所以变量、数组 / 容器元素、结构体字段、*p 都能交换；
+   * 值本身不复制、不重建（结构与容器元素保持同一份对象，只是换了位置）。
+   */
+  private builtinSwap(expr: ExprNode & { kind: 'call' }): RValue {
+    const first = expr.args[0];
+    const second = expr.args[1];
+    if (!first || !second) {
+      throw new SimError('swap() 需要两个参数，例如 swap(a, b) 或 swap(v[i], v[j])。', expr.line);
+    }
+    if (expr.args.length > 2) {
+      throw new SimError('swap() 只能交换两个值。', expr.line);
+    }
+    const left = this.resolveLValue(first);
+    const right = this.resolveLValue(second);
+    if (left === right) return voidValue();
+    const leftValue = left.get();
+    const rightValue = right.get();
+    left.set(rightValue);
+    right.set(leftValue);
     return voidValue();
   }
 

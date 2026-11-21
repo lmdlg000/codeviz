@@ -522,3 +522,157 @@ int main() {
     expect(r.output).toBe('Spike 5000\nTom 8000\nJerry 12000\n');
   });
 });
+
+describe('simulate：std::swap', () => {
+  it('交换两个变量', () => {
+    const r = run(`
+#include <iostream>
+int main() {
+  int a = 1, b = 2;
+  swap(a, b);
+  std::cout << a << " " << b << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('2 1\n');
+  });
+
+  it('交换数组元素与容器元素', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+int main() {
+  int a[3] = {1, 2, 3};
+  swap(a[0], a[2]);
+  vector<int> v = {4, 5, 6};
+  swap(v[0], v[2]);
+  std::cout << a[0] << a[1] << a[2] << " " << v[0] << v[1] << v[2] << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('321 654\n');
+  });
+
+  it('交换 vector<vector<double>> 的两行，值不串行', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<vector<double>> m = {{1,2,3},{4,5,6},{7,8,10}};
+  swap(m[0], m[2]);
+  cout << m[0][0] << " " << m[0][2] << " " << m[2][0] << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('7 10 1\n');
+  });
+
+  it('交换结构体字段', () => {
+    const r = run(`
+#include <iostream>
+using namespace std;
+struct Point { int x; int y; };
+int main() {
+  Point p;
+  p.x = 3;
+  p.y = 9;
+  swap(p.x, p.y);
+  cout << p.x << " " << p.y << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('9 3\n');
+  });
+});
+
+describe('simulate：嵌套 vector 的元素类型', () => {
+  it('字面量初始化的 vector<vector<double>> 保留浮点（不做整数除法）', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<vector<double>> a = {{4, 7}};
+  cout << a[0][0] / a[0][1] << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('0.5714285714\n');
+  });
+
+  it('花括号实参传给 vector<vector<double>> 形参也保留浮点', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+double ratio(vector<vector<double>> a) {
+  return a[1][0] / a[2][0];
+}
+int main() {
+  cout << ratio({{1,2,3},{4,5,6},{7,8,10}}) << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('0.5714285714\n');
+  });
+
+  it('高精度消元求行列式：det3 与 detN 结果一致', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+double det3(double a[3][3]) {
+  return a[0][0] * (a[1][1]*a[2][2] - a[1][2]*a[2][1])
+       - a[0][1] * (a[1][0]*a[2][2] - a[1][2]*a[2][0])
+       + a[0][2] * (a[1][0]*a[2][1] - a[1][1]*a[2][0]);
+}
+double detN(vector<vector<double>> a) {
+  int n = a.size(), sign = 1;
+  double d = 1;
+  for (int c = 0; c < n; ++c) {
+    int piv = c;
+    for (int r = c + 1; r < n; ++r)
+      if (abs(a[r][c]) > abs(a[piv][c])) piv = r;
+    if (abs(a[piv][c]) < 1e-12) return 0;
+    if (piv != c) { swap(a[piv], a[c]); sign = -sign; }
+    d *= a[c][c];
+    for (int r = c + 1; r < n; ++r) {
+      double k = a[r][c] / a[c][c];
+      for (int j = c; j < n; ++j) a[r][j] -= k * a[c][j];
+    }
+  }
+  return sign * d;
+}
+int main() {
+  double A[3][3] = {{1,2,3},{4,5,6},{7,8,10}};
+  cout << det3(A) << " " << detN({{1,2,3},{4,5,6},{7,8,10}}) << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('-3 -3\n');
+  });
+
+  it('abs 对浮点不做截断', () => {
+    const r = run(`
+#include <iostream>
+#include <cmath>
+using namespace std;
+int main() {
+  double x = -0.5;
+  cout << abs(x) << " " << fabs(x) << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('0.5 0.5\n');
+  });
+});
