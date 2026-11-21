@@ -14,6 +14,7 @@ import { HomePage } from './pages/HomePage';
 import { LearnPage } from './pages/LearnPage';
 import { LessonPage } from './pages/LessonPage';
 import { LabPage } from './pages/LabPage';
+import { TriviaPage } from './pages/TriviaPage';
 import { MapPage } from './pages/MapPage';
 import { AboutPage } from './pages/AboutPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -45,8 +46,10 @@ export default function App() {
             : `页面未找到 · CodeViz`
           : route.name === 'lab'
             ? `代码实验室 · CodeViz`
-            : route.name === 'map'
-              ? `知识图谱 · CodeViz`
+            : route.name === 'trivia'
+              ? `趣谈 · CodeViz`
+              : route.name === 'map'
+                ? `知识图谱 · CodeViz`
               : route.name === 'about'
                 ? `关于 · CodeViz`
                 : `页面未找到 · CodeViz`;
@@ -91,6 +94,9 @@ export default function App() {
       break;
     case 'lab':
       page = <LabPage search={route.search} />;
+      break;
+    case 'trivia':
+      page = <TriviaPage />;
       break;
     case 'map':
       page = <MapPage />;

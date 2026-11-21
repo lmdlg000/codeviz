@@ -40,7 +40,7 @@ export const COVERAGE_ROWS: CoverageRow[] = [
   { source: 'C++ 自学视频教程', topic: '继承与派生', status: 'covered', lessonIds: ['c12-inheritance'], note: 'public 继承、构造析构顺序、protected。' },
   { source: 'C++ 自学视频教程', topic: '多态与虚函数', status: 'covered', lessonIds: ['c12-inheritance'], note: '虚函数、虚析构、纯虚函数与抽象类。' },
   { source: 'C++ 自学视频教程', topic: '函数模板与类模板', status: 'covered', lessonIds: ['c13-templates'], note: '类型参数、实例化、模板定义放头文件。' },
-  { source: 'C++ 自学视频教程', topic: 'STL 容器与算法', status: 'partial', lessonIds: ['c13-templates'], note: 'vector / string / map / set / pair 与容器适配器都有讲解和可单步运行的示例；迭代器分类、自定义比较器未展开。' },
+  { source: 'C++ 自学视频教程', topic: 'STL 容器与算法', status: 'covered', lessonIds: ['c13-templates'], note: 'vector / string / map / set / pair 与容器适配器、迭代器五种能力、自定义比较器（函数与 lambda）都有讲解和可单步运行的示例。' },
   { source: 'C++ 自学视频教程', topic: '引用', status: 'covered', lessonIds: ['cpp-refs'], note: '独立一课：别名语义、const T& 传参、返回引用与陷阱；解释器支持引用参数与返回引用。' },
   { source: 'C++ 自学视频教程', topic: '动态内存 new / delete', status: 'covered', lessonIds: ['cpp-memory'], note: '独立一课：new/delete、new[]/delete[]、泄漏/重复释放/释放后使用，单步执行可观察堆块。' },
   { source: 'C++ 自学视频教程', topic: '运算符重载', status: 'covered', lessonIds: ['cpp-operators'], note: '成员/非成员两种写法、<< 为什么用 friend、前置后置 ++、不该重载的运算符。' },

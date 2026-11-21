@@ -109,8 +109,8 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
       trace('cos', 'double cos(double x)', '参数是弧度。'),
       trace('tan', 'double tan(double x)', '参数是弧度。'),
       trace('fmod', 'double fmod(double x, double y)', '浮点取余，符号跟随 x。'),
-      stat('log', 'double log(double x)', '自然对数，x 必须大于 0。'),
-      stat('exp', 'double exp(double x)', 'e 的 x 次方。'),
+      trace('log', 'double log(double x)', '自然对数，x 必须大于 0；x<=0 返回 NaN。'),
+      trace('exp', 'double exp(double x)', 'e 的 x 次方。'),
     ],
   },
   {
@@ -177,6 +177,7 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
       trace('queue', 'std::queue<int> q;', '先进先出：push / pop / front / back / size / empty。'),
       trace('priority_queue', 'std::priority_queue<int> pq;', '每次弹出最大值：push / pop / top。'),
       trace('sort', 'std::sort(v.begin(), v.end(), cmp);', '需 <algorithm>；可以传自定义比较器，单步执行会真实重排区间。'),
+      trace('stable_sort', 'std::stable_sort(v.begin(), v.end());', '与 sort 同样支持比较器，但相等元素的原有顺序会保留。'),
       trace('copy', 'std::copy(a.begin(), a.end(), back_inserter(b));', '把区间拷贝到另一个容器，支持 back_inserter 与目标迭代器。'),
       trace('back_inserter', 'back_inserter(v)', '构造「尾部插入迭代器」，配合 copy 用。'),
       trace('reverse', 'std::reverse(v.begin(), v.end());', '原地反转区间，与 sort 同一套迭代器区间。'),

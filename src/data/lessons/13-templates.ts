@@ -331,6 +331,108 @@ int main() {
     },
     {
       type: 'heading',
+      text: '迭代器的五种能力：不是所有迭代器都能随便跳',
+    },
+    {
+      type: 'text',
+      body:
+        '迭代器（iterator）像“容器里的光标”：`begin()` 指向第一个元素，`end()` 指向最后一个元素的后一位，不要解引用 `end()`。不同容器给的光标能力不同，算法会根据需要选择最小能力的迭代器——这也是“同一份算法能用在很多容器上”的关键。',
+    },
+    {
+      type: 'table',
+      headers: ['类别', '能做的事', '典型容器'],
+      rows: [
+        ['输入 / 输出迭代器', '只能单向读或写，且通常只能走一遍', 'istream_iterator、ostream_iterator'],
+        ['前向迭代器', '单向前进，可以反复读写同一位置', 'forward_list、unordered_map'],
+        ['双向迭代器', '能 ++ 也能 --，前后都能走', 'list、map、set'],
+        ['随机访问迭代器', '能 +n、-n、下标、比较大小', 'vector、deque、array、普通数组'],
+      ],
+    },
+    {
+      type: 'note',
+      tone: 'tip',
+      title: '为什么 list 不能用 std::sort',
+      body:
+        '排序、二分查找需要“随机访问”：能直接算出中间在哪；而 list 只有双向迭代器，所以不能用 std::sort，要用它自己的 sort 成员函数。',
+    },
+    {
+      type: 'text',
+      body:
+        '记住一个判断口诀：**能不能写 `it + 3`？** 能，就是随机访问；只能 `++it` / `--it` 的是双向；只能 `++it` 的是前向。写代码时尽量用 `++it` 而不是 `it + 1`，这样同一段循环在 vector 和 list 上都能跑。另外注意“迭代器失效”：vector 扩容或删除元素后，之前保存的迭代器可能作废，所以范围 for 遍历时不要往容器里 push_back。',
+    },
+    {
+      type: 'code',
+      language: 'cpp',
+      title: 'iterator-categories.cpp',
+      code: `#include <iostream>
+#include <list>
+#include <vector>
+
+int main() {
+  std::vector<int> v = {1, 2, 3};
+  auto it = v.begin();
+  it = it + 2;                  // 随机访问：直接跳两位
+  std::cout << *it << std::endl; // 3
+
+  std::list<int> l = {1, 2, 3};
+  auto lit = l.begin();
+  // lit = lit + 2;             // 编译错误：list 迭代器不能跳
+  ++lit; ++lit;                 // 双向迭代器只能一步一步走
+  std::cout << *lit << std::endl; // 3
+  return 0;
+}`,
+      caption: '同一套 ++ 写法两边都能用；`+2` 只有随机访问迭代器支持。实验室目前支持 vector 迭代器与 map 迭代器。',
+    },
+    {
+      type: 'heading',
+      text: '自定义比较器：让 sort 按你的规则排',
+    },
+    {
+      type: 'text',
+      body:
+        '`sort` 默认按 `<` 升序，但“谁排前面”常常要自己定义。比较器是一个“接受两个元素、返回 bool”的可调用对象：**返回 true 表示第一个应该排在第二个前面**。所以降序只要写 `a > b`；按结构体某个字段排就写 `a.score > b.score`。比较器必须满足“严格弱序”：自己跟自己比较一定返回 false，否则排序结果未定义。',
+    },
+    {
+      type: 'code',
+      language: 'cpp',
+      title: 'comparator.cpp',
+      code: `#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Student { std::string name; int score; };
+
+// 普通函数作比较器：按分数从高到低
+bool byScore(const Student& a, const Student& b) {
+  return a.score > b.score;
+}
+
+int main() {
+  std::vector<Student> v = {{"Tom", 78}, {"Ann", 95}, {"Bob", 85}};
+
+  std::sort(v.begin(), v.end(), byScore);
+  for (const auto& s : v) std::cout << s.name << " " << s.score << "\n";
+
+  // lambda 作比较器：同分时按名字字典序
+  std::sort(v.begin(), v.end(), [](const Student& a, const Student& b) {
+    if (a.score != b.score) return a.score > b.score;
+    return a.name < b.name;
+  });
+  return 0;
+}`,
+      caption:
+        '比较器可以是函数名，也可以是 lambda。`[]` 是捕获列表，`[=]` 按值捕获外部变量，`[&]` 按引用捕获——实验室三种都支持，单步执行能看到每次比较的入参与返回值。',
+    },
+    {
+      type: 'note',
+      tone: 'tip',
+      title: '稳定排序',
+      body:
+        '如果两个元素“相等”（比较器双向都返回 false），`sort` 不保证它们原有的先后。`stable_sort` 会保留相等元素的原顺序，代价是额外内存和稍慢的速度。比如先按分数排、再按姓名排，想让同分的人保持之前按姓名的顺序，就得用 `stable_sort`。',
+    },
+    {
+      type: 'heading',
       text: '四、关联容器与容器适配器：按键找值、只从两端进出',
     },
     {

@@ -2948,6 +2948,8 @@ class Interpreter {
       case 'sin':
       case 'cos':
       case 'tan':
+      case 'log':
+      case 'exp':
       case 'fmod': {
         const first = expr.args[0] ? asNumber(this.evalExpr(expr.args[0])) : 0;
         const second = expr.args[1] ? asNumber(this.evalExpr(expr.args[1])) : 0;
@@ -2955,7 +2957,16 @@ class Interpreter {
           if (second === 0) throw new SimError('fmod 的除数不能是 0。', expr.line);
           return floatValue(first % second);
         }
-        const fn = name === 'sin' ? Math.sin : name === 'cos' ? Math.cos : Math.tan;
+        const fn =
+          name === 'sin'
+            ? Math.sin
+            : name === 'cos'
+              ? Math.cos
+              : name === 'tan'
+                ? Math.tan
+                : name === 'log'
+                  ? Math.log
+                  : Math.exp;
         return floatValue(fn(first));
       }
       case 'isdigit':

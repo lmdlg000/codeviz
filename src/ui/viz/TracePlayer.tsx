@@ -13,6 +13,7 @@ import { conditionMatches, validateCondition } from './breakpointCondition';
 import { findLineStep, findNextBreakpoint, findStepOut, findStepOver, type Breakpoint } from './traceNav';
 import { VizIcon } from './icons';
 import { VizEmpty } from './feedback';
+import { hrefFor } from '../lib/router';
 
 export interface TracePlayerProps {
   code: string;
@@ -657,6 +658,11 @@ export function TracePlayer({
           {unsupported ? (
             <p className="cvz-trace__error-tip">
               建议：把代码简化到变量、分支、循环、函数、数组与 printf 等教学子集内。
+              文件 IO、随机数、realloc 这类写法为什么不能跑，见
+              <a className="cvz-trace__error-link" href={hrefFor('/trivia')}>
+                趣谈
+              </a>
+              。
             </p>
           ) : null}
         </VizEmpty>

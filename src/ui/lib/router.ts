@@ -5,6 +5,7 @@
  *   #/learn               课程目录
  *   #/learn/:id           课程详情
  *   #/lab?sample=x&code=  代码实验室
+ *   #/trivia              趣谈
  *   #/map                 知识图谱
  *   #/about               关于
  */
@@ -14,6 +15,7 @@ export type RouteName =
   | 'learn'
   | 'lesson'
   | 'lab'
+  | 'trivia'
   | 'map'
   | 'about'
   | 'notfound';
@@ -29,7 +31,7 @@ export interface ParsedRoute {
   path: string;
 }
 
-const KNOWN_TOP = new Set(['learn', 'lab', 'map', 'about']);
+const KNOWN_TOP = new Set(['learn', 'lab', 'trivia', 'map', 'about']);
 
 export function normalizeHash(hash: string): string {
   let raw = hash.startsWith('#') ? hash.slice(1) : hash;
@@ -66,6 +68,9 @@ export function parseHash(hash: string): ParsedRoute {
   }
   if (first === 'lab' && !second) {
     return { name: 'lab', search, query, path: '/lab' };
+  }
+  if (first === 'trivia' && !second) {
+    return { name: 'trivia', search, query, path: '/trivia' };
   }
   if (first === 'map' && !second) {
     return { name: 'map', search, query, path: '/map' };

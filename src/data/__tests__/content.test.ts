@@ -7,6 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { chapters, conceptGraph, getLessonsByChapter, lessons, samples } from '../index';
+import { TRIVIA_ITEMS } from '../trivia';
 import { COVERAGE_ROWS } from '../coverage';
 import { LEARNING_PATHS } from '../paths';
 import { SELF_CHECK_ITEMS } from '../selfcheck';
@@ -171,5 +172,24 @@ describe('自查清单', () => {
       expect(Array.isArray(item.rules)).toBe(true);
       if (item.lessonId) expect(lessonIds.has(item.lessonId)).toBe(true);
     }
+  });
+});
+
+describe('趣谈内容', () => {
+  it('id 唯一、字段齐全、代码非空', () => {
+    const ids = TRIVIA_ITEMS.map((item) => item.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const item of TRIVIA_ITEMS) {
+      expect(item.title.length).toBeGreaterThan(0);
+      expect(item.teaser.length).toBeGreaterThan(0);
+      expect(item.whyNot.length).toBeGreaterThan(0);
+      expect(item.local.length).toBeGreaterThan(0);
+      expect(item.tags.length).toBeGreaterThanOrEqual(2);
+      expect(item.code.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it('覆盖考试里常见的文件 IO', () => {
+    expect(TRIVIA_ITEMS.some((item) => item.id === 'file-io')).toBe(true);
   });
 });

@@ -20,6 +20,7 @@ const NAV_ITEMS: Array<{ name: RouteName; label: string; path: string; icon: Ico
   { name: 'home', label: '首页', path: '/', icon: 'home' },
   { name: 'learn', label: '教程', path: '/learn', icon: 'book' },
   { name: 'lab', label: '实验室', path: '/lab', icon: 'flask' },
+  { name: 'trivia', label: '趣谈', path: '/trivia', icon: 'sparkle' },
   { name: 'map', label: '知识图谱', path: '/map', icon: 'map' },
   { name: 'about', label: '关于', path: '/about', icon: 'info' },
 ];

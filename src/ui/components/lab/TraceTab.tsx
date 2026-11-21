@@ -6,6 +6,7 @@ import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { EmptyState } from '../EmptyState';
 import { Icon } from '../Icon';
+import { hrefFor } from '../../lib/router';
 
 export interface TraceTabProps {
   code: string;
@@ -149,6 +150,11 @@ export function TraceTab({
         ) : null}
         <p className="lab-trace-error__suggestion">
           可以试着把代码简化到解释器子集：基础类型、循环、分支、数组、函数调用与 printf。
+          文件 IO、随机数这类操作为什么不能跑，见
+          <a className="lab-trace-error__link" href={hrefFor('/trivia')}>
+            趣谈
+          </a>
+          。
         </p>
         <div className="lab-trace-actions">
           <Button variant="primary" icon="reset" onClick={run}>

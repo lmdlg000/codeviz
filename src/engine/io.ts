@@ -40,7 +40,6 @@ const UNSUPPORTED_FUNCTION_NAMES = [
   'abort',
   'system',
   'sort',
-  'stable_sort',
   'vector',
   'map',
   'set',

@@ -1034,6 +1034,13 @@
   color: var(--ink-tertiary);
 }
 
+.lab-trace-error__link {
+  margin: 0 3px;
+  color: var(--primary, #4f46e5);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .lab-stdin {
   display: flex;
   flex-direction: column;

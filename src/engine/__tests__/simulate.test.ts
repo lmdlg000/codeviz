@@ -819,6 +819,34 @@ int main() {
 `);
     expect(out).toBe('4.00 0.00 3.00\n');
   });
+
+  it('log / exp 可单步执行', () => {
+    const out = outputOf(`
+#include <math.h>
+#include <stdio.h>
+int main() {
+  printf("%.0f %.2f\\n", log(exp(1.0)), exp(0.0));
+  return 0;
+}
+`);
+    expect(out).toBe('1 1.00\n');
+  });
+
+  it('stable_sort 不再被误判为不支持', () => {
+    const out = outputOf(`
+#include <algorithm>
+#include <iostream>
+using namespace std;
+int main() {
+  vector<int> v;
+  v.push_back(3); v.push_back(1); v.push_back(2);
+  stable_sort(v.begin(), v.end());
+  cout << v[0] << v[1] << v[2] << endl;
+  return 0;
+}
+`);
+    expect(out).toBe('123\n');
+  });
 });
 
 describe('simulate：引用语义', () => {
