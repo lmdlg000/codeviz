@@ -3075,6 +3075,7 @@ class Interpreter {
         );
       }
       if (name === 'swap') return this.builtinSwap(expr);
+      if (name === 'iter_swap') return this.builtinSwap(expr, true);
       if (name === 'exit' || name === 'abort') throw new SimError(`函数 ${name}() 暂不支持单步执行。`, expr.line, 'unsupported');
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
@@ -3208,27 +3209,52 @@ class Interpreter {
   }
 
   /**
-   * swap(a, b) / std::swap(a, b)：把两个左值的值对调。
-   * 参数按引用解析，所以变量、数组 / 容器元素、结构体字段、*p 都能交换；
+   * swap(a, b) / std::swap(a, b) / std::iter_swap(it1, it2)：把两个位置的值对调。
+   * - 简单左值（变量、数组 / 容器元素、结构体字段、*p）直接按引用交换；
+   * - 传迭代器（v.begin() + i）时交换的是它指向的元素，等价于 swap(*it1, *it2)；
+   * - iter_swap / 指针值一律交换「指到的东西」，与标准库语义一致。
    * 值本身不复制、不重建（结构与容器元素保持同一份对象，只是换了位置）。
    */
-  private builtinSwap(expr: ExprNode & { kind: 'call' }): RValue {
+  private builtinSwap(expr: ExprNode & { kind: 'call' }, byIterator = false): RValue {
     const first = expr.args[0];
     const second = expr.args[1];
+    const api = byIterator ? 'iter_swap' : 'swap';
     if (!first || !second) {
-      throw new SimError('swap() 需要两个参数，例如 swap(a, b) 或 swap(v[i], v[j])。', expr.line);
+      throw new SimError(
+        `${api}() 需要两个参数，例如 ${byIterator ? 'iter_swap(v.begin(), v.begin() + 1)' : 'swap(a, b) 或 swap(v[i], v[j])'}。`,
+        expr.line,
+      );
     }
     if (expr.args.length > 2) {
-      throw new SimError('swap() 只能交换两个值。', expr.line);
+      throw new SimError(`${api}() 只能交换两个值。`, expr.line);
     }
-    const left = this.resolveLValue(first);
-    const right = this.resolveLValue(second);
+    const left = this.swapTarget(first, byIterator);
+    const right = this.swapTarget(second, byIterator);
     if (left === right) return voidValue();
     const leftValue = left.get();
     const rightValue = right.get();
     left.set(rightValue);
     right.set(leftValue);
     return voidValue();
+  }
+
+  /**
+   * swap 的单个参数落在哪个位置：
+   * 简单左值就是它本身（`swap(p, q)` 交换两个指针变量本身），
+   * 迭代器 / 指针值则解一层，交换它指向的元素（`swap(v.begin() + 1, v.begin() + 2)`）。
+   */
+  private swapTarget(expr: ExprNode, byIterator: boolean): Ref {
+    if (!byIterator && (isSimpleLvalue(expr) || (expr.kind === 'call' && this.returnsReference(expr)))) {
+      return this.resolveLValue(expr);
+    }
+    const value = this.evalExpr(expr);
+    if (value.t === 'pointer') return this.derefRef(value, expr.line, expr);
+    if (!byIterator) return this.resolveLValue(expr);
+    throw new SimError(
+      'iter_swap() 的两个参数都要是迭代器，例如 iter_swap(v.begin(), v.begin() + 1)。',
+      expr.line,
+      'unsupported',
+    );
   }
 
   /**

@@ -676,3 +676,118 @@ int main() {
     expect(r.output).toBe('0.5 0.5\n');
   });
 });
+
+describe('simulate：swap / iter_swap 的迭代器写法', () => {
+  it('swap(v.begin() + i, v.begin() + j) 交换元素', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<int> v = {1, 2, 3, 4};
+  swap(v.begin() + 1, v.begin() + 3);
+  for (int i = 0; i < 4; ++i) cout << v[i];
+  cout << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1432\n');
+  });
+
+  it('iter_swap 与 std::iter_swap 都可用', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<int> a = {1, 2, 3, 4};
+  iter_swap(a.begin(), a.begin() + 2);
+  for (int i = 0; i < 4; ++i) cout << a[i];
+  cout << " ";
+  vector<int> b = {1, 2, 3, 4};
+  std::iter_swap(b.begin() + 1, b.begin() + 2);
+  for (int i = 0; i < 4; ++i) cout << b[i];
+  cout << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3214 1324\n');
+  });
+
+  it('swap 迭代器变量交换的是迭代器本身', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<int> v = {1, 2, 3, 4};
+  auto a = v.begin();
+  auto b = v.begin() + 3;
+  swap(a, b);
+  cout << *a << *b << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('41\n');
+  });
+
+  it('swap 指针变量交换指针本身，iter_swap 交换所指的值', () => {
+    const r = run(`
+#include <iostream>
+int main() {
+  int x = 1, y = 2;
+  int* p = &x;
+  int* q = &y;
+  swap(p, q);
+  std::cout << *p << *q << " ";
+  swap(p, q);
+  std::iter_swap(p, q);
+  std::cout << x << y << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('21 21\n');
+  });
+
+  it('选择排序用 iter_swap 跑通', () => {
+    const r = run(`
+#include <iostream>
+#include <vector>
+using namespace std;
+int main() {
+  vector<int> a = {5, 3, 8, 1};
+  int n = a.size();
+  for (int i = 0; i < n - 1; ++i) {
+    int m = i;
+    for (int j = i + 1; j < n; ++j)
+      if (a[j] < a[m]) m = j;
+    if (m != i) iter_swap(a.begin() + i, a.begin() + m);
+  }
+  for (int i = 0; i < n; ++i) cout << a[i] << " ";
+  cout << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1 3 5 8 \n');
+  });
+
+  it('iter_swap 传非迭代器给出可读提示', () => {
+    const r = run(`
+#include <iostream>
+int main() {
+  int a = 1, b = 2;
+  std::iter_swap(a, b);
+  std::cout << a << b << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok).toBe(false);
+    expect(r.error?.message).toContain('iter_swap()');
+    expect(r.error?.kind).toBe('unsupported');
+  });
+});

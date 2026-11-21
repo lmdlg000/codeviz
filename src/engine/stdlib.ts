@@ -181,7 +181,8 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
       trace('copy', 'std::copy(a.begin(), a.end(), back_inserter(b));', '把区间拷贝到另一个容器，支持 back_inserter 与目标迭代器。'),
       trace('back_inserter', 'back_inserter(v)', '构造「尾部插入迭代器」，配合 copy 用。'),
       trace('reverse', 'std::reverse(v.begin(), v.end());', '原地反转区间，与 sort 同一套迭代器区间。'),
-      trace('swap', 'std::swap(a, b);', '交换两个左值：变量、数组元素、容器元素、结构体字段都可以。'),
+      trace('swap', 'std::swap(a, b);', '交换两个左值：变量、数组元素、容器元素、结构体字段都可以；传迭代器时交换它指向的元素。'),
+      trace('iter_swap', 'std::iter_swap(a.begin(), b.begin());', '交换两个迭代器指向的元素，多用于容器的区间操作。'),
     ],
   },
 ];
