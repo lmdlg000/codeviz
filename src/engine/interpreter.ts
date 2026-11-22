@@ -2758,6 +2758,9 @@ class Interpreter {
     const ref = this.resolveLValue(expr.target);
     if (expr.op === '=') {
       const raw = this.evalExpr(expr.value);
+      // `HAR* p = &h[1]`（&h[1] 是 HAR**）在 C++ 里是类型错误。引擎的指针是槽引用，
+      // 不拦就会静默存进去，直到 p->x 才报含糊的「暂不支持读取」，这里提前给出准确定位。
+      this.assertPointerLevel(raw, ref, expr.line);
       // 类对象赋值优先走 operator=：否则只是把字段别名过去，
       // 右侧临时对象析构后左侧的堆缓冲就悬空了（BigInt 里必踩）。
       const current = ref.get();
@@ -2797,6 +2800,27 @@ class Interpreter {
     const value = this.coerceForRef(next, ref);
     ref.set(value);
     return value;
+  }
+
+  /**
+   * 一级指针字段不能接收「指向指针的指针」。
+   * 运行时指针用槽引用表示，若不在这里拦住，错误会拖到 `p->x` 才以
+   * 「暂不支持读取」的形式暴露，学生看不出是自己的 & 写错了。
+   */
+  private assertPointerLevel(value: RValue, ref: Ref, line: number): void {
+    if (value.t !== 'pointer') return;
+    const targetType = (ref.typeText ?? '').trim();
+    if (!isPointerType(targetType) || /\bvoid\s*\*/.test(targetType)) return;
+    const pointed = value.target ? value.target.get() : value.array?.elems[value.offset];
+    if (!pointed || pointed.t !== 'pointer') return;
+    const source = value.label.replace(/^&\s*/, '');
+    const hint = source
+      ? `想指向 ${source} 所指的对象，请去掉 &，写 ${ref.label} = ${source}`
+      : '想指向对象本身请去掉 &';
+    throw new SimError(
+      `${ref.label} 是 ${targetType}，不能接收 ${value.typeText}（指向指针的指针）。${hint}。`,
+      line,
+    );
   }
 
   private coerceForRef(value: RValue, ref: Ref): RValue {

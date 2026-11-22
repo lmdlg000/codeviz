@@ -360,3 +360,58 @@ int main() {
     expect(r.output).toBe('5 1 5\n');
   });
 });
+
+describe('simulate：成员指针的链式箭头访问', () => {
+  const HAR_PROGRAM = (assign: string, output: string): string => `
+#include <iostream>
+using namespace std;
+class HAR {
+public:
+  int x, y;
+  HAR* p;
+};
+int main() {
+  HAR* h[2];
+  h[0] = new HAR;
+  h[1] = new HAR;
+  h[0]->x = 1;
+  h[0]->y = 2;
+  h[1]->x = 3;
+  h[1]->y = 4;
+  ${assign}
+  cout << ${output} << endl;
+  delete h[0];
+  delete h[1];
+  return 0;
+}`;
+
+  it('h[0]->p = h[1] 后 h[0]->p->x 能读到 3', () => {
+    const r = run(HAR_PROGRAM('h[0]->p = h[1];', '(h[0]->p)->x'));
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3\n');
+  });
+
+  it('把 &h[1] 赋给 HAR* 字段时给出类型诊断，而不是含糊的「暂不支持读取」', () => {
+    const r = run(HAR_PROGRAM('h[0]->p = &h[1];', '(h[0]->p)->x'));
+    expect(r.ok).toBe(false);
+    expect(r.error?.message).toContain('HAR**');
+    expect(r.error?.message).toContain('请去掉 &');
+    expect(r.error?.message).not.toContain('暂不支持读取');
+  });
+
+  it('void* 字段可以接收指向指针的地址（合法隐式转换，不误报）', () => {
+    const r = run(`
+#include <iostream>
+struct Bag { void* slot; };
+int main() {
+  Bag b;
+  int x = 7;
+  int* p = &x;
+  b.slot = &p;
+  std::cout << "ok" << std::endl;
+  return 0;
+}`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('ok\n');
+  });
+});
