@@ -85,6 +85,24 @@ export function simulate(code: string, options: SimulateOptions = {}): TraceResu
   try {
     const tokenizerResult = tokenize(code);
     const parseResult = parseTokens(tokenizerResult.tokens);
+    // 解析器为了容错会丢掉无法闭合的语句；若直接跑剩下的代码，
+    // 界面会显示「程序执行结束」却没有那条语句的输出，看起来像解释器坏了。
+    const syntaxError = parseResult.diagnostics.find((item) => item.severity === 'error');
+    if (syntaxError) {
+      return {
+        ok: false,
+        supported: false,
+        error: {
+          message: `第 ${syntaxError.line} 行有语法错误：${syntaxError.message}`,
+          line: syntaxError.line,
+          kind: 'syntax',
+        },
+        steps: [],
+        output: '',
+        truncated: false,
+        maxSteps,
+      };
+    }
     return simulateProgram(parseResult.program, { maxSteps, stdin: options.stdin });
   } catch (error) {
     return {

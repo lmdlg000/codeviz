@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { simulate } from '../index';
+import { analyzeCode, simulate } from '../index';
 import { samples } from '../../data';
 
 const run = (code: string) => simulate(code);
@@ -413,5 +413,47 @@ int main() {
 }`);
     expect(r.ok, r.error?.message).toBe(true);
     expect(r.output).toBe('ok\n');
+  });
+});
+
+describe('simulate：new 出来的指针数组', () => {
+  const FULL = (cout: string, cleanup: string): string => `
+#include <iostream>
+class HAR {
+public:
+  int x, y;
+  HAR* p;
+};
+int main() {
+  HAR** h = new HAR*[2];
+  for (int i = 0; i < 2; ++i) {
+    h[i] = new HAR;
+  }
+  h[0]->x = 1;
+  h[0]->y = 2;
+  h[1]->x = 3;
+  h[1]->y = 4;
+  h[0]->p = h[1];
+  h[1]->p = h[0];
+  std::cout << ${cout} << std::endl;
+  ${cleanup}
+  return 0;
+}`;
+
+  it('HAR** h = new HAR*[2] 可以逐项 new 后再链式 -> 访问', () => {
+    const r = run(FULL('(h[0]->p)->x << " " << (h[1]->p)->y', 'delete h[0];\n  delete h[1];'));
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('3 2\n');
+  });
+
+  it('delete[] 释放指针数组本身', () => {
+    const r = run(FULL('h[0]->x', 'delete h[0];\n  delete h[1];\n  delete[] h;'));
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1\n');
+  });
+
+  it('不再对 new HAR*[2] 误报「这里需要 {」', () => {
+    const a = analyzeCode(FULL('h[0]->x', 'delete h[0];\n  delete h[1];\n  delete[] h;'));
+    expect(a.diagnostics.filter((d) => d.severity === 'error')).toHaveLength(0);
   });
 });

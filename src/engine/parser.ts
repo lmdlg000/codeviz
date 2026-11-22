@@ -1975,7 +1975,14 @@ export class Parser {
     if (tok.text === 'new') {
       this.advance();
       const spec = this.parseTypePart(emptyQuals());
-      const typeText = spec ? spec.text : 'int';
+      let typeText = spec ? spec.text : 'int';
+      // `new HAR*[2]`：parseTypePart 只吃到 HAR，星号要在这里收进类型，
+      // 否则剩下的 `*[2]` 会被当成新语句，报出「这里需要 {」这种误导性诊断。
+      while (this.check('*')) {
+        this.advance();
+        typeText += '*';
+        while (this.check('const') || this.check('volatile')) this.advance();
+      }
       let arraySize: ExprNode | undefined;
       if (this.check('[')) {
         this.advance();

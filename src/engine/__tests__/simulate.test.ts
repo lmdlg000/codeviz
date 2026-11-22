@@ -942,3 +942,28 @@ int main() {
     expect(r.output).toBe('101\n');
   });
 });
+
+describe('simulate：语法错误不能被静默跳过', () => {
+  it('括号不闭合时直接报语法错误，而不是跑完剩余语句却不输出', () => {
+    const result = simulate(`#include <iostream>
+int main() {
+  int x = 1;
+  std::cout << ((x) << std::endl;
+  return 0;
+}
+`);
+    expect(result.ok).toBe(false);
+    expect(result.error?.kind).toBe('syntax');
+    expect(result.error?.line).toBe(4);
+    expect(result.error?.message).toContain('语法错误');
+    expect(result.output).toBe('');
+  });
+
+  it('正常代码不受影响', () => {
+    const result = simulate(`#include <iostream>
+int main() { std::cout << "ok" << std::endl; return 0; }
+`);
+    expect(result.ok).toBe(true);
+    expect(result.output).toBe('ok\n');
+  });
+});

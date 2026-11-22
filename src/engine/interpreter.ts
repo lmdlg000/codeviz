@@ -3124,8 +3124,12 @@ class Interpreter {
     const safeLength = Math.max(1, length);
     const base = lastSegment(elemType);
     const cls = this.classMap.get(base);
-    const makeDefault = (): RValue =>
-      cls ? this.createStructValue(cls.name, undefined) : this.defaultScalar(base, elemType);
+    const makeDefault = (): RValue => {
+      // `new HAR*[2]` 的元素是空指针，不是整数 0；否则 h[0] = new HAR 之前的
+      // h[0]->x 会把 int0 当对象解引用，和真实 C++ 的行为对不上。
+      if (isPointerType(elemType)) return nullValue();
+      return cls ? this.createStructValue(cls.name, undefined) : this.defaultScalar(base, elemType);
+    };
     const elems: RValue[] = [];
     for (let i = 0; i < safeLength; i++) elems.push(makeDefault());
 
@@ -3164,7 +3168,9 @@ class Interpreter {
   /** new T / new T(初值) / new T[n] */
   private evalNew(expr: ExprNode & { kind: 'new' }): RValue {
     const rawType = (expr.typeText || 'int').replace(/\s+/g, '');
-    const elemType = this.concretizeType(baseTypeName(rawType), rawType);
+    // concretizeType 只认模板实参、会丢掉尾部的 *，`new HAR*[2]` 要多带回来
+    const stars = rawType.match(/\*+$/)?.[0] ?? '';
+    const elemType = this.concretizeType(baseTypeName(rawType), rawType) + stars;
     const isArray = Boolean(expr.arraySize);
 
     let length = 1;
