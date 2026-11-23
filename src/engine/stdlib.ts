@@ -130,6 +130,8 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
       trace('free', 'void free(void *p)', '释放 malloc / calloc 的内存；与 new 混用是未定义行为。'),
       stat('realloc', 'void *realloc(void *p, size_t size)', '重新分配大小，可能搬移内存，旧指针失效。'),
       stat('qsort', 'void qsort(void *base, size_t n, size_t size, cmp)', '通用排序，需配合函数指针。'),
+      trace('exit', 'void exit(int status)', '立即结束整个程序；单步执行会停在调用处，保留此前输出。'),
+      trace('abort', 'void abort(void)', '异常终止程序；单步执行会停在调用处，保留此前输出。'),
     ],
   },
   {

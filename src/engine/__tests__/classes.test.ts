@@ -457,3 +457,104 @@ int main() {
     expect(a.diagnostics.filter((d) => d.severity === 'error')).toHaveLength(0);
   });
 });
+
+describe('simulate：C 风格链表（malloc + 二级指针形参）', () => {
+  const LIST_CODE = `#include <stdio.h>
+#include <stdlib.h>
+struct node {
+  int x;
+  struct node *next;
+};
+struct node *loop(struct node *head, int dir) {
+  struct node *p1, *p2;
+  p1 = head;
+  if (p1 == NULL || p1->next == NULL) return head;
+  if (dir >= 0) {
+    while (p1->next != NULL) { p2 = p1; p1 = p1->next; }
+    p2->next = NULL;
+    p1->next = head;
+    head = p1;
+  } else {
+    p1 = head;
+    head = head->next;
+    p2 = head;
+    while (p2->next != NULL) { p2 = p2->next; }
+    p2->next = p1;
+    p1->next = NULL;
+  }
+  return head;
+}
+struct node* createNode(int value) {
+  struct node* p = (struct node*)malloc(sizeof(struct node));
+  if (p == NULL) { printf("alloc failed\\n"); exit(1); }
+  p->x = value;
+  p->next = NULL;
+  return p;
+}
+void appendNode(struct node** head, int value) {
+  struct node* p = createNode(value);
+  if (*head == NULL) { *head = p; return; }
+  struct node* temp = *head;
+  while (temp->next != NULL) temp = temp->next;
+  temp->next = p;
+}
+void printList(struct node* head) {
+  printf("head->");
+  while (head != NULL) {
+    printf("%d", head->x);
+    if (head->next != NULL) printf("->");
+    head = head->next;
+  }
+  printf("\\n");
+}
+void freeList(struct node* head) {
+  while (head != NULL) { struct node* t = head; head = head->next; free(t); }
+}
+int main() {
+  struct node* head = NULL;
+  appendNode(&head, 1);
+  appendNode(&head, 3);
+  appendNode(&head, 5);
+  appendNode(&head, 4);
+  printList(head);
+  head = loop(head, 1);
+  printList(head);
+  head = loop(head, -1);
+  printList(head);
+  head = loop(head, -1);
+  printList(head);
+  freeList(head);
+  return 0;
+}`;
+
+  it('struct node *loop(...) 不再误判为类型定义', () => {
+    const a = analyzeCode(LIST_CODE);
+    expect(a.diagnostics.filter((d) => d.severity === 'error')).toHaveLength(0);
+  });
+
+  it('循环右移 / 左移输出正确且无内存泄漏', () => {
+    const r = run(LIST_CODE);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe(
+      'head->1->3->5->4\nhead->4->1->3->5\nhead->1->3->5->4\nhead->3->5->4->1\n',
+    );
+    expect(r.heapIssues).toHaveLength(0);
+  });
+
+  it('exit(1) 立即结束程序，保留此前输出', () => {
+    const r = run(`
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+  printf("before\\n");
+  exit(3);
+  printf("after\\n");
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('before\n');
+    expect(r.interpreterNote).toContain('退出码 3');
+    expect(r.steps.at(-1)?.description).toContain('exit');
+  });
+});

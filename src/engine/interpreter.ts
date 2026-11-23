@@ -99,6 +99,18 @@ class OpsLimitError extends Error {
   }
 }
 
+/** exit() / abort()：整个程序提前结束，不是执行错误 */
+class ExitProcessError extends Error {
+  readonly code: number;
+  readonly line: number;
+  constructor(code: number, line: number) {
+    super('process exit');
+    this.name = 'ExitProcessError';
+    this.code = code;
+    this.line = line;
+  }
+}
+
 interface Slot {
   name: string;
   value: RValue;
@@ -732,6 +744,16 @@ class Interpreter {
       this.finishEnd(false);
       return this.successResult();
     } catch (error) {
+      if (error instanceof ExitProcessError) {
+        this.emit(
+          { event: 'step', description: `调用 ${error.code === 134 ? 'abort' : 'exit'}，程序提前结束`, line: error.line },
+          true,
+        );
+        this.finishEnd(false, `程序调用 ${error.code === 134 ? 'abort' : 'exit'} 提前结束`);
+        const result = this.successResult();
+        result.interpreterNote = `程序在退出码 ${error.code} 处提前结束，此前输出已保留。`;
+        return result;
+      }
       if (error instanceof StepLimitError) {
         this.truncated = true;
         this.finishEnd(true);
@@ -824,16 +846,18 @@ class Interpreter {
     }
   }
 
-  private finishEnd(aborted: boolean): void {
+  private finishEnd(aborted: boolean, description?: string): void {
     if (this.steps.length > 0 && this.steps[this.steps.length - 1].event === 'end') return;
     this.emit(
       {
         event: 'end',
-        description: aborted
-          ? this.truncated
-            ? `已达到步数 / 次数上限（最多 ${this.stepLimit} 步），追踪提前结束。`
-            : '执行因错误提前结束。'
-          : '程序执行结束',
+        description:
+          description ??
+          (aborted
+            ? this.truncated
+              ? `已达到步数 / 次数上限（最多 ${this.stepLimit} 步），追踪提前结束。`
+              : '执行因错误提前结束。'
+            : '程序执行结束'),
         line: this.currentLine,
       },
       true,
@@ -3100,7 +3124,10 @@ class Interpreter {
       }
       if (name === 'swap') return this.builtinSwap(expr);
       if (name === 'iter_swap') return this.builtinSwap(expr, true);
-      if (name === 'exit' || name === 'abort') throw new SimError(`函数 ${name}() 暂不支持单步执行。`, expr.line, 'unsupported');
+      if (name === 'exit' || name === 'abort') {
+        const code = name === 'exit' && expr.args[0] ? asInt(this.evalExpr(expr.args[0])) : 134;
+        throw new ExitProcessError(code, expr.line);
+      }
       throw new SimError(`调用了源码中没有定义的函数 ${name}()。`, expr.line, 'unsupported');
     }
     // 类外定义的成员函数（BigInt::alloc 这种）沿用当前 this
@@ -3477,6 +3504,12 @@ class Interpreter {
     }
 
     const arg = expr.args[0];
+    // malloc(sizeof(struct node))：直接按 sizeof 的类型分配一个对象，
+    // 否则会退化成「16 个 char」，强转成 struct node* 后 ->x 就读不到字段。
+    if (arg && arg.kind === 'sizeof') {
+      const type = sizeofTypeOf(arg);
+      if (type) return { elemType: baseTypeName(type), length: 1 };
+    }
     if (arg && arg.kind === 'binary' && arg.op === '*') {
       const rightType = sizeofTypeOf(arg.right);
       if (rightType) {

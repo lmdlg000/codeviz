@@ -575,7 +575,9 @@ export class Parser {
       const token = this.peek(j);
       if (token.kind === 'eof') return false;
       if (token.text === '{') return true;
-      if (token.text === ';' || token.text === '=') return false;
+      // `struct node *loop(struct node *head) {`：参数表的 ( 先于函数体 { 出现，
+      // 这是函数定义，不是类型定义。不拦的话会按 struct 定义解析并在 * 处报错。
+      if (token.text === '(' || token.text === ';' || token.text === '=') return false;
     }
     return false;
   }
