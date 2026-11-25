@@ -791,3 +791,111 @@ int main() {
     expect(r.error?.kind).toBe('unsupported');
   });
 });
+
+describe('simulate：ostream 格式化与字符串流', () => {
+  it('for 里的 std::set<long long>::iterator 声明不再报「需要 ;」', () => {
+    const r = run(`
+#include <iostream>
+#include <set>
+int main() {
+  std::set<long long> s;
+  s.insert(2);
+  s.insert(1);
+  for (std::set<long long>::iterator it = s.begin(); it != s.end(); ++it)
+    std::cout << *it;
+  std::cout << std::endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('12\n');
+  });
+
+  it('setw 与 left 生效，setw 只作用于紧随其后的输出', () => {
+    const r = run(`
+#include <iostream>
+#include <iomanip>
+using namespace std;
+int main() {
+  cout << left << setw(6) << "n = 3" << "X" << endl;
+  cout << setw(6) << 42 << "Y" << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('n = 3 X\n42    Y\n');
+  });
+
+  it('ostringstream 的 << 追加与 str() 取值', () => {
+    const r = run(`
+#include <iostream>
+#include <sstream>
+using namespace std;
+int main() {
+  ostringstream nums;
+  for (int i = 1; i <= 3; ++i) {
+    if (i > 1) nums << ' ';
+    nums << i;
+  }
+  cout << nums.str() << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('1 2 3\n');
+  });
+
+  it('Randel / Armstrong 程序能跑出 n=3 的结果（后续受 20000 步上限截断）', () => {
+    const r = run(`
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <set>
+using namespace std;
+static int gN;
+static int gCnt[10];
+static long long gPow[10];
+static set<long long> gFound;
+bool MatchMultiset(long long s) {
+  int c[10] = { 0 };
+  int len = 0;
+  while (s > 0) { c[s % 10]++; s /= 10; len++; }
+  if (len != gN) return false;
+  for (int d = 0; d <= 9; d++) if (c[d] != gCnt[d]) return false;
+  return true;
+}
+void Search(int digit, int remaining) {
+  if (remaining == 0) {
+    long long s = 0;
+    for (int d = 0; d <= 9; d++) s += (long long)gCnt[d] * gPow[d];
+    if (MatchMultiset(s)) gFound.insert(s);
+    return;
+  }
+  if (digit == 0) { gCnt[0] = remaining; Search(-1, 0); gCnt[0] = 0; return; }
+  for (int k = remaining; k >= 0; --k) { gCnt[digit] = k; Search(digit - 1, remaining - k); }
+  gCnt[digit] = 0;
+}
+int main() {
+  int n = 3;
+  gN = n;
+  for (int i = 0; i <= 9; i++) {
+    gPow[i] = 1;
+    for (int e = 0; e < n; e++) gPow[i] *= i;
+  }
+  Search(9, n);
+  ostringstream nums;
+  int m = 0;
+  for (set<long long>::iterator it = gFound.begin(); it != gFound.end(); ++it) {
+    if (m > 0) nums << ' ';
+    nums << *it;
+    m++;
+  }
+  cout << nums.str() << " Total: " << m << endl;
+  return 0;
+}
+`);
+    expect(r.ok, r.error?.message).toBe(true);
+    expect(r.output).toBe('153 370 371 407 Total: 4\n');
+  });
+});

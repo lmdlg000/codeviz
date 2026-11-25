@@ -2336,7 +2336,19 @@ export class Parser {
       i += 2;
     }
     if (sawQualified) {
-      if (this.peek(i).text === '<') i = this.skipBalancedIndex(i, '<', '>');
+      // std::set<long long>::iterator it：模板实参后面还能再接 :: 限定，
+      // 原来跳完 <...> 就停，看到 :: 直接判成表达式，for 里就报「需要 ;」。
+      for (;;) {
+        if (this.peek(i).text === '<') {
+          i = this.skipBalancedIndex(i, '<', '>');
+          continue;
+        }
+        if (this.peek(i).text === '::') {
+          i += 2;
+          continue;
+        }
+        break;
+      }
       return this.peek(i).kind === 'ident';
     }
 
@@ -2350,8 +2362,20 @@ export class Parser {
       }
       return false;
     }
-    if (next.text === '<') {
-      const after = this.skipBalancedIndex(1, '<', '>');
+    if (next.text === '<' || next.text === '::') {
+      let after = 1;
+      // 模板实参后可能还有 ::iterator 这类限定，要一路跳到真正的变量名
+      for (;;) {
+        if (this.peek(after).text === '<') {
+          after = this.skipBalancedIndex(after, '<', '>');
+          continue;
+        }
+        if (this.peek(after).text === '::') {
+          after += 2;
+          continue;
+        }
+        break;
+      }
       return this.peek(after).kind === 'ident';
     }
     return false;

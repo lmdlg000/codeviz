@@ -676,6 +676,8 @@ class Interpreter {
   private heapCache: HeapBlockSnapshot[] | undefined;
   /** 执行 operator<< 时，把 os << x 的文本收集到这里 */
   private captureSink: string[] | null = null;
+  /** std::left 一经设置就一直有效（与真实 ostream 一致） */
+  private streamLeftAlign = false;
   /**
    * 表达式产生的临时类对象（函数按值返回 / 类名当构造函数用）。
    * C++ 里它们的生命周期到「完整表达式」结束，这里用语句边界近似：
@@ -1553,18 +1555,24 @@ class Interpreter {
       const value = this.evalExpr(declarator.init);
       return this.coercePointer(value, base);
     }
+    // `static set<long long> g;` 这类声明要把前置限定去掉再认容器类型
+    const containerType = typeText.replace(/^(?:static|const|extern|register|mutable|volatile)\s+/, '');
     // std::vector<T> 用动态数组承载：push_back / size / begin / end 都能逐步看到
-    const vectorElem = vectorElemType(typeText);
+    const vectorElem = vectorElemType(containerType);
     if (vectorElem) return this.createVectorValue(vectorElem, declarator.init, typeText);
     // 关联容器 / 容器适配器 / pair
-    const assoc = assocTypeOf(typeText);
+    const assoc = assocTypeOf(containerType);
     if (assoc) return this.createMapValue(assoc, declarator.init, typeText);
-    const adapter = adapterTypeOf(typeText);
+    const adapter = adapterTypeOf(containerType);
     if (adapter) {
       return this.createAdapterValue(adapter.adapter, adapter.elemType, declarator.init, typeText);
     }
-    const pairTypes = pairTypeOf(typeText);
+    const pairTypes = pairTypeOf(containerType);
     if (pairTypes) return this.createPairValue(pairTypes.first, pairTypes.second, declarator.init, typeText);
+    // ostringstream 用字符串承载：<< 追加，str() 取回
+    if (/ostringstream|stringstream/i.test(typeText)) {
+      return stringValue('', typeText);
+    }
     if (isStringType(base) && !isPointerType(typeText)) {
       if (!declarator.init) return stringValue('', base);
       return coerceValue(this.evalExpr(declarator.init), typeText);
@@ -2642,6 +2650,16 @@ class Interpreter {
     if (expr.op === '<<') {
       const { base } = flattenBinaryChain(expr, '<<');
       if (/(^|::)cout$/.test(rootName(base))) return this.execCout(expr);
+      // ostringstream << x：把内容追加到字符串流变量
+      if (expr.left.kind === 'ident' && this.hasSlot(expr.left.name)) {
+        const target = this.lookupSlot(expr.left.name, expr.line);
+        if (/ostringstream|stringstream/i.test(target.typeText)) {
+          const right = this.evalExpr(expr.right);
+          const appended = stringValue(this.toText(target.value) + this.toText(right), target.typeText);
+          target.ref.set(appended);
+          return appended;
+        }
+      }
       // 正在执行 operator<< 里的 os << x：os 是形参，求值为 void
       if (this.captureSink) {
         const leftValue = this.evalExpr(expr.left);
@@ -2902,6 +2920,10 @@ class Interpreter {
         this.printOutput(`${text}\n`, expr.line);
         return intValue(0);
       }
+      case 'setw':
+        return intValue(expr.args[0] ? Math.max(0, asInt(this.evalExpr(expr.args[0]))) : 0);
+      case 'left':
+        return voidValue();
       case 'putchar': {
         const value = expr.args[0] ? this.evalExpr(expr.args[0]) : intValue(0);
         this.printOutput(String.fromCharCode(asInt(value)), expr.line);
@@ -3851,7 +3873,7 @@ class Interpreter {
       if (method === 'begin') return this.vectorIterator(object, 0, expr.line);
       if (method === 'end') return this.vectorIterator(object, object.elems.length, expr.line);
     }
-    if (method === 'c_str' && object.t === 'string') return object;
+    if ((method === 'c_str' || method === 'str') && object.t === 'string') return object;
     // `at` 是容器 / 字符串的下标访问；用户类里自己写的 at() 走下面的方法分派
     if (method === 'at' && expr.args[0] && object.t !== 'struct') {
       const index = asInt(this.evalExpr(expr.args[0]));
@@ -4225,6 +4247,17 @@ class Interpreter {
   private execCout(expr: ExprNode & { kind: 'binary' }): RValue {
     const { items } = flattenBinaryChain(expr, '<<');
     let chunk = '';
+    let width = 0;
+    const appendPadded = (text: string): void => {
+      const pad = Math.max(0, width - Array.from(text).length);
+      width = 0; // setw 只作用于紧随其后的那一次输出
+      if (pad === 0) {
+        chunk += text;
+        return;
+      }
+      const spaces = ' '.repeat(pad);
+      chunk += this.streamLeftAlign ? text + spaces : spaces + text;
+    };
     for (const item of items) {
       if (item.kind === 'ident' && item.name === 'endl') {
         chunk += '\n';
@@ -4234,16 +4267,27 @@ class Interpreter {
         chunk += '\n';
         continue;
       }
+      if (
+        (item.kind === 'member' && item.op === '::' && item.name === 'left') ||
+        (item.kind === 'ident' && item.name === 'left')
+      ) {
+        this.streamLeftAlign = true;
+        continue;
+      }
+      if (item.kind === 'call' && /(^|::)setw$/.test(item.name ?? '')) {
+        width = item.args[0] ? Math.max(0, asInt(this.evalExpr(item.args[0]))) : 0;
+        continue;
+      }
       const value = this.evalExpr(item);
       if (value.t === 'void') continue;
       if (value.t === 'struct') {
         const text = this.runStreamOperator(value, expr.line);
         if (text !== null) {
-          chunk += text;
+          appendPadded(text);
           continue;
         }
       }
-      chunk += this.toText(value);
+      appendPadded(this.toText(value));
     }
     this.printOutput(chunk, expr.line);
     return intValue(0);
