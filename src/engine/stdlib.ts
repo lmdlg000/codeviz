@@ -161,6 +161,7 @@ export const STDLIB_GROUPS: StdlibGroup[] = [
       trace('stoi', 'int stoi(const std::string &s)', '字符串转 int，非法输入会抛异常。'),
       trace('to_string', 'std::to_string(x)', '数值转字符串。'),
       trace('ostringstream', 'std::ostringstream oss;', '内存里的字符串流：用 << 拼接，str() 取出结果。'),
+      trace('str', 'oss.str()', '取出 ostringstream 里已经拼好的字符串。'),
       stat('substr', 's.substr(pos, len)', '取子串，pos 越界会抛异常。'),
       stat('find', 's.find("x")', '找不到时返回 std::string::npos。'),
       stat('push_back', 's.push_back(c)', '尾部追加一个字符。'),

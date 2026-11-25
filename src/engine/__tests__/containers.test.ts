@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { simulate } from '../index';
+import { analyzeCode, simulate } from '../index';
 
 const run = (code: string) => simulate(code);
 
@@ -789,6 +789,23 @@ int main() {
     expect(r.ok).toBe(false);
     expect(r.error?.message).toContain('iter_swap()');
     expect(r.error?.kind).toBe('unsupported');
+  });
+});
+
+describe('诊断：标准库函数不应报未定义', () => {
+  it('setw / str 等来自覆盖表的函数不再误报', () => {
+    const a = analyzeCode(`#include <iostream>
+#include <iomanip>
+#include <sstream>
+using namespace std;
+int main() {
+  ostringstream s;
+  s << setw(4) << 1;
+  cout << s.str() << endl;
+  return 0;
+}
+`);
+    expect(a.diagnostics.filter((d) => d.rule === 'undefined-function')).toHaveLength(0);
   });
 });
 

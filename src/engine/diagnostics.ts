@@ -14,6 +14,7 @@ import { collectExprs, walkExpr, walkStmt } from './ast';
 import type { ExprNode } from './ast';
 import type { LexIssue } from './tokenizer';
 import { parseFormat, printfArgCount, scanfNeedsAddress } from './io';
+import { STDLIB_ALL_NAMES } from './stdlib';
 import { truncateText } from './utils';
 
 export interface DiagnosticInput {
@@ -383,7 +384,8 @@ export function buildDiagnostics(input: DiagnosticInput): Diagnostic[] {
     for (const call of record.calls) {
       const name = call.callee;
       if (!name || reportedCalls.has(name)) continue;
-      if (knownFunctionNames.has(name) || STD_FUNCTION_NAMES.has(name)) continue;
+      // stdlib.ts 是标准库覆盖表的唯一事实来源；别再靠这里的旧名单误报
+      if (knownFunctionNames.has(name) || STD_FUNCTION_NAMES.has(name) || STDLIB_ALL_NAMES.has(name)) continue;
       // 函数式类型转换：char('0' + x)、int(f)、double(v) 都是内置类型名，不是函数调用
       if (CAST_LIKE_NAMES.has(name)) continue;
       reportedCalls.add(name);
